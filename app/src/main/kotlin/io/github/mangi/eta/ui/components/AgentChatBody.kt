@@ -109,6 +109,13 @@ import kotlinx.coroutines.launch
 import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.IconButtonDefaults
+import io.github.mangi.eta.ui.app.LocalBlurEnabled
+import io.github.mangi.eta.ui.app.LocalChatHazeState
+import io.github.mangi.eta.ui.app.glassHazeSource
+import dev.chrisbanes.haze.HazeState
+import io.github.mangi.eta.ui.app.GlassInputBarBottomMargin
+import io.github.mangi.eta.ui.app.GlassInputBarHorizontalMargin
+import io.github.mangi.eta.ui.app.rememberGlassHazeState
 import top.yukonga.miuix.kmp.basic.Scaffold
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.blur.BlendColorEntry
@@ -355,12 +362,18 @@ private fun AgentChatScaffold(
 ) {
     val surfaceColor = MiuixTheme.colorScheme.surface
     val frostEnabled = hasMessages && LocalBlurEnabled.current && isRuntimeShaderSupported()
+    // Haze v2：聊天界面的真实背景模糊。hazeState 在顶层创建，消息列表是模糊源，
+    // 输入栏/气泡是玻璃。
+    val chatHazeState = rememberGlassHazeState()
     val messageBackdrop = rememberLayerBackdrop {
         // Backdrop 必须包含不透明底色，否则文字边缘模糊到透明区域时会出现黑边。
         drawRect(surfaceColor)
         drawContent()
     }
 
+    androidx.compose.runtime.CompositionLocalProvider(
+        LocalChatHazeState provides chatHazeState.takeIf { frostEnabled },
+    ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
         containerColor = Color.Transparent,
@@ -373,6 +386,7 @@ private fun AgentChatScaffold(
         bottomBar = {
             AgentChatBottomBar(
                 messageBackdrop = messageBackdrop.takeIf { frostEnabled },
+                hazeState = chatHazeState.takeIf { frostEnabled },
                 input = input,
                 modelPickerState = modelPickerState,
                 isCompacting = isCompacting,
@@ -440,10 +454,12 @@ private fun AgentChatScaffold(
                 onHistoryViewportChanged = onHistoryViewportChanged,
                 modifier = Modifier
                     .fillMaxSize()
+                    .glassHazeSource(chatHazeState, frostEnabled)
                     .then(if (frostEnabled) Modifier.layerBackdrop(messageBackdrop) else Modifier),
             )
         }
     }
+    } // CompositionLocalProvider(LocalChatHazeState)
 }
 
 @Composable
@@ -992,6 +1008,7 @@ internal fun resolveFinalResultMessageIds(
 @Composable
 private fun AgentChatBottomBar(
     messageBackdrop: LayerBackdrop?,
+    hazeState: HazeState?,
     input: String,
     modelPickerState: AgentModelPickerUiState,
     isCompacting: Boolean,
@@ -1023,64 +1040,19 @@ private fun AgentChatBottomBar(
     onRemoveFileReference: (String) -> Unit,
     onCancelMessageEdit: () -> Unit,
 ) {
+    // iOS 风格悬浮底栏：整栏悬浮不贴边，左右 16.dp、底部 12.dp 留白，
+    // 背景由输入框自身的 Haze 毛玻璃提供，这里不再画实色底。
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .imePadding(),
+            .imePadding()
+            .navigationBarsPadding()
+            .padding(
+                start = GlassInputBarHorizontalMargin,
+                end = GlassInputBarHorizontalMargin,
+                bottom = GlassInputBarBottomMargin,
+            ),
     ) {
-        if (messageBackdrop != null) {
-            val blurColors = BlurDefaults.blurColors(
-                blendColors = listOf(
-                    BlendColorEntry(MiuixTheme.colorScheme.surface.copy(alpha = 0.72f))
-                ),
-            )
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(ChatBottomFrostHeight)
-                    // DstIn 让真实磨砂在顶部透明、靠近输入框时逐渐变实，消除硬裁切线。
-                    .graphicsLayer {
-                        compositingStrategy = CompositingStrategy.Offscreen
-                    }
-                    .drawWithContent {
-                        drawContent()
-                        drawRect(
-                            brush = Brush.verticalGradient(
-                                colors = listOf(Color.Transparent, Color.Black),
-                            ),
-                            blendMode = BlendMode.DstIn,
-                        )
-                    }
-                    .textureBlur(
-                        backdrop = messageBackdrop,
-                        shape = RectangleShape,
-                        blurRadius = 20f,
-                        colors = blurColors,
-                    ),
-            )
-        } else {
-            // 空白主页沿用原来的轻微渐隐，不改变主页视觉。
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(16.dp)
-                    .background(
-                        Brush.verticalGradient(
-                            colors = listOf(
-                                Color.Transparent,
-                                MiuixTheme.colorScheme.surface,
-                            ),
-                        )
-                    ),
-            )
-        }
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(MiuixTheme.colorScheme.surface)
-                .navigationBarsPadding()
-                .padding(start = 16.dp, end = 16.dp, bottom = 12.dp),
-        ) {
             AgentChatInputBar(
                 input = input,
                 modelPickerState = modelPickerState,
@@ -1114,9 +1086,9 @@ private fun AgentChatBottomBar(
                 onAttachFilePath = onAttachFilePath,
                 onRemoveFileReference = onRemoveFileReference,
                 onCancelMessageEdit = onCancelMessageEdit,
+                hazeState = hazeState,
                 modifier = Modifier.fillMaxWidth(),
             )
-        }
     }
 }
 

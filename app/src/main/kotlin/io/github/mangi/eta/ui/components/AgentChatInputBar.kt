@@ -49,6 +49,9 @@ import androidx.compose.material.icons.rounded.ArrowUpward
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Stop
 import androidx.compose.runtime.Composable
+import dev.chrisbanes.haze.HazeState
+import io.github.mangi.eta.ui.app.LocalBlurEnabled
+import io.github.mangi.eta.ui.app.glassHaze
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -145,6 +148,7 @@ internal fun AgentChatInputBar(
     onAttachFilePath: (String) -> Unit,
     onRemoveFileReference: (String) -> Unit,
     onCancelMessageEdit: () -> Unit,
+    hazeState: HazeState? = null,
     modifier: Modifier = Modifier,
 ) {
     val keyboard = LocalSoftwareKeyboardController.current
@@ -259,20 +263,34 @@ internal fun AgentChatInputBar(
                     inputContainerTopPx = coordinates.positionInWindow().y.roundToInt()
                 },
         ) {
+            // iOS 风格悬浮输入框：Haze 真实背景模糊 + 半透明底色 + 描边 + 阴影。
+            // 模糊关闭时回退为原来的 squircleSurface 实色底。
+            val blurOn = LocalBlurEnabled.current && hazeState != null
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .dropShadow(
                         shape = InputContainerShape,
                         shadow = Shadow(
-                            radius = 8.dp,
+                            radius = 12.dp,
                             color = Color.Black,
-                            alpha = 0.08f,
+                            alpha = 0.12f,
                         ),
                     )
-                    .squircleSurface(
-                        color = MiuixTheme.colorScheme.surfaceContainer,
-                        cornerRadius = 20.dp,
+                    .then(
+                        if (blurOn) {
+                            Modifier
+                                .glassHaze(hazeState, blurEnabled = true, cornerRadius = 20.dp)
+                                .background(
+                                    MiuixTheme.colorScheme.surfaceContainer.copy(alpha = 0.55f),
+                                    InputContainerShape,
+                                )
+                        } else {
+                            Modifier.squircleSurface(
+                                color = MiuixTheme.colorScheme.surfaceContainer,
+                                cornerRadius = 20.dp,
+                            )
+                        }
                     )
                     .squircleBorder(
                         width = 0.5.dp,

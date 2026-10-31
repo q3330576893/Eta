@@ -113,6 +113,9 @@ import top.yukonga.miuix.kmp.basic.TooltipBox
 import top.yukonga.miuix.kmp.basic.TooltipDefaults
 import top.yukonga.miuix.kmp.basic.rememberTooltipState
 import top.yukonga.miuix.kmp.squircle.squircleBorder
+import io.github.mangi.eta.ui.app.LocalBlurEnabled
+import io.github.mangi.eta.ui.app.LocalChatHazeState
+import io.github.mangi.eta.ui.app.glassHaze
 import top.yukonga.miuix.kmp.squircle.squircleSurface
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 
@@ -316,6 +319,9 @@ private fun UserMessageBubble(
     } else {
         Color(0xFFE5E7EA)
     }
+    // Haze：用户气泡背景模糊，玻璃感。只在主聊天（非 overlay）启用。
+    val bubbleHazeState = LocalChatHazeState.current.takeIf { !assistantOverlay }
+    val bubbleBlurOn = LocalBlurEnabled.current && bubbleHazeState != null
 
     Row(
         modifier = modifier
@@ -382,6 +388,11 @@ private fun UserMessageBubble(
                                 bottomStart = 20.dp,
                             )
                         }
+                    )
+                    // 用户气泡 Haze 毛玻璃：模糊身后的聊天背景
+                    .then(
+                        if (bubbleBlurOn) Modifier.glassHaze(bubbleHazeState, blurEnabled = true, cornerRadius = 18.dp)
+                        else Modifier
                     )
                     .then(
                         if (isEditing) {

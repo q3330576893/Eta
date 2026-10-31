@@ -51,6 +51,12 @@ import io.github.mangi.eta.ui.components.CharacterAvatar
 import io.github.mangi.eta.ui.components.ConversationSidePaneScaffold
 import io.github.mangi.eta.ui.components.MiuixBackButton
 import io.github.mangi.eta.ui.components.RoleplayChatUi
+import androidx.compose.foundation.layout.Box
+import dev.chrisbanes.haze.HazeState
+import io.github.mangi.eta.ui.app.LocalBlurEnabled
+import io.github.mangi.eta.ui.app.glassHaze
+import io.github.mangi.eta.ui.app.glassHazeSource
+import io.github.mangi.eta.ui.app.rememberGlassHazeState
 import io.github.mangi.eta.ui.components.TopBarBackdrop
 import io.github.mangi.eta.ui.components.captureForTopBar
 import io.github.mangi.eta.ui.components.rememberTopBarBackdrop
@@ -117,6 +123,9 @@ internal fun AgentAppShell(
     val scrollBehavior = MiuixScrollBehavior()
     val backdrop = rememberTopBarBackdrop()
     val topBarColor = topBarContainerColor(backdrop)
+    // Haze v2：顶栏真实背景模糊，与 Miuix TopBarBackdrop 共存（Haze 做模糊，Miuix 做染色）。
+    val topBarHazeState: HazeState = rememberGlassHazeState()
+    val topBarBlurOn = LocalBlurEnabled.current
     val pageContent: @Composable () -> Unit = {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
@@ -125,6 +134,9 @@ internal fun AgentAppShell(
             ),
             topBar = {
                 if (currentRoute !is AppRoute.Settings) {
+                    Box(
+                        modifier = Modifier.glassHaze(topBarHazeState, topBarBlurOn, cornerRadius = 0.dp),
+                    ) {
                     TopBarBackdrop(backdrop) {
                         AgentTopBar(
                             route = currentRoute,
@@ -144,6 +156,7 @@ internal fun AgentAppShell(
                             onOpenCharacter = onOpenCharacter,
                         )
                     }
+                    } // Box(glassHaze)
                 }
             },
         ) { padding ->
@@ -151,6 +164,7 @@ internal fun AgentAppShell(
                 modifier = Modifier
                     .fillMaxSize()
                     .captureForTopBar(backdrop)
+                    .glassHazeSource(topBarHazeState, topBarBlurOn)
                     .nestedScroll(scrollBehavior.nestedScrollConnection),
             ) {
                 content(padding)
