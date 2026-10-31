@@ -110,7 +110,6 @@ import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.IconButtonDefaults
 import io.github.mangi.eta.ui.app.LocalBlurEnabled
-import io.github.mangi.eta.ui.app.LocalChatBackdrop
 import io.github.mangi.eta.ui.app.GlassInputBarBottomMargin
 import io.github.mangi.eta.ui.app.GlassInputBarHorizontalMargin
 import top.yukonga.miuix.kmp.basic.Scaffold
@@ -120,6 +119,7 @@ import top.yukonga.miuix.kmp.blur.BlurDefaults
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 import top.yukonga.miuix.kmp.blur.isRuntimeShaderSupported
 import top.yukonga.miuix.kmp.blur.layerBackdrop
+import top.yukonga.miuix.kmp.blur.rememberLayerBackdrop
 import top.yukonga.miuix.kmp.blur.textureBlur
 import top.yukonga.miuix.kmp.squircle.squircleBorder
 import top.yukonga.miuix.kmp.squircle.squircleSurface
@@ -356,13 +356,15 @@ private fun AgentChatScaffold(
     onHistoryViewportChanged: (Boolean) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val surfaceColor = MiuixTheme.colorScheme.surface
     val frostEnabled = hasMessages && LocalBlurEnabled.current && isRuntimeShaderSupported()
-    // v3.1 白闪修复：backdrop 改由 AgentAppShell 在顶层创建，经 LocalChatBackdrop 下发，
-    // 这里只取用不创建。之前在此处 rememberLayerBackdrop，每次页面导航都会重建 backdrop，
-    // 重建第一帧还没 capture 到背景内容，先显示 drawRect 的不透明底色，造成白闪。
-    // 提升到 Shell 层后只创建一次，导航时复用，白闪消失。
+    // v3：Miuix backdrop 做聊天界面的真实背景模糊。messageBackdrop 在顶层创建，
     // 消息列表是模糊源（layerBackdrop），输入栏是玻璃（textureBlur）。
-    val messageBackdrop = LocalChatBackdrop.current
+    val messageBackdrop = rememberLayerBackdrop {
+        // Backdrop 必须包含不透明底色，否则文字边缘模糊到透明区域时会出现黑边。
+        drawRect(surfaceColor)
+        drawContent()
+    }
 
     Scaffold(
         modifier = modifier.fillMaxSize(),
@@ -443,7 +445,7 @@ private fun AgentChatScaffold(
                 onHistoryViewportChanged = onHistoryViewportChanged,
                 modifier = Modifier
                     .fillMaxSize()
-                    .then(if (frostEnabled && messageBackdrop != null) Modifier.layerBackdrop(messageBackdrop) else Modifier),
+                    .then(if (frostEnabled) Modifier.layerBackdrop(messageBackdrop) else Modifier),
             )
         }
     }

@@ -27,7 +27,6 @@ import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Stop
 import androidx.compose.material.icons.rounded.Terminal
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -105,6 +104,7 @@ internal fun AgentAppShell(
     onConversationRename: (ConversationSummaryUi) -> Unit,
     onConversationExport: (ConversationSummaryUi) -> Unit,
     onConversationDelete: (ConversationSummaryUi) -> Unit,
+    onBatchDelete: (List<ConversationSummaryUi>) -> Unit,
     onOpenTools: () -> Unit,
     onOpenSkills: () -> Unit,
     onOpenCharacters: () -> Unit,
@@ -119,12 +119,6 @@ internal fun AgentAppShell(
     val scrollBehavior = MiuixScrollBehavior()
     val backdrop = rememberTopBarBackdrop()
     val topBarColor = topBarContainerColor(backdrop)
-    // v3.1 白闪修复：聊天 backdrop 提升到 Shell 顶层创建并复用。
-    // 之前在 AgentChatScaffold 内 rememberLayerBackdrop，每次页面导航都会重建，
-    // 重建第一帧 backdrop 还没 capture 到背景，先显示 drawRect 的不透明底色，造成白闪。
-    // 提升到这里后只创建一次，导航时复用，白闪消失。
-    // 底色用不透明的 surface 色，防止模糊采样到透明区域出现黑边。
-    val chatBackdrop = rememberGlassBackdrop(MiuixTheme.colorScheme.surface.copy(alpha = 1f))
     val pageContent: @Composable () -> Unit = {
         Scaffold(
             modifier = Modifier.fillMaxSize(),
@@ -168,7 +162,6 @@ internal fun AgentAppShell(
         }
     }
 
-    CompositionLocalProvider(LocalChatBackdrop provides chatBackdrop) {
     Box(modifier = modifier.fillMaxSize()) {
         if (conversationPaneState != null && currentRoute is AppRoute.Home) {
             ConversationSidePaneScaffold(
@@ -182,6 +175,7 @@ internal fun AgentAppShell(
                 onConversationRename = onConversationRename,
                 onConversationExport = onConversationExport,
                 onConversationDelete = onConversationDelete,
+                onBatchDelete = onBatchDelete,
                 onOpenSettings = onOpenSettings,
                 onOpenModelProviders = onOpenModelProviders,
                 onOpenTools = onOpenTools,
@@ -194,7 +188,6 @@ internal fun AgentAppShell(
         } else {
             pageContent()
         }
-    }
     }
 }
 
