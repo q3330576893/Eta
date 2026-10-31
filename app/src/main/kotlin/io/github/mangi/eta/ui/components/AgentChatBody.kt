@@ -443,7 +443,7 @@ private fun AgentChatScaffold(
                 onHistoryViewportChanged = onHistoryViewportChanged,
                 modifier = Modifier
                     .fillMaxSize()
-                    .then(if (frostEnabled) Modifier.layerBackdrop(messageBackdrop) else Modifier),
+                    .then(if (frostEnabled && messageBackdrop != null) Modifier.layerBackdrop(messageBackdrop) else Modifier),
             )
         }
     }
