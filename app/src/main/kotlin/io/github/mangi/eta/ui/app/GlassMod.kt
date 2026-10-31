@@ -1,1 +1,58 @@
-cGFja2FnZSBpby5naXRodWIubWFuZ2kuZXRhLnVpLmFwcAoKaW1wb3J0IGFuZHJvaWR4LmNvbXBvc2UucnVudGltZS5Db21wb3NhYmxlCmltcG9ydCBhbmRyb2lkeC5jb21wb3NlLnVpLmdyYXBoaWNzLkNvbG9yCmltcG9ydCB0b3AueXVrb25nYS5taXVpeC5rbXAuYmx1ci5MYXllckJhY2tkcm9wCmltcG9ydCB0b3AueXVrb25nYS5taXVpeC5rbXAuYmx1ci5pc1J1bnRpbWVTaGFkZXJTdXBwb3J0ZWQKaW1wb3J0IHRvcC55dWtvbmdhLm1pdWl4LmttcC5ibHVyLnJlbWVtYmVyTGF5ZXJCYWNrZHJvcAoKLyoqCiAqIOeOu+eSg+WMluiuvuiuoeinhOiMg++8iGlPUyDpo47moLzno6jnoILnjrvnkoPvvInjgIIKICoKICog6K6+6K6h55uu5qCH77ya5q+P5Liq5oyJ6ZSuL+WNoeeJh+acrOi6q+WNiumAj+aYju+8iOWNiumAj+aYjuW6leiJsiArIOejqOegguaooeeziu+8ie+8jOWPguiAgyBpT1Mg5o6n5Yi25Lit5b+D6LSo5oSf44CCCiAqCiAqIOWunueOsOWIhuS4uuS4pOWxgu+8mgogKiAxLiDpgI/mmI7luqbvvIjlhajlsYDvvInvvJpbQWdlbnRBcHBUaGVtZV0g5Lit5bCGIHN1cmZhY2Ug57O76aKc6Imy57uf5LiA5pS55Li65Y2K6YCP5piO77yMCiAqICAgIOaJgOacieS9v+eUqCBNaXVpeFRoZW1lLmNvbG9yU2NoZW1lLnN1cmZhY2UgLyBzdXJmYWNlQ29udGFpbmVyIC8gc3VyZmFjZUNvbnRhaW5lckhpZ2ggLwogKiAgICBzdXJmYWNlQ29udGFpbmVySGlnaGVzdCDnmoTnu4Tku7bvvIjljaHniYfjgIHmjInpkq7jgIHlr7nor53moYbjgIHovpPlhaXmoI/nrYnvvInoh6rliqjojrflvpfljYrpgI/mmI7lupXoibLjgIIKICogMi4g56Oo56CC5qih57OK77yI5oyJ6ZyA77yJ77ya5L2/55SoIE1pdWl4IOeahCBMYXllckJhY2tkcm9wICsgdGV4dHVyZUJsdXIg5py65Yi244CCCiAqICAgIOW3suacieS9jee9ru+8mumhtuagj++8iFRvcEJhckJhY2tkcm9w77yJ44CB6IGK5aSp5bqV6YOo56Oo56CC77yIQWdlbnRDaGF0Qm9kee+8ieOAggogKiAgICDmlrDlop7njrvnkoPooajpnaLml7bvvIzpgbXlvqrku6XkuIvmqKHlvI/vvJoKICogICAgICBhLiDlnKjooqvpga7mjKHlhoXlrrnnmoTniLbnuqfosIPnlKggW3JlbWVtYmVyR2xhc3NCYWNrZHJvcF0g5Yib5bu6IGJhY2tkcm9w77ybCiAqICAgICAgYi4g6KKr6YGu5oyh5YaF5a655YqgIE1vZGlmaWVyLmxheWVyQmFja2Ryb3AoYmFja2Ryb3Ap77ybCiAqICAgICAgYy4g546755KD6KGo6Z2i5YqgIE1vZGlmaWVyLnRleHR1cmVCbHVyKGJhY2tkcm9wLCBzaGFwZSwgR2xhc3NCbHVyUmFkaXVzLCBjb2xvcnMp44CCCiAqCiAqIOaooeeziuaAu+W8gOWFs++8mkFwcGVhcmFuY2VTZXR0aW5ncy5ibHVyRW5hYmxlZO+8iOm7mOiupOW8gO+8ie+8jOmAmui/hyBMb2NhbEJsdXJFbmFibGVkIOS4i+WPkeOAggogKiDkuLvpopjpgI/mmI7luqbkuI7mqKHns4rlhbHnlKjor6XlvIDlhbPvvJrlhbPpl63ml7bmgaLlpI3ljp/mnInkuI3pgI/mmI7lpJbop4LjgIIKICovCgovLyByZWdpb24g546755KD6YCP5piO5bqm77yIc3VyZmFjZSDns7vpopzoibLnmoQgYWxwaGHvvIkKCmludGVybmFsIGNvbnN0IHZhbCBHbGFzc1N1cmZhY2VBbHBoYSA9IDAuNzJmCmludGVybmFsIGNvbnN0IHZhbCBHbGFzc1N1cmZhY2VDb250YWluZXJBbHBoYSA9IDAuNjJmCmludGVybmFsIGNvbnN0IHZhbCBHbGFzc1N1cmZhY2VDb250YWluZXJIaWdoQWxwaGEgPSAwLjY4ZgppbnRlcm5hbCBjb25zdCB2YWwgR2xhc3NTdXJmYWNlQ29udGFpbmVySGlnaGVzdEFscGhhID0gMC43MmYKCi8vIGVuZHJlZ2lvbgoKLy8gcmVnaW9uIOejqOegguaooeeziuWPguaVsAoKLyoqIOejqOegguaooeeziuWNiuW+hO+8jOS4jumhtuagj+S/neaMgeS4gOiHtOOAgiAqLwppbnRlcm5hbCBjb25zdCB2YWwgR2xhc3NCbHVyUmFkaXVzID0gMjVmCgovLyBlbmRyZWdpb24KCi8qKgogKiDliJvlu7rnjrvnkoMgYmFja2Ryb3DvvIzlpI3nlKjlhajlsYDmqKHns4rlvIDlhbPkuI7ov5DooYzml7bnnYDoibLlmajmlK/mjIHmo4Dmn6XjgIIKICoKICogQHBhcmFtIGJhc2VDb2xvciBiYWNrZHJvcCDlupXoibLvvIjpgJrluLjlj5blr7nlupTooajpnaLnmoTkuLvpopjoibLvvIx0ZXh0dXJlQmx1ciDkvJrlho3lj6DliqAgYmxlbmQg6aKc6Imy77yJCiAqIEByZXR1cm4g5Y+v55So5pe26L+U5ZueIExheWVyQmFja2Ryb3DvvJvmqKHns4rlhbPpl63miJborr7lpIfkuI3mlK/mjIHml7bov5Tlm54gbnVsbO+8jOiwg+eUqOaWueW6lOWbnumAgOS4uue6r+iJsuiDjOaZrwogKi8KQENvbXBvc2FibGUKaW50ZXJuYWwgZnVuIHJlbWVtYmVyR2xhc3NCYWNrZHJvcChiYXNlQ29sb3I6IENvbG9yKTogTGF5ZXJCYWNrZHJvcD8gewogICAgaWYgKCFMb2NhbEJsdXJFbmFibGVkLmN1cnJlbnQgfHwgIWlzUnVudGltZVNoYWRlclN1cHBvcnRlZCgpKSByZXR1cm4gbnVsbAogICAgcmV0dXJuIHJlbWVtYmVyTGF5ZXJCYWNrZHJvcCB7CiAgICAgICAgZHJhd1JlY3QoYmFzZUNvbG9yKQogICAgICAgIGRyYXdDb250ZW50KCkKICAgIH0KfQo=
+package io.github.mangi.eta.ui.app
+
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.graphics.Color
+import top.yukonga.miuix.kmp.blur.LayerBackdrop
+import top.yukonga.miuix.kmp.blur.isRuntimeShaderSupported
+import top.yukonga.miuix.kmp.blur.rememberLayerBackdrop
+
+/**
+ * 玻璃化设计规范（iOS 风格磨砂玻璃）。
+ *
+ * 设计目标：每个按键/卡片本身半透明（半透明底色 + 磨砂模糊），参考 iOS 控制中心质感。
+ *
+ * 实现分为两层：
+ * 1. 透明度（全局）：[AgentAppTheme] 中将 surface 系颜色统一改为半透明，
+ *    所有使用 MiuixTheme.colorScheme.surface / surfaceContainer / surfaceContainerHigh /
+ *    surfaceContainerHighest 的组件（卡片、按钮、对话框、输入栏等）自动获得半透明底色。
+ * 2. 磨砂模糊（按需）：使用 Miuix 的 LayerBackdrop + textureBlur 机制。
+ *    已有位置：顶栏（TopBarBackdrop）、聊天底部磨砂（AgentChatBody）。
+ *    新增玻璃表面时，遵循以下模式：
+ *      a. 在被遮挡内容的父级调用 [rememberGlassBackdrop] 创建 backdrop；
+ *      b. 被遮挡内容加 Modifier.layerBackdrop(backdrop)；
+ *      c. 玻璃表面加 Modifier.textureBlur(backdrop, shape, GlassBlurRadius, colors)。
+ *
+ * 模糊总开关：AppearanceSettings.blurEnabled（默认开），通过 LocalBlurEnabled 下发。
+ * 主题透明度与模糊共用该开关：关闭时恢复原有不透明外观。
+ */
+
+// region 玻璃透明度（surface 系颜色的 alpha）
+
+internal const val GlassSurfaceAlpha = 0.72f
+internal const val GlassSurfaceContainerAlpha = 0.62f
+internal const val GlassSurfaceContainerHighAlpha = 0.68f
+internal const val GlassSurfaceContainerHighestAlpha = 0.72f
+
+// endregion
+
+// region 磨砂模糊参数
+
+/** 磨砂模糊半径，与顶栏保持一致。 */
+internal const val GlassBlurRadius = 25f
+
+// endregion
+
+/**
+ * 创建玻璃 backdrop，复用全局模糊开关与运行时着色器支持检查。
+ *
+ * @param baseColor backdrop 底色（通常取对应表面的主题色，textureBlur 会再叠加 blend 颜色）
+ * @return 可用时返回 LayerBackdrop；模糊关闭或设备不支持时返回 null，调用方应回退为纯色背景
+ */
+@Composable
+internal fun rememberGlassBackdrop(baseColor: Color): LayerBackdrop? {
+    if (!LocalBlurEnabled.current || !isRuntimeShaderSupported()) return null
+    return rememberLayerBackdrop {
+        drawRect(baseColor)
+        drawContent()
+    }
+}
