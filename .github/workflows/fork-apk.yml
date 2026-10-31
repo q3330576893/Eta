@@ -1,0 +1,31 @@
+name: Fork Debug APK
+
+on:
+  push:
+    branches: [muse-build]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 准备构建环境
+        uses: ./.github/actions/setup-build
+
+      - name: 编译 Debug APK
+        run: ./gradlew --no-daemon :app:assembleDebug
+
+      - name: 发布 Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="debug-apk-${{ github.run_number }}"
+          APK=$(ls app/build/outputs/apk/debug/*.apk | head -1)
+          echo "APK=$APK"
+          gh release create "$TAG" "$APK" --title "Debug APK $TAG" --notes "Fork 自动构建"
