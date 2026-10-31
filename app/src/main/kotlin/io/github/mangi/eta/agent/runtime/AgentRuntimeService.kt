@@ -138,6 +138,11 @@ internal class AgentRuntimeService : Service(), LifecycleOwner, SavedStateRegist
         override fun cancelRestore() = mainHandler.removeCallbacks(restoreCapsule)
     }
     private val hideToken = Any()
+    /** 常驻开关：打开 Eta 后胶囊一直在，不随任务结束消失。 */
+    private var capsulePinned = false
+
+    /** 完成后未读：胶囊保留「已完成」提示，直到用户打开 Eta。 */
+    private var unreadFinished = false
 
     override fun onCreate() {
         super.onCreate()
@@ -167,8 +172,33 @@ internal class AgentRuntimeService : Service(), LifecycleOwner, SavedStateRegist
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
-        if (intent?.action != ACTION_KEEP_ALIVE || runs.all().isEmpty()) {
-            stopSelf(startId)
+        when (intent?.action) {
+            ACTION_PIN_CAPSULE -> {
+                capsulePinned = true
+                ensureOverlayVisible()
+                if (runs.all().isEmpty()) {
+                    state.value = AgentOverlayState(status = AgentOverlayStatus.Idle)
+                }
+            }
+            ACTION_UNPIN_CAPSULE -> {
+                capsulePinned = false
+                if (runs.all().isEmpty()) dismissAndStop()
+            }
+            ACTION_CLEAR_READ -> {
+                unreadFinished = false
+                if (runs.all().isEmpty()) {
+                    if (capsulePinned) {
+                        state.value = AgentOverlayState(status = AgentOverlayStatus.Idle)
+                        ensureOverlayVisible()
+                    } else {
+                        dismissAndStop()
+                    }
+                }
+            }
+            else -> {
+                val keepAlive = intent?.action == ACTION_KEEP_ALIVE && runs.all().isNotEmpty()
+                if (!keepAlive && !capsulePinned && !unreadFinished) stopSelf(startId)
+            }
         }
         return START_NOT_STICKY
     }
@@ -1266,7 +1296,7 @@ internal class AgentRuntimeService : Service(), LifecycleOwner, SavedStateRegist
      * 胶囊窗口使用固定宽度与分档高度，动画只在窗口内进行。
      * WRAP_CONTENT 会让每一帧的尺寸变化都触发 WindowManager 重新布局整个窗口，这是卡顿的来源；
      * 但窗口内透明区域同样会吞掉触摸（包括 Agent 自己注入的点击），所以高度只在需要时扩大：
-     * 展开前先扩到目标档，收起动画结束后再缩回，见 [setCapsuleWindowHeight]。
+     * 展开前先扩到目标档，收起动画结束后再缩回，见 updateCapsuleWindowBounds。
      */
     private fun capsuleLayoutParams(): WindowManager.LayoutParams =
         WindowManager.LayoutParams(
@@ -1401,10 +1431,8 @@ internal class AgentRuntimeService : Service(), LifecycleOwner, SavedStateRegist
 
     private fun enterFinalState(finalState: AgentOverlayState) {
         state.value = finalState
-
-        // 任务完成通知：成功/失败时弹通知，点击跳回主界面
-        val ok = finalState.phase == AgentOverlayPhase.FINISHED
-        TaskCompletionNotification.show(this, ok, finalState.detailText)
+        // 只要有一个会话输出完成/失败，胶囊就留一条提示，直到用户打开 Eta 或点开会话。
+        unreadFinished = true
 
         val run = displayedRun
         if (AgentOverlayVisibilityPolicy.shouldShowResultCard(
@@ -1421,9 +1449,29 @@ internal class AgentRuntimeService : Service(), LifecycleOwner, SavedStateRegist
             }
             windowManager?.let(::showResultCard) ?: dismissAndStop()
             mainHandler.removeCallbacksAndMessages(hideToken)
+        } else if (capsulePinned) {
+            // 胶囊常驻：收起但保留「已完成」提示，不退回空闲，不退出服务。
+            mainHandler.removeCallbacksAndMessages(hideToken)
+            capsuleExpanded.value = false
+            updateCapsuleWindowBounds(expanding = false)
+            state.value = finishedNoticeState(finalState)
+            ensureOverlayVisible()
         } else {
-            dismissAndStop()
+            // 完成提示不自动消失：保留胶囊显示「已完成」，等用户打开 Eta 再收。
+            mainHandler.removeCallbacksAndMessages(hideToken)
+            capsuleExpanded.value = false
+            updateCapsuleWindowBounds(expanding = false)
+            state.value = finishedNoticeState(finalState)
+            ensureOverlayVisible()
         }
+    }
+
+    /** 完成/失败后胶囊里保留的一条提示文案。 */
+    private fun finishedNoticeState(finalState: AgentOverlayState): AgentOverlayState {
+        val failed = finalState.phase == AgentOverlayPhase.FAILED
+        return finalState.copy(
+            thought = if (failed) "任务失败，点开查看" else "已完成，点开查看结果",
+        )
     }
 
     private fun removeAmbientWindows() {
@@ -1442,6 +1490,15 @@ internal class AgentRuntimeService : Service(), LifecycleOwner, SavedStateRegist
         // stopSelf 不会销毁仍被客户端绑定的服务；窗口关闭后不再保留完整请求与结果历史。
         displayedRun?.completedContext = null
         displayedRun = null
+        unreadFinished = false
+        if (capsulePinned && runs.all().isEmpty()) {
+            // 常驻模式下不撤胶囊，只收回到折叠态。
+            capsuleExpanded.value = false
+            updateCapsuleWindowBounds(expanding = false)
+            state.value = AgentOverlayState(status = AgentOverlayStatus.Idle)
+            ensureOverlayVisible()
+            return
+        }
         removeOverlayWindows()
         if (runs.all().isEmpty() && !guiControl.state.value.userPaused) {
             VirtualDisplayController.release(this)
@@ -1500,6 +1557,9 @@ internal class AgentRuntimeService : Service(), LifecycleOwner, SavedStateRegist
         }
 
         private const val ACTION_KEEP_ALIVE = "io.github.mangi.eta.agent.runtime.KEEP_ALIVE"
+        const val ACTION_PIN_CAPSULE = "io.github.mangi.eta.agent.runtime.PIN_CAPSULE"
+        const val ACTION_UNPIN_CAPSULE = "io.github.mangi.eta.agent.runtime.UNPIN_CAPSULE"
+        const val ACTION_CLEAR_READ = "io.github.mangi.eta.agent.runtime.CLEAR_READ"
         private const val HIDE_DELAY_MS = 2_500L
         private const val RESULT_REVIEW_DELAY_MS = 120_000L
         private const val RESULT_CARD_HEIGHT_RATIO = 0.5f
