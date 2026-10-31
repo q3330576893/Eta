@@ -1,1 +1,136 @@
-cGFja2FnZSBpby5naXRodWIubWFuZ2kuZXRhLnVpLmFwcAoKaW1wb3J0IGFuZHJvaWR4LmNvbXBvc2UuZm91bmRhdGlvbi5pc1N5c3RlbUluRGFya1RoZW1lCmltcG9ydCBhbmRyb2lkeC5jb21wb3NlLnJ1bnRpbWUuQ29tcG9zYWJsZQppbXBvcnQgYW5kcm9pZHguY29tcG9zZS5ydW50aW1lLkNvbXBvc2l0aW9uTG9jYWxQcm92aWRlcgppbXBvcnQgYW5kcm9pZHguY29tcG9zZS5ydW50aW1lLkxhdW5jaGVkRWZmZWN0CmltcG9ydCBhbmRyb2lkeC5jb21wb3NlLnJ1bnRpbWUucmVtZW1iZXIKaW1wb3J0IGFuZHJvaWR4LmNvbXBvc2UudWkuZ3JhcGhpY3MuQ29sb3IKaW1wb3J0IGFuZHJvaWR4LmNvbXBvc2UudWkucGxhdGZvcm0uTG9jYWxEZW5zaXR5CmltcG9ydCBhbmRyb2lkeC5jb21wb3NlLnVpLnVuaXQuRGVuc2l0eQppbXBvcnQgaW8uZ2l0aHViLm1hbmdpLmV0YS5kYXRhLm1vZGVsLkFwcGVhcmFuY2VBY2NlbnRDb2xvcgppbXBvcnQgaW8uZ2l0aHViLm1hbmdpLmV0YS5kYXRhLm1vZGVsLkFwcGVhcmFuY2VQYWxldHRlU3R5bGUKaW1wb3J0IGlvLmdpdGh1Yi5tYW5naS5ldGEuZGF0YS5tb2RlbC5BcHBlYXJhbmNlU2V0dGluZ3MKaW1wb3J0IGlvLmdpdGh1Yi5tYW5naS5ldGEuZGF0YS5tb2RlbC5BcHBlYXJhbmNlVGhlbWVNb2RlCmltcG9ydCB0b3AueXVrb25nYS5taXVpeC5rbXAudGhlbWUuQ29sb3JTY2hlbWVNb2RlCmltcG9ydCB0b3AueXVrb25nYS5taXVpeC5rbXAudGhlbWUuTWl1aXhUaGVtZQppbXBvcnQgdG9wLnl1a29uZ2EubWl1aXgua21wLnRoZW1lLlRoZW1lQ29sb3JTcGVjCmltcG9ydCB0b3AueXVrb25nYS5taXVpeC5rbXAudGhlbWUuVGhlbWVDb250cm9sbGVyCmltcG9ydCB0b3AueXVrb25nYS5taXVpeC5rbXAudGhlbWUuVGhlbWVQYWxldHRlU3R5bGUKaW1wb3J0IHRvcC55dWtvbmdhLm1pdWl4LmttcC50aGVtZS5wbGF0Zm9ybUR5bmFtaWNDb2xvcnMKCkBDb21wb3NhYmxlCmZ1biBBZ2VudEFwcFRoZW1lKAogICAgYXBwZWFyYW5jZTogQXBwZWFyYW5jZVNldHRpbmdzLAogICAgYXBwbHlJbnRlcmZhY2VTY2FsZTogQm9vbGVhbiwKICAgIG9uUmVzb2x2ZWREYXJrTW9kZUNoYW5nZTogKEJvb2xlYW4pIC0+IFVuaXQgPSB7fSwKICAgIGNvbnRlbnQ6IEBDb21wb3NhYmxlICgpIC0+IFVuaXQsCikgewogICAgdmFsIHN5c3RlbURhcmsgPSBpc1N5c3RlbUluRGFya1RoZW1lKCkKICAgIHZhbCBpc0RhcmsgPSB3aGVuIChhcHBlYXJhbmNlLnRoZW1lTW9kZSkgewogICAgICAgIEFwcGVhcmFuY2VUaGVtZU1vZGUuU1lTVEVNIC0+IHN5c3RlbURhcmsKICAgICAgICBBcHBlYXJhbmNlVGhlbWVNb2RlLkxJR0hUIC0+IGZhbHNlCiAgICAgICAgQXBwZWFyYW5jZVRoZW1lTW9kZS5EQVJLIC0+IHRydWUKICAgIH0KICAgIHZhbCBjb2xvclNjaGVtZU1vZGUgPSB3aGVuIHsKICAgICAgICAhYXBwZWFyYW5jZS5tb25ldEVuYWJsZWQgJiYgYXBwZWFyYW5jZS50aGVtZU1vZGUgPT0gQXBwZWFyYW5jZVRoZW1lTW9kZS5MSUdIVCAtPiBDb2xvclNjaGVtZU1vZGUuTGlnaHQKICAgICAgICAhYXBwZWFyYW5jZS5tb25ldEVuYWJsZWQgJiYgYXBwZWFyYW5jZS50aGVtZU1vZGUgPT0gQXBwZWFyYW5jZVRoZW1lTW9kZS5EQVJLIC0+IENvbG9yU2NoZW1lTW9kZS5EYXJrCiAgICAgICAgIWFwcGVhcmFuY2UubW9uZXRFbmFibGVkIC0+IENvbG9yU2NoZW1lTW9kZS5TeXN0ZW0KICAgICAgICBhcHBlYXJhbmNlLnRoZW1lTW9kZSA9PSBBcHBlYXJhbmNlVGhlbWVNb2RlLkxJR0hUIC0+IENvbG9yU2NoZW1lTW9kZS5Nb25ldExpZ2h0CiAgICAgICAgYXBwZWFyYW5jZS50aGVtZU1vZGUgPT0gQXBwZWFyYW5jZVRoZW1lTW9kZS5EQVJLIC0+IENvbG9yU2NoZW1lTW9kZS5Nb25ldERhcmsKICAgICAgICBlbHNlIC0+IENvbG9yU2NoZW1lTW9kZS5Nb25ldFN5c3RlbQogICAgfQogICAgdmFsIHN5c3RlbVNlZWRDb2xvciA9IGlmICgKICAgICAgICBhcHBlYXJhbmNlLm1vbmV0RW5hYmxlZCAmJiBhcHBlYXJhbmNlLmFjY2VudENvbG9yID09IEFwcGVhcmFuY2VBY2NlbnRDb2xvci5TWVNURU0KICAgICkgewogICAgICAgIHBsYXRmb3JtRHluYW1pY0NvbG9ycyhpc0RhcmspLnByaW1hcnkKICAgIH0gZWxzZSB7CiAgICAgICAgbnVsbAogICAgfQogICAgdmFsIGtleUNvbG9yID0gd2hlbiB7CiAgICAgICAgIWFwcGVhcmFuY2UubW9uZXRFbmFibGVkIC0+IG51bGwKICAgICAgICBhcHBlYXJhbmNlLmFjY2VudENvbG9yID09IEFwcGVhcmFuY2VBY2NlbnRDb2xvci5TWVNURU0gLT4gc3lzdGVtU2VlZENvbG9yCiAgICAgICAgZWxzZSAtPiBhcHBlYXJhbmNlLmFjY2VudENvbG9yLnNlZWRDb2xvcigpCiAgICB9CiAgICB2YWwgY29udHJvbGxlciA9IHJlbWVtYmVyKGFwcGVhcmFuY2UsIGNvbG9yU2NoZW1lTW9kZSwga2V5Q29sb3IsIGlzRGFyaykgewogICAgICAgIFRoZW1lQ29udHJvbGxlcigKICAgICAgICAgICAgY29sb3JTY2hlbWVNb2RlID0gY29sb3JTY2hlbWVNb2RlLAogICAgICAgICAgICBrZXlDb2xvciA9IGtleUNvbG9yLAogICAgICAgICAgICBjb2xvclNwZWMgPSBUaGVtZUNvbG9yU3BlYy5TcGVjMjAyNSwKICAgICAgICAgICAgcGFsZXR0ZVN0eWxlID0gYXBwZWFyYW5jZS5wYWxldHRlU3R5bGUudG9NaXVpeFBhbGV0dGVTdHlsZSgpLAogICAgICAgICAgICBpc0RhcmsgPSBpc0RhcmssCiAgICAgICAgKQogICAgfQogICAgdmFsIGNvbG9ycyA9IGNvbnRyb2xsZXIuY3VycmVudENvbG9ycygpCiAgICB2YWwgdGhlbWVkQ29sb3JzID0gcmVtZW1iZXIoY29sb3JzLCBpc0RhcmssIGFwcGVhcmFuY2UubW9uZXRFbmFibGVkLCBhcHBlYXJhbmNlLnB1cmVCbGFja0VuYWJsZWQsIGFwcGVhcmFuY2UuYmx1ckVuYWJsZWQpIHsKICAgICAgICB2YWwgYmFzZSA9IGlmIChhcHBlYXJhbmNlLm1vbmV0RW5hYmxlZCAmJiBhcHBlYXJhbmNlLnB1cmVCbGFja0VuYWJsZWQgJiYgaXNEYXJrKSB7CiAgICAgICAgICAgIGNvbG9ycy5jb3B5KAogICAgICAgICAgICAgICAgYmFja2dyb3VuZCA9IENvbG9yLkJsYWNrLAogICAgICAgICAgICAgICAgc3VyZmFjZSA9IENvbG9yLkJsYWNrLAogICAgICAgICAgICApCiAgICAgICAgfSBlbHNlIHsKICAgICAgICAgICAgY29sb3JzCiAgICAgICAgfQogICAgICAgIGlmICghYXBwZWFyYW5jZS5ibHVyRW5hYmxlZCkgewogICAgICAgICAgICAvLyDmqKHns4rlvIDlhbPlhbPpl63ml7bkv53mjIHljp/mnInkuI3pgI/mmI7lpJbop4IKICAgICAgICAgICAgYmFzZQogICAgICAgIH0gZWxzZSB7CiAgICAgICAgICAgIC8vIOeOu+eSg+WMlu+8mnN1cmZhY2Ug57O76aKc6Imy57uf5LiA5pS55Li65Y2K6YCP5piO77yM5LiO56Oo56CC5qih57OK6YWN5ZCI5a6e546wIGlPUyDpo47moLznjrvnkoPotKjmhJ/jgIIKICAgICAgICAgICAgLy8g5YWo5bGA55Sf5pWI77ya5omA5pyJ5Y2h54mH44CB5oyJ6ZKu44CB5a+56K+d5qGG44CB6L6T5YWl5qCP562J5L2/55So6L+Z5Lqb6aKc6Imy55qE57uE5Lu26Ieq5Yqo5Y+Y5Li65Y2K6YCP5piO44CCCiAgICAgICAgICAgIGJhc2UuY29weSgKICAgICAgICAgICAgICAgIHN1cmZhY2UgPSBiYXNlLnN1cmZhY2UuY29weShhbHBoYSA9IEdsYXNzU3VyZmFjZUFscGhhKSwKICAgICAgICAgICAgICAgIHN1cmZhY2VDb250YWluZXIgPSBiYXNlLnN1cmZhY2VDb250YWluZXIuY29weShhbHBoYSA9IEdsYXNzU3VyZmFjZUNvbnRhaW5lckFscGhhKSwKICAgICAgICAgICAgICAgIHN1cmZhY2VDb250YWluZXJIaWdoID0gYmFzZS5zdXJmYWNlQ29udGFpbmVySGlnaC5jb3B5KGFscGhhID0gR2xhc3NTdXJmYWNlQ29udGFpbmVySGlnaEFscGhhKSwKICAgICAgICAgICAgICAgIHN1cmZhY2VDb250YWluZXJIaWdoZXN0ID0gYmFzZS5zdXJmYWNlQ29udGFpbmVySGlnaGVzdC5jb3B5KGFscGhhID0gR2xhc3NTdXJmYWNlQ29udGFpbmVySGlnaGVzdEFscGhhKSwKICAgICAgICAgICAgKQogICAgICAgIH0KICAgIH0KCiAgICBMYXVuY2hlZEVmZmVjdChpc0RhcmspIHsgb25SZXNvbHZlZERhcmtNb2RlQ2hhbmdlKGlzRGFyaykgfQoKICAgIE1pdWl4VGhlbWUoY29sb3JzID0gdGhlbWVkQ29sb3JzKSB7CiAgICAgICAgdmFsIHBsYXRmb3JtRGVuc2l0eSA9IExvY2FsRGVuc2l0eS5jdXJyZW50CiAgICAgICAgdmFsIGFwcERlbnNpdHkgPSByZW1lbWJlcihwbGF0Zm9ybURlbnNpdHksIGFwcGVhcmFuY2UuaW50ZXJmYWNlU2NhbGUsIGFwcGx5SW50ZXJmYWNlU2NhbGUpIHsKICAgICAgICAgICAgaWYgKGFwcGx5SW50ZXJmYWNlU2NhbGUpIHsKICAgICAgICAgICAgICAgIERlbnNpdHkoCiAgICAgICAgICAgICAgICAgICAgZGVuc2l0eSA9IHBsYXRmb3JtRGVuc2l0eS5kZW5zaXR5ICogYXBwZWFyYW5jZS5pbnRlcmZhY2VTY2FsZSwKICAgICAgICAgICAgICAgICAgICBmb250U2NhbGUgPSBwbGF0Zm9ybURlbnNpdHkuZm9udFNjYWxlLAogICAgICAgICAgICAgICAgKQogICAgICAgICAgICB9IGVsc2UgewogICAgICAgICAgICAgICAgcGxhdGZvcm1EZW5zaXR5CiAgICAgICAgICAgIH0KICAgICAgICB9CiAgICAgICAgQ29tcG9zaXRpb25Mb2NhbFByb3ZpZGVyKAogICAgICAgICAgICBMb2NhbEFwcGVhcmFuY2VTZXR0aW5ncyBwcm92aWRlcyBhcHBlYXJhbmNlLAogICAgICAgICAgICBMb2NhbEJsdXJFbmFibGVkIHByb3ZpZGVzIGFwcGVhcmFuY2UuYmx1ckVuYWJsZWQsCiAgICAgICAgICAgIExvY2FsVG9wQmFyQmx1clN0eWxlIHByb3ZpZGVzIGFwcGVhcmFuY2UudG9wQmFyQmx1clN0eWxlLAogICAgICAgICAgICBMb2NhbFBsYXRmb3JtRGVuc2l0eSBwcm92aWRlcyBwbGF0Zm9ybURlbnNpdHksCiAgICAgICAgICAgIExvY2FsRGVuc2l0eSBwcm92aWRlcyBhcHBEZW5zaXR5LAogICAgICAgICkgewogICAgICAgICAgICBjb250ZW50KCkKICAgICAgICB9CiAgICB9Cn0KCnByaXZhdGUgZnVuIEFwcGVhcmFuY2VQYWxldHRlU3R5bGUudG9NaXVpeFBhbGV0dGVTdHlsZSgpOiBUaGVtZVBhbGV0dGVTdHlsZSA9IHdoZW4gKHRoaXMpIHsKICAgIEFwcGVhcmFuY2VQYWxldHRlU3R5bGUuVE9OQUxfU1BPVCAtPiBUaGVtZVBhbGV0dGVTdHlsZS5Ub25hbFNwb3QKICAgIEFwcGVhcmFuY2VQYWxldHRlU3R5bGUuTkVVVFJBTCAtPiBUaGVtZVBhbGV0dGVTdHlsZS5OZXV0cmFsCiAgICBBcHBlYXJhbmNlUGFsZXR0ZVN0eWxlLlZJQlJBTlQgLT4gVGhlbWVQYWxldHRlU3R5bGUuVmlicmFudAogICAgQXBwZWFyYW5jZVBhbGV0dGVTdHlsZS5FWFBSRVNTSVZFIC0+IFRoZW1lUGFsZXR0ZVN0eWxlLkV4cHJlc3NpdmUKICAgIEFwcGVhcmFuY2VQYWxldHRlU3R5bGUuUkFJTkJPVyAtPiBUaGVtZVBhbGV0dGVTdHlsZS5SYWluYm93CiAgICBBcHBlYXJhbmNlUGFsZXR0ZVN0eWxlLkZSVUlUX1NBTEFEIC0+IFRoZW1lUGFsZXR0ZVN0eWxlLkZydWl0U2FsYWQKICAgIEFwcGVhcmFuY2VQYWxldHRlU3R5bGUuTU9OT0NIUk9NRSAtPiBUaGVtZVBhbGV0dGVTdHlsZS5Nb25vY2hyb21lCiAgICBBcHBlYXJhbmNlUGFsZXR0ZVN0eWxlLkZJREVMSVRZIC0+IFRoZW1lUGFsZXR0ZVN0eWxlLkZpZGVsaXR5CiAgICBBcHBlYXJhbmNlUGFsZXR0ZVN0eWxlLkNPTlRFTlQgLT4gVGhlbWVQYWxldHRlU3R5bGUuQ29udGVudAp9Cgpwcml2YXRlIGZ1biBBcHBlYXJhbmNlQWNjZW50Q29sb3Iuc2VlZENvbG9yKCk6IENvbG9yID0gd2hlbiAodGhpcykgewogICAgQXBwZWFyYW5jZUFjY2VudENvbG9yLlNZU1RFTSwgQXBwZWFyYW5jZUFjY2VudENvbG9yLkJMVUUgLT4gQ29sb3IoMHhGRjM0ODJGRikKICAgIEFwcGVhcmFuY2VBY2NlbnRDb2xvci5QVVJQTEUgLT4gQ29sb3IoMHhGRjY3NTBBNCkKICAgIEFwcGVhcmFuY2VBY2NlbnRDb2xvci5QSU5LIC0+IENvbG9yKDB4RkZCMDAwNkQpCiAgICBBcHBlYXJhbmNlQWNjZW50Q29sb3IuUkVEIC0+IENvbG9yKDB4RkZCQTFBMUEpCiAgICBBcHBlYXJhbmNlQWNjZW50Q29sb3IuT1JBTkdFIC0+IENvbG9yKDB4RkZCNjVEMDApCiAgICBBcHBlYXJhbmNlQWNjZW50Q29sb3IuWUVMTE9XIC0+IENvbG9yKDB4RkY3RDU3MDApCiAgICBBcHBlYXJhbmNlQWNjZW50Q29sb3IuR1JFRU4gLT4gQ29sb3IoMHhGRjAwNkQzQikKICAgIEFwcGVhcmFuY2VBY2NlbnRDb2xvci5URUFMIC0+IENvbG9yKDB4RkYwMDZBNkEpCn0K
+package io.github.mangi.eta.ui.app
+
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
+import io.github.mangi.eta.data.model.AppearanceAccentColor
+import io.github.mangi.eta.data.model.AppearancePaletteStyle
+import io.github.mangi.eta.data.model.AppearanceSettings
+import io.github.mangi.eta.data.model.AppearanceThemeMode
+import top.yukonga.miuix.kmp.theme.ColorSchemeMode
+import top.yukonga.miuix.kmp.theme.MiuixTheme
+import top.yukonga.miuix.kmp.theme.ThemeColorSpec
+import top.yukonga.miuix.kmp.theme.ThemeController
+import top.yukonga.miuix.kmp.theme.ThemePaletteStyle
+import top.yukonga.miuix.kmp.theme.platformDynamicColors
+
+@Composable
+fun AgentAppTheme(
+    appearance: AppearanceSettings,
+    applyInterfaceScale: Boolean,
+    onResolvedDarkModeChange: (Boolean) -> Unit = {},
+    content: @Composable () -> Unit,
+) {
+    val systemDark = isSystemInDarkTheme()
+    val isDark = when (appearance.themeMode) {
+        AppearanceThemeMode.SYSTEM -> systemDark
+        AppearanceThemeMode.LIGHT -> false
+        AppearanceThemeMode.DARK -> true
+    }
+    val colorSchemeMode = when {
+        !appearance.monetEnabled && appearance.themeMode == AppearanceThemeMode.LIGHT -> ColorSchemeMode.Light
+        !appearance.monetEnabled && appearance.themeMode == AppearanceThemeMode.DARK -> ColorSchemeMode.Dark
+        !appearance.monetEnabled -> ColorSchemeMode.System
+        appearance.themeMode == AppearanceThemeMode.LIGHT -> ColorSchemeMode.MonetLight
+        appearance.themeMode == AppearanceThemeMode.DARK -> ColorSchemeMode.MonetDark
+        else -> ColorSchemeMode.MonetSystem
+    }
+    val systemSeedColor = if (
+        appearance.monetEnabled && appearance.accentColor == AppearanceAccentColor.SYSTEM
+    ) {
+        platformDynamicColors(isDark).primary
+    } else {
+        null
+    }
+    val keyColor = when {
+        !appearance.monetEnabled -> null
+        appearance.accentColor == AppearanceAccentColor.SYSTEM -> systemSeedColor
+        else -> appearance.accentColor.seedColor()
+    }
+    val controller = remember(appearance, colorSchemeMode, keyColor, isDark) {
+        ThemeController(
+            colorSchemeMode = colorSchemeMode,
+            keyColor = keyColor,
+            colorSpec = ThemeColorSpec.Spec2025,
+            paletteStyle = appearance.paletteStyle.toMiuixPaletteStyle(),
+            isDark = isDark,
+        )
+    }
+    val colors = controller.currentColors()
+    val themedColors = remember(colors, isDark, appearance.monetEnabled, appearance.pureBlackEnabled, appearance.blurEnabled) {
+        val base = if (appearance.monetEnabled && appearance.pureBlackEnabled && isDark) {
+            colors.copy(
+                background = Color.Black,
+                surface = Color.Black,
+            )
+        } else {
+            colors
+        }
+        if (!appearance.blurEnabled) {
+            // 模糊开关关闭时保持原有不透明外观
+            base
+        } else {
+            // 玻璃化：surface 系颜色统一改为半透明，与磨砂模糊配合实现 iOS 风格玻璃质感。
+            // 全局生效：所有卡片、按钮、对话框、输入栏等使用这些颜色的组件自动变为半透明。
+            base.copy(
+                surface = base.surface.copy(alpha = GlassSurfaceAlpha),
+                surfaceContainer = base.surfaceContainer.copy(alpha = GlassSurfaceContainerAlpha),
+                surfaceContainerHigh = base.surfaceContainerHigh.copy(alpha = GlassSurfaceContainerHighAlpha),
+                surfaceContainerHighest = base.surfaceContainerHighest.copy(alpha = GlassSurfaceContainerHighestAlpha),
+            )
+        }
+    }
+
+    LaunchedEffect(isDark) { onResolvedDarkModeChange(isDark) }
+
+    MiuixTheme(colors = themedColors) {
+        val platformDensity = LocalDensity.current
+        val appDensity = remember(platformDensity, appearance.interfaceScale, applyInterfaceScale) {
+            if (applyInterfaceScale) {
+                Density(
+                    density = platformDensity.density * appearance.interfaceScale,
+                    fontScale = platformDensity.fontScale,
+                )
+            } else {
+                platformDensity
+            }
+        }
+        CompositionLocalProvider(
+            LocalAppearanceSettings provides appearance,
+            LocalBlurEnabled provides appearance.blurEnabled,
+            LocalTopBarBlurStyle provides appearance.topBarBlurStyle,
+            LocalPlatformDensity provides platformDensity,
+            LocalDensity provides appDensity,
+        ) {
+            content()
+        }
+    }
+}
+
+private fun AppearancePaletteStyle.toMiuixPaletteStyle(): ThemePaletteStyle = when (this) {
+    AppearancePaletteStyle.TONAL_SPOT -> ThemePaletteStyle.TonalSpot
+    AppearancePaletteStyle.NEUTRAL -> ThemePaletteStyle.Neutral
+    AppearancePaletteStyle.VIBRANT -> ThemePaletteStyle.Vibrant
+    AppearancePaletteStyle.EXPRESSIVE -> ThemePaletteStyle.Expressive
+    AppearancePaletteStyle.RAINBOW -> ThemePaletteStyle.Rainbow
+    AppearancePaletteStyle.FRUIT_SALAD -> ThemePaletteStyle.FruitSalad
+    AppearancePaletteStyle.MONOCHROME -> ThemePaletteStyle.Monochrome
+    AppearancePaletteStyle.FIDELITY -> ThemePaletteStyle.Fidelity
+    AppearancePaletteStyle.CONTENT -> ThemePaletteStyle.Content
+}
+
+private fun AppearanceAccentColor.seedColor(): Color = when (this) {
+    AppearanceAccentColor.SYSTEM, AppearanceAccentColor.BLUE -> Color(0xFF3482FF)
+    AppearanceAccentColor.PURPLE -> Color(0xFF6750A4)
+    AppearanceAccentColor.PINK -> Color(0xFFB0006D)
+    AppearanceAccentColor.RED -> Color(0xFFBA1A1A)
+    AppearanceAccentColor.ORANGE -> Color(0xFFB65D00)
+    AppearanceAccentColor.YELLOW -> Color(0xFF7D5700)
+    AppearanceAccentColor.GREEN -> Color(0xFF006D3B)
+    AppearanceAccentColor.TEAL -> Color(0xFF006A6A)
+}
