@@ -2,6 +2,7 @@ package io.github.mangi.eta.ui.app
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -84,6 +85,18 @@ internal val GlassInputBarHorizontalMargin = 16.dp
 internal val GlassInputBarBottomMargin = 12.dp
 
 // endregion
+
+/**
+ * 聊天消息列表的 backdrop，通过 CompositionLocal 由 AgentAppShell 在顶层创建并下发。
+ *
+ * 提升到 Shell 层级的目的：backdrop 对象在页面导航时不重建。之前 backdrop 在
+ * AgentChatScaffold 内用 rememberLayerBackdrop 创建，每次进出页面都会重建，
+ * 重建的第一帧 backdrop 还没 capture 到背景内容，先显示了 drawRect 的不透明底色，
+ * 造成白闪。提升到 Shell 层后只创建一次，导航时复用，白闪消失。
+ *
+ * 为 null 表示模糊不可用（开关关闭或设备不支持 RuntimeShader），调用方应回退为非模糊 UI。
+ */
+val LocalChatBackdrop = compositionLocalOf<LayerBackdrop?> { null }
 
 /**
  * 创建玻璃 backdrop（Miuix 机制）。
