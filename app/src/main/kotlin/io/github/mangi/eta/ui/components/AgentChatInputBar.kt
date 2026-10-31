@@ -49,9 +49,9 @@ import androidx.compose.material.icons.rounded.ArrowUpward
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Stop
 import androidx.compose.runtime.Composable
-import dev.chrisbanes.haze.HazeState
 import io.github.mangi.eta.ui.app.LocalBlurEnabled
-import io.github.mangi.eta.ui.app.glassHaze
+import io.github.mangi.eta.ui.app.glassTextureBlur
+import top.yukonga.miuix.kmp.blur.LayerBackdrop
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -148,7 +148,7 @@ internal fun AgentChatInputBar(
     onAttachFilePath: (String) -> Unit,
     onRemoveFileReference: (String) -> Unit,
     onCancelMessageEdit: () -> Unit,
-    hazeState: HazeState? = null,
+    backdrop: LayerBackdrop? = null,
     modifier: Modifier = Modifier,
 ) {
     val keyboard = LocalSoftwareKeyboardController.current
@@ -263,9 +263,9 @@ internal fun AgentChatInputBar(
                     inputContainerTopPx = coordinates.positionInWindow().y.roundToInt()
                 },
         ) {
-            // iOS 风格悬浮输入框：Haze 真实背景模糊 + 半透明底色 + 描边 + 阴影。
+            // iOS 风格悬浮输入框：Miuix 真实背景模糊 + 半透明底色 + 描边 + 阴影。
             // 模糊关闭时回退为原来的 squircleSurface 实色底。
-            val blurOn = LocalBlurEnabled.current && hazeState != null
+            val blurOn = LocalBlurEnabled.current && backdrop != null
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -279,12 +279,11 @@ internal fun AgentChatInputBar(
                     )
                     .then(
                         if (blurOn) {
-                            Modifier
-                                .glassHaze(hazeState, blurEnabled = true, cornerRadius = 20.dp)
-                                .background(
-                                    MiuixTheme.colorScheme.surfaceContainer.copy(alpha = 0.55f),
-                                    InputContainerShape,
-                                )
+                            Modifier.glassTextureBlur(
+                                backdrop = backdrop,
+                                shape = InputContainerShape,
+                                blendColor = MiuixTheme.colorScheme.surfaceContainer.copy(alpha = 0.55f),
+                            )
                         } else {
                             Modifier.squircleSurface(
                                 color = MiuixTheme.colorScheme.surfaceContainer,

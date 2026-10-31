@@ -161,10 +161,6 @@ dependencies {
     implementation(libs.miuix.blur)
     implementation(libs.miuix.nav)
     implementation(libs.miuix.preference)
-    // Haze v2：iOS 风格磨砂玻璃背景模糊
-    implementation(libs.haze)
-    implementation(libs.haze.blur)
-    implementation(libs.haze.blur.materials)
     implementation(libs.material.icons.extended)
     implementation(libs.androidx.navigationevent)
     implementation(libs.androidx.lifecycle.runtime.compose)

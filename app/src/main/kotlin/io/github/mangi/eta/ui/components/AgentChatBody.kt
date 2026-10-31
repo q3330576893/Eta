@@ -110,12 +110,8 @@ import top.yukonga.miuix.kmp.basic.Icon
 import top.yukonga.miuix.kmp.basic.IconButton
 import top.yukonga.miuix.kmp.basic.IconButtonDefaults
 import io.github.mangi.eta.ui.app.LocalBlurEnabled
-import io.github.mangi.eta.ui.app.LocalChatHazeState
-import io.github.mangi.eta.ui.app.glassHazeSource
-import dev.chrisbanes.haze.HazeState
 import io.github.mangi.eta.ui.app.GlassInputBarBottomMargin
 import io.github.mangi.eta.ui.app.GlassInputBarHorizontalMargin
-import io.github.mangi.eta.ui.app.rememberGlassHazeState
 import top.yukonga.miuix.kmp.basic.Scaffold
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.blur.BlendColorEntry
@@ -362,18 +358,14 @@ private fun AgentChatScaffold(
 ) {
     val surfaceColor = MiuixTheme.colorScheme.surface
     val frostEnabled = hasMessages && LocalBlurEnabled.current && isRuntimeShaderSupported()
-    // Haze v2：聊天界面的真实背景模糊。hazeState 在顶层创建，消息列表是模糊源，
-    // 输入栏/气泡是玻璃。
-    val chatHazeState = rememberGlassHazeState()
+    // v3：Miuix backdrop 做聊天界面的真实背景模糊。messageBackdrop 在顶层创建，
+    // 消息列表是模糊源（layerBackdrop），输入栏是玻璃（textureBlur）。
     val messageBackdrop = rememberLayerBackdrop {
         // Backdrop 必须包含不透明底色，否则文字边缘模糊到透明区域时会出现黑边。
         drawRect(surfaceColor)
         drawContent()
     }
 
-    androidx.compose.runtime.CompositionLocalProvider(
-        LocalChatHazeState provides chatHazeState.takeIf { frostEnabled },
-    ) {
     Scaffold(
         modifier = modifier.fillMaxSize(),
         containerColor = Color.Transparent,
@@ -386,7 +378,6 @@ private fun AgentChatScaffold(
         bottomBar = {
             AgentChatBottomBar(
                 messageBackdrop = messageBackdrop.takeIf { frostEnabled },
-                hazeState = chatHazeState.takeIf { frostEnabled },
                 input = input,
                 modelPickerState = modelPickerState,
                 isCompacting = isCompacting,
@@ -454,12 +445,10 @@ private fun AgentChatScaffold(
                 onHistoryViewportChanged = onHistoryViewportChanged,
                 modifier = Modifier
                     .fillMaxSize()
-                    .glassHazeSource(chatHazeState, frostEnabled)
                     .then(if (frostEnabled) Modifier.layerBackdrop(messageBackdrop) else Modifier),
             )
         }
     }
-    } // CompositionLocalProvider(LocalChatHazeState)
 }
 
 @Composable
@@ -1008,7 +997,6 @@ internal fun resolveFinalResultMessageIds(
 @Composable
 private fun AgentChatBottomBar(
     messageBackdrop: LayerBackdrop?,
-    hazeState: HazeState?,
     input: String,
     modelPickerState: AgentModelPickerUiState,
     isCompacting: Boolean,
@@ -1041,7 +1029,7 @@ private fun AgentChatBottomBar(
     onCancelMessageEdit: () -> Unit,
 ) {
     // iOS 风格悬浮底栏：整栏悬浮不贴边，左右 16.dp、底部 12.dp 留白，
-    // 背景由输入框自身的 Haze 毛玻璃提供，这里不再画实色底。
+    // 背景由输入框自身的 Miuix 毛玻璃提供，这里不再画实色底。
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -1086,7 +1074,7 @@ private fun AgentChatBottomBar(
                 onAttachFilePath = onAttachFilePath,
                 onRemoveFileReference = onRemoveFileReference,
                 onCancelMessageEdit = onCancelMessageEdit,
-                hazeState = hazeState,
+                backdrop = messageBackdrop,
                 modifier = Modifier.fillMaxWidth(),
             )
     }
