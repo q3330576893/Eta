@@ -208,6 +208,10 @@
   <string name="conversation_delete_message">This conversation and its messages will be permanently deleted.</string>
   <string name="conversation_delete_message_title">Delete message?</string>
   <string name="conversation_delete_message_body">This message will be deleted.</string>
+  <plurals name="conversation_batch_delete_message">
+    <item quantity="one">This conversation and its messages will be permanently deleted.</item>
+    <item quantity="other">%d conversations and their messages will be permanently deleted.</item>
+  </plurals>
   <plurals name="conversation_delete_later_turns">
     <item quantity="one">This message and %d later turn will be deleted.</item>
     <item quantity="other">This message and %d later turns will be deleted.</item>

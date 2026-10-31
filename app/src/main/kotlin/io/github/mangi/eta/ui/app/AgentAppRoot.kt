@@ -180,6 +180,7 @@ fun AgentAppRoot(
     var conversationPaneOpen by rememberSaveable { mutableStateOf(false) }
     var conversationRenameTarget by remember { mutableStateOf<ConversationSummaryUi?>(null) }
     var conversationDeleteTarget by remember { mutableStateOf<ConversationSummaryUi?>(null) }
+    var conversationBatchDeleteTarget by remember { mutableStateOf<List<ConversationSummaryUi>?>(null) }
     var conversationExportTarget by remember { mutableStateOf<ConversationSummaryUi?>(null) }
     var messageDeleteTarget by remember { mutableStateOf<MessageMutationTarget?>(null) }
     var messageRegenerateTarget by remember { mutableStateOf<MessageMutationTarget?>(null) }
@@ -336,6 +337,9 @@ fun AgentAppRoot(
             },
             onConversationDelete = { conversation ->
                 conversationDeleteTarget = conversation
+            },
+            onBatchDelete = { conversations ->
+                conversationBatchDeleteTarget = conversations
             },
             onOpenTools = { pushRoute(AppRoute.Tools) },
             onOpenSkills = { pushRoute(AppRoute.Skills) },
@@ -841,6 +845,32 @@ fun AgentAppRoot(
                     }
                     agentState.deleteConversation(conversation.id)
                     conversationDeleteTarget = null
+                },
+            )
+        }
+    }
+
+    conversationBatchDeleteTarget?.let { conversations ->
+        WindowDialog(
+            show = true,
+            cornerRadius = DialogDefaults.CornerRadius,
+            title = stringResource(R.string.conversation_delete_title),
+            summary = pluralStringResource(
+                R.plurals.conversation_batch_delete_message,
+                conversations.size,
+                conversations.size,
+            ),
+            onDismissRequest = { conversationBatchDeleteTarget = null },
+        ) {
+            MiuixDialogActions(
+                confirmText = stringResource(R.string.action_delete),
+                destructive = true,
+                onCancel = { conversationBatchDeleteTarget = null },
+                onConfirm = {
+                    conversations.forEach { conversation ->
+                        agentState.deleteConversation(conversation.id)
+                    }
+                    conversationBatchDeleteTarget = null
                 },
             )
         }

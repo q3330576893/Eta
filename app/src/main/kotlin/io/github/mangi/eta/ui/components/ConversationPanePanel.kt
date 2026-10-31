@@ -53,6 +53,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.state.ToggleableState
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpSize
@@ -60,6 +61,7 @@ import androidx.compose.ui.unit.dp
 import io.github.mangi.eta.R
 import io.github.mangi.eta.ui.model.ConversationPaneUiState
 import io.github.mangi.eta.ui.model.ConversationSummaryUi
+import top.yukonga.miuix.kmp.basic.Checkbox
 import top.yukonga.miuix.kmp.basic.DropdownDefaults
 import top.yukonga.miuix.kmp.basic.DropdownImpl
 import top.yukonga.miuix.kmp.basic.DropdownItem
@@ -122,6 +124,7 @@ internal fun ConversationPanePanel(
     onConversationRename: (ConversationSummaryUi) -> Unit,
     onConversationExport: (ConversationSummaryUi) -> Unit,
     onConversationDelete: (ConversationSummaryUi) -> Unit,
+    onBatchDelete: (List<ConversationSummaryUi>) -> Unit,
     onOpenSettings: () -> Unit,
     onOpenModelProviders: () -> Unit,
     onOpenTools: () -> Unit,
@@ -132,6 +135,8 @@ internal fun ConversationPanePanel(
 ) {
     // state.conversations 已由 AgentAppState 按标题、预览与消息内容过滤。
     val query = state.searchQuery.trim()
+    var batchMode by remember { mutableStateOf(false) }
+    var selectedIds by remember { mutableStateOf(setOf<String>()) }
     val groups = remember(state.conversations) { state.conversations.groupForDrawer() }
 
     Surface(
@@ -172,6 +177,20 @@ internal fun ConversationPanePanel(
                 verticalArrangement = Arrangement.spacedBy(ConversationPanelMetrics.RowGap),
                 overscrollEffect = null,
             ) {
+                item(key = "batch-toolbar") {
+                    BatchDeleteToolbar(
+                        batchMode = batchMode,
+                        selectedCount = selectedIds.size,
+                        hasConversations = state.conversations.isNotEmpty(),
+                        onEnterBatchMode = { batchMode = true; selectedIds = emptySet() },
+                        onSelectAll = { selectedIds = state.conversations.map { it.id }.toSet() },
+                        onCancel = { batchMode = false; selectedIds = emptySet() },
+                        onDelete = {
+                            onBatchDelete(state.conversations.filter { it.id in selectedIds })
+                            batchMode = false; selectedIds = emptySet()
+                        },
+                    )
+                }
                 if (state.conversations.isEmpty()) {
                     item {
                         EmptyConversations(isSearching = query.isNotBlank())
@@ -188,7 +207,15 @@ internal fun ConversationPanePanel(
                             ConversationTextRow(
                                 conversation = conversation,
                                 selected = conversation.id == state.selectedConversationId,
-                                onClick = { onConversationSelected(conversation.id) },
+                                batchMode = batchMode,
+                                checked = conversation.id in selectedIds,
+                                onClick = {
+                                    if (batchMode) {
+                                        selectedIds = if (conversation.id in selectedIds) selectedIds - conversation.id else selectedIds + conversation.id
+                                    } else {
+                                        onConversationSelected(conversation.id)
+                                    }
+                                },
                                 onRename = { onConversationRename(conversation) },
                                 onExport = { onConversationExport(conversation) },
                                 onDelete = { onConversationDelete(conversation) },
@@ -264,6 +291,59 @@ private fun PaneActionBar(
 }
 
 @Composable
+private fun BatchDeleteToolbar(
+    batchMode: Boolean,
+    selectedCount: Int,
+    hasConversations: Boolean,
+    onEnterBatchMode: () -> Unit,
+    onSelectAll: () -> Unit,
+    onCancel: () -> Unit,
+    onDelete: () -> Unit,
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(start = 16.dp, top = 8.dp, bottom = 4.dp, end = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            if (batchMode) "已选 $selectedCount 项" else "会话历史",
+            style = MiuixTheme.textStyles.body2,
+            fontWeight = FontWeight.SemiBold,
+            color = MiuixTheme.colorScheme.onSurface,
+            modifier = Modifier.weight(1f),
+        )
+        if (batchMode) {
+            Text(
+                "全选",
+                color = MiuixTheme.colorScheme.primary,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.padding(horizontal = 8.dp).clickable { onSelectAll() },
+            )
+            Text(
+                "取消",
+                color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.padding(horizontal = 8.dp).clickable { onCancel() },
+            )
+            Text(
+                "删除",
+                color = if (selectedCount == 0) MiuixTheme.colorScheme.onSurfaceVariantSummary else MiuixTheme.colorScheme.error,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(horizontal = 8.dp).clickable(enabled = selectedCount > 0) { onDelete() },
+            )
+        } else if (hasConversations) {
+            Text(
+                "批量删除",
+                color = MiuixTheme.colorScheme.primary,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.padding(horizontal = 8.dp).clickable { onEnterBatchMode() },
+            )
+        }
+    }
+}
+
+@Composable
 private fun ConversationSectionHeader(
     group: ConversationDrawerGroup,
 ) {
@@ -304,6 +384,8 @@ private fun ConversationSectionHeader(
 private fun ConversationTextRow(
     conversation: ConversationSummaryUi,
     selected: Boolean,
+    batchMode: Boolean = false,
+    checked: Boolean = false,
     onClick: () -> Unit,
     onRename: () -> Unit,
     onExport: () -> Unit,
@@ -339,6 +421,13 @@ private fun ConversationTextRow(
                 ),
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            if (batchMode) {
+                Checkbox(
+                    state = if (checked) ToggleableState.On else ToggleableState.Off,
+                    onClick = onClick,
+                    modifier = Modifier.padding(end = 4.dp),
+                )
+            }
             conversation.characterName?.let { name ->
                 CharacterAvatar(
                     name = name,
