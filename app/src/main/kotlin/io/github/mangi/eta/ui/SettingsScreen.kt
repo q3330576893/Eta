@@ -81,7 +81,6 @@ import io.github.mangi.eta.ui.components.EtaPreferenceDivider
 import io.github.mangi.eta.ui.components.EtaPreferenceGroup
 import io.github.mangi.eta.ui.components.EtaPreferenceGroupTitle
 import io.github.mangi.eta.ui.components.EtaPreferenceIcon
-import io.github.mangi.eta.data.datastore.SettingsDataStore
 import io.github.mangi.eta.ui.components.EtaSwitchPreference
 import io.github.mangi.eta.ui.components.EtaWindowDialog
 import io.github.mangi.eta.ui.components.LanguagePreference
@@ -128,8 +127,6 @@ private fun SettingsPageContent(
     var overlayGranted by remember {
         mutableStateOf(android.provider.Settings.canDrawOverlays(context))
     }
-    // 悬浮胶囊常驻开关
-    val capsuleSettings by SettingsDataStore.settingsFlow().collectAsState(initial = null)
     var accessibilityGranted by remember {
         mutableStateOf(isAgentAccessibilityEnabled(context))
     }
@@ -399,46 +396,6 @@ private fun SettingsPageContent(
                         key = Prefs.Keys.AGENT_VIRTUAL_DISPLAY_ENABLED,
                         icon = Icons.Rounded.Layers,
                         iconTint = EtaPreferenceColors.Blue,
-                    )
-
-                    EtaPreferenceDivider()
-                    EtaSwitchPreference(
-                        title = "悬浮胶囊常驻",
-                        summary = "打开 Eta 后一直显示悬浮胶囊（没任务时也在），点它看运行中会话",
-                        checked = capsuleSettings?.overlayCapsulePinned == true,
-                        onCheckedChange = { value ->
-                            if (value && !android.provider.Settings.canDrawOverlays(context)) {
-                                runCatching {
-                                    context.startActivity(
-                                        Intent(
-                                            android.provider.Settings.ACTION_MANAGE_OVERLAY_PERMISSION,
-                                            Uri.parse("package:${context.packageName}"),
-                                        ).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK),
-                                    )
-                                }
-                            }
-                            coroutineScope.launch {
-                                SettingsDataStore.updateSettings { it.copy(overlayCapsulePinned = value) }
-                                runCatching {
-                                    context.startService(
-                                        Intent(context, io.github.mangi.eta.agent.runtime.AgentRuntimeService::class.java)
-                                            .setAction(
-                                                if (value) {
-                                                    io.github.mangi.eta.agent.runtime.AgentRuntimeService.ACTION_PIN_CAPSULE
-                                                } else {
-                                                    io.github.mangi.eta.agent.runtime.AgentRuntimeService.ACTION_UNPIN_CAPSULE
-                                                },
-                                            ),
-                                    )
-                                }
-                            }
-                        },
-                        startAction = {
-                            EtaPreferenceIcon(
-                                icon = Icons.Rounded.SupportAgent,
-                                tint = EtaPreferenceColors.Green,
-                            )
-                        },
                     )
 
                     EtaPreferenceDivider()
