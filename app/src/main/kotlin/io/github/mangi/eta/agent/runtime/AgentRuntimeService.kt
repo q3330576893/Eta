@@ -1402,6 +1402,10 @@ internal class AgentRuntimeService : Service(), LifecycleOwner, SavedStateRegist
     private fun enterFinalState(finalState: AgentOverlayState) {
         state.value = finalState
 
+        // 任务完成通知：成功/失败时弹通知，点击跳回主界面
+        val ok = finalState.phase == AgentOverlayPhase.FINISHED
+        TaskCompletionNotification.show(this, ok, finalState.detailText)
+
         val run = displayedRun
         if (AgentOverlayVisibilityPolicy.shouldShowResultCard(
                 hasExecutedForegroundTool = run?.hasExecutedForegroundTool == true,

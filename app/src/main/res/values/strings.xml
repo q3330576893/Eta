@@ -1454,4 +1454,8 @@
   <string name="chat_queue_remove">移除排队消息</string>
   <string name="chat_queue_images_only">[%1$d 张图片]</string>
   <string name="chat_queue_files_only">[%1$d 个文件]</string>
+    <string name="task_completion_channel">任务完成</string>
+    <string name="task_completion_ok_title">任务已完成</string>
+    <string name="task_completion_fail_title">任务失败</string>
+    <string name="task_completion_ok_body">Eta 任务已结束，点击查看</string>
 </resources>
