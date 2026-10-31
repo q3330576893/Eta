@@ -121,6 +121,9 @@ fun AgentAppRoot(
     onTerminalOpened: () -> Unit = {},
     onSpeechSettingsOpened: () -> Unit = {},
     onAssistantConversationOpened: (Boolean) -> Unit = {},
+    screenshotUri: String? = null,
+    screenshotPrefillText: String? = null,
+    onScreenshotHandled: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val resources = LocalResources.current
@@ -136,6 +139,19 @@ fun AgentAppRoot(
         if (openTerminal) {
             if (backStack.lastOrNull() != AppRoute.Terminal) backStack.add(AppRoute.Terminal)
             onTerminalOpened()
+        }
+    }
+    // 双击胶囊发送截图：附加图片到当前会话（或新会话）。
+    // TODO: 预填文本「帮我看看这屏」需要接入聊天输入框的 draft 状态，待后续完善。
+    LaunchedEffect(screenshotUri) {
+        if (screenshotUri != null) {
+            // 确保在聊天首页
+            if (backStack.lastOrNull() != AppRoute.Home) {
+                backStack.clear()
+                backStack.add(AppRoute.Home)
+            }
+            agentState.attachImage(screenshotUri)
+            onScreenshotHandled()
         }
     }
     val navigator = remember(backStack) { AgentNavigator(backStack) }
