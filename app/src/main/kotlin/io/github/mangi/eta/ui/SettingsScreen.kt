@@ -286,12 +286,24 @@ private fun SettingsPageContent(
                     EtaArrowPreference(
                         title = "App 知识库",
                         summary = "记住 App 操作流程，下次自动执行",
+                        startAction = {
+                            EtaPreferenceIcon(
+                                icon = Icons.Rounded.TouchApp,
+                                tint = EtaPreferenceColors.Orange,
+                            )
+                        },
                         onClick = { onNavigate(AppRoute.AppKnowledge) },
                     )
 
                     EtaArrowPreference(
                         title = "预设管理",
                         summary = "导入预设包，一键套用自定义人格",
+                        startAction = {
+                            EtaPreferenceIcon(
+                                icon = Icons.Rounded.Palette,
+                                tint = EtaPreferenceColors.Blue,
+                            )
+                        },
                         onClick = { onNavigate(AppRoute.PresetManager) },
                     )
 
