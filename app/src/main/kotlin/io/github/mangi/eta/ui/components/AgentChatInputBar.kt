@@ -103,6 +103,8 @@ import top.yukonga.miuix.kmp.squircle.squircleSurface
 import top.yukonga.miuix.kmp.theme.LocalDismissState
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 import top.yukonga.miuix.kmp.window.WindowListPopup
+import androidx.compose.ui.platform.LocalContext
+import kotlinx.coroutines.delay
 
 private val SendButtonVisualSize = ChatInputActionIconSize
 private val SendIconSize = 16.dp
@@ -173,6 +175,16 @@ internal fun AgentChatInputBar(
     val density = LocalDensity.current
     val statusBarTopPx = WindowInsets.statusBars.getTop(density)
     var inputContainerTopPx by remember { mutableIntStateOf(0) }
+    // 输入栏状态行：内存百分比（每 5 秒刷新），点开看内存详情。
+    val memoryContext = LocalContext.current
+    var memoryUsage by remember { mutableStateOf(readMemoryUsage(memoryContext)) }
+    var showMemorySheet by remember { mutableStateOf(false) }
+    LaunchedEffect(memoryContext) {
+        while (true) {
+            memoryUsage = readMemoryUsage(memoryContext)
+            delay(MEMORY_REFRESH_MILLIS)
+        }
+    }
     val thinkingPopupMaxHeight = with(density) {
         (inputContainerTopPx - statusBarTopPx).coerceAtLeast(0).toDp()
     }.minus(ChatInputPopupMargin * 2)
@@ -298,6 +310,24 @@ internal fun AgentChatInputBar(
                     )
                     .padding(horizontal = 10.dp, vertical = 8.dp),
             ) {
+                // 状态行：内存百分比（右对齐，可点击看详情）。
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(start = 8.dp, end = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                ) {
+                    Spacer(Modifier.weight(1f))
+                    Text(
+                        text = stringResource(R.string.memory_inline_label, memoryUsage.usedPercent),
+                        style = MiuixTheme.textStyles.footnote2,
+                        color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
+                        modifier = Modifier
+                            .clickable { showMemorySheet = true }
+                            .padding(horizontal = 4.dp, vertical = 2.dp),
+                    )
+                }
+                MemoryUsageSheet(show = showMemorySheet, onDismiss = { showMemorySheet = false })
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
