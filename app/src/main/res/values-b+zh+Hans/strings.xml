@@ -1456,4 +1456,14 @@
     <string name="token_usage_input_price_hint">输入 $/1M</string>
     <string name="token_usage_output_price_hint">输出 $/1M</string>
 
+
+    <string name="msg_action_copy">复制</string>
+    <string name="msg_action_read_aloud">朗读</string>
+    <string name="msg_action_stop_reading">停止朗读</string>
+    <string name="msg_action_translate">翻译</string>
+    <string name="msg_translate_title">翻译</string>
+    <string name="msg_translate_loading">翻译中…</string>
+    <string name="msg_translate_failed">翻译失败，请重试</string>
+    <string name="msg_translate_retry">重试</string>
+    <string name="msg_translate_copy">复制译文</string>
 </resources>
