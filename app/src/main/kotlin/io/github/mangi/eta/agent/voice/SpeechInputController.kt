@@ -1,6 +1,7 @@
 package io.github.mangi.eta.agent.voice
 
 import android.content.Context
+import io.github.mangi.eta.R
 import io.github.mangi.eta.core.AndroidAgentLogger
 import io.github.mangi.eta.data.model.AsrProvider
 import io.github.mangi.eta.data.model.SpeechCredentials
@@ -11,6 +12,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.ReceiveChannel
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,7 +25,9 @@ internal data class SpeechInputState(
     val level: Float = 0f,
     val progress: String = "",
     val error: String? = null,
+    val systemIssue: EtaSpeechIssue? = null,
     val configureAvailable: Boolean = false,
+    val downloadAvailable: Boolean = false,
 ) {
     val active: Boolean get() = phase != EtaSpeechPhase.IDLE
 }
@@ -51,10 +55,15 @@ internal class SpeechInputController(
     val state = mutableState.asStateFlow()
     private var generation = 0L
     private var finishRequested = false
+    private var pendingSystemResult: String? = null
     private var job: Job? = null
+    private var delivery: Job? = null
     private var recorder: SpeechAudioCapture? = null
+    private var system: EtaSpeechInput? = null
     private var lease: SpeechAudioLease? = null
     private var capturing = false
+    private var autoSubmit = false
+    private var refineTranscript = false
 
     /**
      * [holdToTalk] 表示用户按住说话：松手才结束，期间的停顿不会自动发送。
@@ -69,11 +78,18 @@ internal class SpeechInputController(
                 val config = settings ?: SpeechSettingsRepository.settings()
                 if (!config.recognitionEnabled) return@launch
                 lease = SpeechAudioLease(context) { cancel() }.also { it.acquire(playback = false) }
-                val secrets = credentials ?: SpeechSettingsRepository.credentials(context)
+                val secrets = credentials ?: if (config.asr == AsrProvider.SYSTEM) SpeechCredentials()
+                    else SpeechSettingsRepository.credentials(context)
                 validateSpeechSettings(config, secrets, synthesis = false)
                 val endpointSilenceMs = if (automaticEndpoint && !holdToTalk) config.autoSendSilenceMs else 0
-                val audio = createRecorder()
-                recorder = audio
+                autoSubmit = endpointSilenceMs > 0
+                refineTranscript = config.refineTranscript
+                if (config.asr == AsrProvider.SYSTEM) {
+                    startSystem(session, endpointSilenceMs)
+                    awaitCancellation()
+                } else {
+                    val audio = createRecorder()
+                    recorder = audio
                 fun update(transform: (SpeechInputState) -> SpeechInputState) {
                     scope.launch(Dispatchers.Main.immediate) {
                         if (generation == session) mutableState.value = transform(mutableState.value)
@@ -128,6 +144,7 @@ internal class SpeechInputController(
                     cancel()
                     onResult(final)
                 }
+                }
             } catch (error: Exception) {
                 if (error is CancellationException && error !is kotlinx.coroutines.TimeoutCancellationException) throw error
                 if (generation == session) {
@@ -147,6 +164,54 @@ internal class SpeechInputController(
         }
     }
 
+    /** 系统识别结果从回调到达，纠错需要挂起，因此在会话自身的协程外单独交付。 */
+    private fun deliver(session: Long, text: String) {
+        if (!refineTranscript) { cancel(); onResult(text); return }
+        pendingSystemResult = null
+        finishRequested = true
+        lease?.close(); lease = null
+        delivery = scope.launch(Dispatchers.Main.immediate) {
+            val final = refined(session, refineTranscript, text)
+            if (generation == session) { cancel(); onResult(final) }
+        }
+    }
+
+    private fun startSystem(session: Long, endpointSilenceMs: Int) {
+        fun update(transform: (SpeechInputState) -> SpeechInputState) {
+            if (generation == session) mutableState.value = transform(mutableState.value)
+        }
+        system = EtaSpeechInput(context,
+            onListening = { update { it.copy(phase = EtaSpeechPhase.LISTENING, progress = "正在聆听") } },
+            onRecognizing = { update { it.copy(phase = EtaSpeechPhase.RECOGNIZING, progress = "正在识别") } },
+            onLevel = { level -> update { it.copy(level = level) } },
+            onPartial = { text -> update { it.copy(preview = text) } },
+            onResult = { text ->
+                if (generation == session) {
+                    if (autoSubmit || finishRequested) deliver(session, text)
+                    else {
+                        pendingSystemResult = text
+                        lease?.close(); lease = null
+                        update { it.copy(phase = EtaSpeechPhase.LISTENING, preview = text, progress = "识别完成，点击完成插入", level = 0f) }
+                    }
+                }
+            },
+            onError = { issue ->
+                if (generation == session) { lease?.close(); lease = null }
+                update { SpeechInputState(error = context.getString(speechIssueMessage(issue)), systemIssue = issue,
+                    downloadAvailable = issue.kind == EtaSpeechIssueKind.DOWNLOAD_AVAILABLE) }
+            },
+            onDownloadStatus = { status -> update {
+                SpeechInputState(progress = context.getString(when (status) {
+                    EtaSpeechDownloadStatus.DOWNLOADING -> R.string.voice_model_downloading
+                    EtaSpeechDownloadStatus.SCHEDULED -> R.string.voice_model_scheduled
+                    EtaSpeechDownloadStatus.READY -> R.string.voice_model_ready
+                    EtaSpeechDownloadStatus.FAILED -> R.string.voice_model_download_failed
+                }), downloadAvailable = status == EtaSpeechDownloadStatus.FAILED)
+            } },
+            completeSilenceMs = endpointSilenceMs.takeIf { it > 0 },
+        ).also { it.start() }
+    }
+
     /** 纠错失败不影响交付；只有纠错仍属于当前会话时才展示进度。 */
     private suspend fun refined(session: Long, refineTranscript: Boolean, text: String): String {
         if (!refineTranscript || generation != session) return text
@@ -164,17 +229,27 @@ internal class SpeechInputController(
     }
 
     fun finish() {
-        if (!mutableState.value.active || finishRequested) return
+        if (!mutableState.value.active) return
+        pendingSystemResult?.let { text -> deliver(generation, text); return }
+        if (finishRequested) return
         finishRequested = true
         if (mutableState.value.phase == EtaSpeechPhase.STARTING) { cancel(); return }
         recorder?.finish()
-        mutableState.value = mutableState.value.copy(phase = EtaSpeechPhase.RECOGNIZING, progress = "正在识别", level = 0f)
+        system?.finish()
+        if (system == null) {
+            mutableState.value = mutableState.value.copy(phase = EtaSpeechPhase.RECOGNIZING, progress = "正在识别", level = 0f)
+        }
     }
 
     fun cancel() {
         generation++
         finishRequested = false
+        autoSubmit = false
+        refineTranscript = false
+        pendingSystemResult = null
         recorder?.cancel(); recorder = null
+        system?.cancel(); system = null
+        delivery?.cancel(); delivery = null
         releaseCapture()
         job?.cancel(); job = null
         lease?.close(); lease = null
