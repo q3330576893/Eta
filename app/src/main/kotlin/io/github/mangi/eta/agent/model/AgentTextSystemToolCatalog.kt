@@ -193,6 +193,7 @@ internal object AgentTextSystemToolCatalog {
                         )
                         .put("required", JSONArray().put("panel"))
                 )
+            )
             .put(
                 AgentToolSchema.function(
                     name = "ask_user_choice",
