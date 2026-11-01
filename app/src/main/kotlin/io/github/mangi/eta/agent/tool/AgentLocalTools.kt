@@ -27,6 +27,7 @@ import io.github.mangi.eta.agent.model.AgentFileToolCatalog
 import io.github.mangi.eta.agent.overlay.AgentHapticFeedback
 import io.github.mangi.eta.agent.overlay.AgentOverlayClearance
 import io.github.mangi.eta.agent.overlay.GestureIndicator
+import io.github.mangi.eta.agent.overlay.AgentChoiceCardBridge
 import io.github.mangi.eta.agent.runtime.AgentAppContext
 import io.github.mangi.eta.agent.runtime.AgentRunCancelledException
 import io.github.mangi.eta.agent.runtime.GuiControlCoordinator
@@ -274,6 +275,8 @@ internal class AgentLocalTools(
                 "wait" -> textResult(deviceController.waitMs(args.optInt("duration_ms", 1_000)))
                 "wait_for_text" -> textResult(waitForText(args))
                 "wait_for_package" -> textResult(waitForPackage(args))
+                "ask_user_choice" -> textResult(askUserChoice(args))
+                "show_copyable_text" -> textResult(showCopyableText(args))
                 "open_system_panel" -> {
                     publishedObservation.set(PublishedObservation())
                     activeDisplayId = Display.DEFAULT_DISPLAY
@@ -821,6 +824,117 @@ internal class AgentLocalTools(
             timeoutMs = args.optInt("timeout_ms", 10_000),
             displayId = currentActiveDisplayId(),
         )
+
+    /**
+     * 悬浮选择卡片：弹出选项让用户点选，阻塞等待结果（最长 120 秒）。
+     * Agent 线程调用，UI 线程渲染卡片；通过 AgentChoiceCardBridge 传递请求与结果。
+     */
+    private fun askUserChoice(args: JSONObject): String {
+        val title = args.optString("title", "请选择").takeIf { it.isNotBlank() } ?: "请选择"
+        val sub = args.optString("sub", "")
+        val optionsJson = args.optJSONArray("options")
+            ?: return errorResult("INVALID_ARGUMENT", "ask_user_choice 需要 options 参数")
+        if (optionsJson.length() == 0) {
+            return errorResult("INVALID_ARGUMENT", "ask_user_choice 的 options 不能为空")
+        }
+        val options = (0 until minOf(optionsJson.length(), 4)).map { i ->
+            val o = optionsJson.getJSONObject(i)
+            AgentChoiceCardBridge.ChoiceOption(
+                title = o.optString("title", ""),
+                desc = o.optString("desc", ""),
+                recommend = o.optBoolean("recommend", false),
+            )
+        }
+        val future = java.util.concurrent.CompletableFuture<Int>()
+        AgentChoiceCardBridge.choiceRequest.value =
+            AgentChoiceCardBridge.ChoiceRequest(title, sub, options, future)
+        val index = awaitChoiceCardResult(future)
+        // 无论何种结果都尝试清理请求，避免卡片残留
+        AgentChoiceCardBridge.choiceRequest.compareAndSet(
+            AgentChoiceCardBridge.choiceRequest.value?.takeIf { it.future === future },
+            null,
+        )
+        if (index < 0) {
+            return errorResult("CANCELLED", "用户未选择（取消或超时）")
+        }
+        val chosen = options.getOrNull(index)
+        return JSONObject()
+            .put("ok", true)
+            .put("tool", "ask_user_choice")
+            .put("index", index)
+            .put("title", chosen?.title ?: "")
+            .toString()
+    }
+
+    /**
+     * 悬浮复制卡片：展示可一键复制的文本，阻塞等待用户操作（最长 120 秒）。
+     */
+    private fun showCopyableText(args: JSONObject): String {
+        val text = args.optString("text", "")
+        if (text.isBlank()) {
+            return errorResult("INVALID_ARGUMENT", "show_copyable_text 的 text 不能为空")
+        }
+        val title = args.optString("title", "").takeIf { it.isNotBlank() } ?: "复制内容"
+        val future = java.util.concurrent.CompletableFuture<Boolean>()
+        AgentChoiceCardBridge.copyRequest.value =
+            AgentChoiceCardBridge.CopyRequest(title, text, future)
+        val copied = awaitCopyCardResult(future)
+        AgentChoiceCardBridge.copyRequest.compareAndSet(
+            AgentChoiceCardBridge.copyRequest.value?.takeIf { it.future === future },
+            null,
+        )
+        return JSONObject()
+            .put("ok", true)
+            .put("tool", "show_copyable_text")
+            .put("copied", copied)
+            .toString()
+    }
+
+    /**
+     * 阻塞等待选择卡片结果。轮询 closed 标志以支持取消；超时或取消时返回 -1。
+     * 运行在 agent-runtime 线程，阻塞是预期的（wait 系列工具有同类模式）。
+     */
+    private fun awaitChoiceCardResult(future: java.util.concurrent.CompletableFuture<Int>): Int {
+        val deadline = android.os.SystemClock.uptimeMillis() + 120_000
+        while (true) {
+            if (closed.get()) {
+                future.complete(-1)
+                return -1
+            }
+            try {
+                return future.get(500, java.util.concurrent.TimeUnit.MILLISECONDS)
+            } catch (_: java.util.concurrent.TimeoutException) {
+                // 继续轮询
+            } catch (_: Exception) {
+                return -1
+            }
+            if (android.os.SystemClock.uptimeMillis() >= deadline) {
+                future.complete(-1)
+                return -1
+            }
+        }
+    }
+
+    private fun awaitCopyCardResult(future: java.util.concurrent.CompletableFuture<Boolean>): Boolean {
+        val deadline = android.os.SystemClock.uptimeMillis() + 120_000
+        while (true) {
+            if (closed.get()) {
+                future.complete(false)
+                return false
+            }
+            try {
+                return future.get(500, java.util.concurrent.TimeUnit.MILLISECONDS)
+            } catch (_: java.util.concurrent.TimeoutException) {
+                // 继续轮询
+            } catch (_: Exception) {
+                return false
+            }
+            if (android.os.SystemClock.uptimeMillis() >= deadline) {
+                future.complete(false)
+                return false
+            }
+        }
+    }
 
     /**
      * 坐标系必须显式声明。旧版按"上一次观察是否带截图"隐式切换默认值，模型无从得知，
