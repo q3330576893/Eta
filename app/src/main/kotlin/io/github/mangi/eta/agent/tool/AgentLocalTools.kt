@@ -59,6 +59,7 @@ import io.github.mangi.eta.data.repository.AgentMemoryException
 import io.github.mangi.eta.data.repository.AgentMemoryMutation
 import io.github.mangi.eta.data.repository.AgentMemoryRepository
 import io.github.mangi.eta.data.repository.AgentMemoryWriteResult
+import io.github.mangi.eta.data.repository.AppKnowledgeRepository
 import io.github.mangi.eta.data.repository.LinuxEnvironmentSettingsRepository
 import io.github.mangi.eta.data.repository.WebToolsSettingsRepository
 import java.util.Locale
@@ -289,6 +290,8 @@ internal class AgentLocalTools(
                 in AgentFileToolCatalog.names -> textResult(terminalTool { terminalController.fileTool(toolCall.name, args) })
                 "memory_get" -> textResult(memoryGet(args))
                 "memory_write" -> textResult(memoryWrite(args))
+            "remember_app_usage" -> textResult(rememberAppUsage(args))
+            "recall_app_usage" -> textResult(recallAppUsage(args))
                 "skills_list" -> textResult(skillsList(args))
                 "skills_read" -> textResult(skillsRead(args))
                 "skills_read_resource" -> textResult(skillsReadResource(args))
@@ -439,6 +442,49 @@ internal class AgentLocalTools(
         }
     } catch (failure: AgentMemoryException) {
         errorResult(failure.code, failure.message ?: "记忆写入失败")
+    }
+
+
+    private fun rememberAppUsage(args: JSONObject): String = try {
+        val pkg = args.optString("package_name").trim()
+        val desc = args.optString("action_description").trim()
+        val stepsJson = args.optString("steps_json").trim()
+        if (pkg.isBlank() || desc.isBlank() || stepsJson.isBlank()) {
+            errorResult("INVALID_ARGUMENT", "package_name、action_description、steps_json 均为必填")
+        } else try {
+            JSONArray(stepsJson)
+            val record = AppKnowledgeRepository.remember(
+                context, pkg, args.optString("app_name").trim(), desc, stepsJson)
+            JSONObject().put("ok", true).put("id", record.id)
+                .put("use_count", record.useCount).toString()
+        } catch (_: Exception) {
+            errorResult("INVALID_ARGUMENT", "steps_json 不是有效的 JSON 数组")
+        }
+    } catch (e: Exception) {
+        errorResult("DB_ERROR", e.message ?: "保存失败")
+    }
+
+    private fun recallAppUsage(args: JSONObject): String = try {
+        val pkg = args.optString("package_name").trim()
+        val query = args.optString("query").trim()
+        if (pkg.isBlank()) return errorResult("INVALID_ARGUMENT", "package_name 为必填")
+        val records = AppKnowledgeRepository.recall(context, pkg, query)
+        records.firstOrNull()?.let { AppKnowledgeRepository.bumpUsage(context, it.id) }
+        JSONObject().put("ok", true).put("count", records.size).put(
+            "records",
+            JSONArray().also { arr ->
+                records.take(5).forEach { r ->
+                    arr.put(JSONObject()
+                        .put("id", r.id)
+                        .put("app_name", r.appName)
+                        .put("action_description", r.actionDescription)
+                        .put("steps_json", r.stepsJson)
+                        .put("use_count", r.useCount))
+                }
+            },
+        ).toString()
+    } catch (e: Exception) {
+        errorResult("DB_ERROR", e.message ?: "检索失败")
     }
 
     private fun browserUse(args: JSONObject, toolCallId: String): AgentModelClient.ToolResult {
