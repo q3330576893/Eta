@@ -36,7 +36,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAG="debug-apk-${{ github.run_number }}"
+          TAG="debug-apk-$(echo ${{ github.sha }} | cut -c1-7)"
           APK=$(ls app/build/outputs/apk/debug/*.apk | head -1)
           echo "APK=$APK"
           gh release create "$TAG" "$APK" --title "Debug APK $TAG" --notes "Fork 自动构建"
@@ -45,7 +45,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          TAG="release-apk-${{ github.run_number }}"
+          TAG="release-apk-$(echo ${{ github.sha }} | cut -c1-7)"
           APK=$(ls app/build/outputs/apk/release/*.apk | head -1)
           echo "APK=$APK"
           ls -lh "$APK"
