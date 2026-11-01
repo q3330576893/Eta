@@ -62,6 +62,12 @@ class EtaApp : Application(), XposedServiceHelper.OnServiceListener {
         ProviderRepository.init(this)
         McpServerRepository.init(this)
         XposedServiceHelper.registerListener(this)
+        // 定时任务：进程启动后重排所有启用任务（兜底开机/进程被杀场景）
+        applicationScope.launch {
+            runCatching {
+                io.github.mangi.eta.scheduler.ScheduledTaskScheduler.rescheduleAll(this@EtaApp)
+            }
+        }
         applicationScope.launch {
             try {
                 SpeechOssUpload(this@EtaApp).retryPending(this@EtaApp)

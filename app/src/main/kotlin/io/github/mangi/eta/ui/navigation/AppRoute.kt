@@ -104,6 +104,9 @@ sealed interface AppRoute : NavKey {
 
     @Serializable
     data class ModelProviderNew(val providerType: NewProviderType) : AppRoute
+
+    @Serializable
+    data object ScheduledTasks : AppRoute
 }
 
 @Serializable

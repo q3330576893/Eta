@@ -173,6 +173,9 @@ dependencies {
     // DataStore：Provider / Model 结构化 JSON 与当前选中 ID 等键值
     implementation(libs.datastore.preferences)
 
+    // WorkManager：定时任务调度（每小时周期任务）
+    implementation(libs.work.runtime.ktx)
+
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)

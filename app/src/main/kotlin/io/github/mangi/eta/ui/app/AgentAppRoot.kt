@@ -68,6 +68,7 @@ import io.github.mangi.eta.ui.pages.providers.ModelProviderDetailScreen
 import io.github.mangi.eta.ui.pages.providers.ModelProviderListScreen
 import io.github.mangi.eta.ui.screens.backup.DataBackupScreen
 import io.github.mangi.eta.ui.screens.browser.AgentBrowserActivity
+import io.github.mangi.eta.ui.scheduler.ScheduledTasksRoute
 import io.github.mangi.eta.agent.browser.BrowserSessionRegistry
 import io.github.mangi.eta.ui.screens.characters.CharacterDetailScreen
 import io.github.mangi.eta.ui.screens.characters.CharacterEditorScreen
@@ -121,9 +122,6 @@ fun AgentAppRoot(
     onTerminalOpened: () -> Unit = {},
     onSpeechSettingsOpened: () -> Unit = {},
     onAssistantConversationOpened: (Boolean) -> Unit = {},
-    screenshotUri: String? = null,
-    screenshotPrefillText: String? = null,
-    onScreenshotHandled: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val resources = LocalResources.current
@@ -139,19 +137,6 @@ fun AgentAppRoot(
         if (openTerminal) {
             if (backStack.lastOrNull() != AppRoute.Terminal) backStack.add(AppRoute.Terminal)
             onTerminalOpened()
-        }
-    }
-    // 双击胶囊发送截图：附加图片到当前会话（或新会话）。
-    // TODO: 预填文本「帮我看看这屏」需要接入聊天输入框的 draft 状态，待后续完善。
-    LaunchedEffect(screenshotUri) {
-        if (screenshotUri != null) {
-            // 确保在聊天首页
-            if (backStack.lastOrNull() != AppRoute.Home) {
-                backStack.clear()
-                backStack.add(AppRoute.Home)
-            }
-            agentState.attachImage(screenshotUri)
-            onScreenshotHandled()
         }
     }
     val navigator = remember(backStack) { AgentNavigator(backStack) }
@@ -491,6 +476,9 @@ fun AgentAppRoot(
             }
             entry<AppRoute.Subagents>(swipeDismiss = swipeDismiss) {
                 SubagentSettingsScreen(onBack = ::popRoute)
+            }
+            entry<AppRoute.ScheduledTasks>(swipeDismiss = swipeDismiss) {
+                ScheduledTasksRoute(onBack = ::popRoute)
             }
             entry<AppRoute.Skills>(swipeDismiss = swipeDismiss) {
                 LaunchedEffect(Unit) {

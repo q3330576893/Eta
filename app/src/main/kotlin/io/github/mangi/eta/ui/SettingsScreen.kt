@@ -35,6 +35,7 @@ import androidx.compose.material.icons.rounded.Security
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.icons.rounded.SettingsVoice
 import androidx.compose.material.icons.rounded.Smartphone
+import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material.icons.rounded.SportsBar
 import androidx.compose.material.icons.rounded.SupportAgent
 import androidx.compose.material.icons.rounded.SwipeUp
@@ -364,6 +365,14 @@ private fun SettingsPageContent(
                         title = stringResource(R.string.settings_tools_list),
                         startAction = { EtaPreferenceIcon(Icons.Rounded.Dashboard, tint = EtaPreferenceColors.Green) },
                         onClick = { onNavigate(AppRoute.Tools) },
+                    )
+
+                    EtaPreferenceDivider()
+                    EtaArrowPreference(
+                        title = "定时任务",
+                        summary = "到点自动执行，支持条件跳过",
+                        startAction = { EtaPreferenceIcon(Icons.Rounded.Schedule, tint = EtaPreferenceColors.Blue) },
+                        onClick = { onNavigate(AppRoute.ScheduledTasks) },
                     )
 
                     EtaPreferenceDivider()

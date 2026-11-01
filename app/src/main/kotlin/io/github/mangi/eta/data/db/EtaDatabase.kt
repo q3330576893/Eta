@@ -25,8 +25,9 @@ import androidx.room.migration.Migration
         McpServerEntity::class,
         CharacterEntity::class,
         UserPersonaEntity::class,
+        ScheduledTaskEntity::class,
     ],
-    version = 23,
+    version = 24,
     exportSchema = false,
 )
 internal abstract class EtaDatabase : RoomDatabase() {
@@ -36,6 +37,7 @@ internal abstract class EtaDatabase : RoomDatabase() {
     abstract fun skillDao(): SkillDao
     abstract fun mcpServerDao(): McpServerDao
     abstract fun characterDao(): CharacterDao
+    abstract fun scheduledTaskDao(): ScheduledTaskDao
 
     companion object {
         @Volatile
@@ -66,6 +68,7 @@ internal abstract class EtaDatabase : RoomDatabase() {
                         MIGRATION_20_21,
                         MIGRATION_21_22,
                         MIGRATION_22_23,
+                        MIGRATION_23_24,
                     )
                     .addCallback(object : Callback() {
                         override fun onCreate(db: androidx.sqlite.db.SupportSQLiteDatabase) { createTextChunkCleanup(db) }
@@ -116,6 +119,26 @@ internal abstract class EtaDatabase : RoomDatabase() {
 
         internal val MIGRATION_22_23 = Migration(22, 23) { database ->
             database.execSQL("ALTER TABLE model_providers ADD COLUMN auth_mode TEXT NOT NULL DEFAULT 'api_key'")
+        }
+
+        internal val MIGRATION_23_24 = Migration(23, 24) { database ->
+            database.execSQL(
+                "CREATE TABLE IF NOT EXISTS scheduled_tasks (" +
+                    "id TEXT NOT NULL PRIMARY KEY, " +
+                    "title TEXT NOT NULL, " +
+                    "prompt TEXT NOT NULL, " +
+                    "scheduleType TEXT NOT NULL, " +
+                    "hour INTEGER NOT NULL, " +
+                    "minute INTEGER NOT NULL, " +
+                    "dayOfWeek INTEGER, " +
+                    "enabled INTEGER NOT NULL, " +
+                    "conditionType TEXT NOT NULL, " +
+                    "conditionParams TEXT NOT NULL, " +
+                    "createdAt INTEGER NOT NULL, " +
+                    "updatedAt INTEGER NOT NULL, " +
+                    "lastRunAt INTEGER, " +
+                    "lastResult TEXT NOT NULL)"
+            )
         }
 
         private fun createTextChunkCleanup(database: androidx.sqlite.db.SupportSQLiteDatabase) {
