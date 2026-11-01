@@ -91,6 +91,7 @@ sealed interface AppRoute : NavKey {
     data object TokenUsageStats : AppRoute
     data object ScheduledTasks : AppRoute
     data object AppKnowledge : AppRoute
+    data object PresetManager : AppRoute
 
     @Serializable
     data object CommunityCatalog : AppRoute
