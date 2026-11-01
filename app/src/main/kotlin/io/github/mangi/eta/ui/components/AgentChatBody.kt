@@ -98,6 +98,7 @@ import io.github.mangi.eta.ui.model.UserMessageUi
 import io.github.mangi.eta.ui.model.latestContextUsage
 import io.github.mangi.eta.ui.voice.SpeechAutoReadAloud
 import io.github.mangi.eta.ui.voice.SpeechPlaybackHost
+import io.github.mangi.eta.ui.voice.VoiceConversationHost
 import kotlin.math.exp
 import kotlin.math.min
 import kotlinx.coroutines.CancellationException
@@ -237,6 +238,12 @@ internal fun AgentChatBody(
 
     SpeechPlaybackHost {
         SpeechAutoReadAloud(messages = messages, isStreaming = isStreaming)
+        VoiceConversationHost(
+            messages = messages,
+            isStreaming = isStreaming,
+            onSubmit = onSubmit,
+            onStop = onStop,
+        ) {
         AgentChatScaffold(
             visibleMessages = visibleMessages,
             hasMessages = visibleMessages.isNotEmpty() || hasEarlierMessages,
@@ -301,6 +308,7 @@ internal fun AgentChatBody(
             onHistoryViewportChanged = onHistoryViewportChanged,
             modifier = modifier,
         )
+        }
     }
 }
 

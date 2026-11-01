@@ -1,7 +1,9 @@
 package io.github.mangi.eta.ui.components
 
+import io.github.mangi.eta.ui.voice.LocalVoiceConversationOpen
 import io.github.mangi.eta.ui.voice.SpeechDictationButton
 import io.github.mangi.eta.ui.voice.SpeechInputFeedback
+import io.github.mangi.eta.ui.voice.VoiceConversationButton
 import io.github.mangi.eta.ui.voice.rememberSpeechInput
 import androidx.compose.ui.text.TextRange
 import androidx.compose.animation.AnimatedContent
@@ -84,6 +86,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import io.github.mangi.eta.R
 import io.github.mangi.eta.data.model.ReasoningEffort
+import io.github.mangi.eta.data.model.TtsProvider
 import io.github.mangi.eta.data.repository.SpeechSettingsRepository
 import io.github.mangi.eta.ui.model.AgentContextUsageUi
 import io.github.mangi.eta.ui.model.AgentModelPickerUiState
@@ -159,6 +162,8 @@ internal fun AgentChatInputBar(
     val textFieldState = rememberTextFieldState(initialText = input)
     val speechSettings by remember { SpeechSettingsRepository.settingsFlow() }.collectAsState(initial = null)
     val recognitionEnabled = speechSettings?.recognitionEnabled == true
+    val voiceConversationAvailable = recognitionEnabled &&
+        speechSettings?.tts != null && speechSettings.tts != TtsProvider.NONE
     val dictation = rememberSpeechInput { recognized ->
         textFieldState.edit {
             val range = selection
@@ -418,6 +423,12 @@ internal fun AgentChatInputBar(
 
                         if (recognitionEnabled) {
                             SpeechDictationButton(dictation, enabled = !isCompacting)
+                            Spacer(modifier = Modifier.width(2.dp))
+                        }
+
+                        if (voiceConversationAvailable) {
+                            val openVoiceConversation = LocalVoiceConversationOpen.current
+                            VoiceConversationButton(onClick = openVoiceConversation, enabled = !isCompacting)
                             Spacer(modifier = Modifier.width(2.dp))
                         }
 

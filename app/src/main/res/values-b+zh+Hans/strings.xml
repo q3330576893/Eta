@@ -1466,4 +1466,15 @@
     <string name="msg_translate_failed">翻译失败，请重试</string>
     <string name="msg_translate_retry">重试</string>
     <string name="msg_translate_copy">复制译文</string>
+
+  <string name="voice_conv_title">实时语音对话</string>
+  <string name="voice_conv_idle">实时语音对话</string>
+  <string name="voice_conv_listening">正在聆听…请说话</string>
+  <string name="voice_conv_thinking">思考中…</string>
+  <string name="voice_conv_speaking">正在说话…点按可打断</string>
+  <string name="voice_conv_error">语音对话出错</string>
+  <string name="voice_conv_close">结束语音对话</string>
+  <string name="voice_conv_stop">结束</string>
+  <string name="voice_conv_tap_to_interrupt">点按打断</string>
+  <string name="voice_conv_you_said">你说：%1$s</string>
 </resources>
