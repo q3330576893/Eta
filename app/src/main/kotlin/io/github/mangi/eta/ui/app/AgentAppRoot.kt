@@ -101,6 +101,7 @@ import io.github.mangi.eta.ui.screens.appknowledge.AppKnowledgeScreen
 import io.github.mangi.eta.ui.screens.mcp.McpServerDetailScreen
 import io.github.mangi.eta.ui.screens.tokenstats.TokenUsageStatsScreen
 import io.github.mangi.eta.ui.screens.appknowledge.AppKnowledgeScreen
+import io.github.mangi.eta.ui.screens.github.GitHubAccountScreen
 import io.github.mangi.eta.ui.screens.mcp.McpServersScreen
 import io.github.mangi.eta.ui.screens.tokenstats.TokenUsageStatsScreen
 import io.github.mangi.eta.ui.screens.appknowledge.AppKnowledgeScreen
@@ -813,6 +814,9 @@ fun AgentAppRoot(
                     onImported = { providerId -> navigator.replace(AppRoute.ModelProviderDetail(providerId)) },
                     onBack = ::popRoute,
                 )
+            }
+            entry<AppRoute.GitHubAccount>(swipeDismiss = swipeDismiss) {
+                GitHubAccountScreen(onBack = ::popRoute)
             }
             entry<AppRoute.McpServers>(swipeDismiss = swipeDismiss) {
                 McpServersScreen(
