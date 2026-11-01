@@ -1482,4 +1482,11 @@
     <string name="token_usage_keyword_hint">Model keyword, e.g. gpt-4o</string>
     <string name="token_usage_input_price_hint">Input $/1M</string>
     <string name="token_usage_output_price_hint">Output $/1M</string>
+
+    <string name="settings_hotword_title">Hotword Wakeup</string>
+    <string name="settings_hotword_summary">Say "Eta" to wake up</string>
+    <string name="settings_hotword_ready">Say "Eta" to wake up</string>
+    <string name="settings_hotword_downloading">Downloading model</string>
+    <string name="settings_hotword_extracting">Extracting model</string>
+    <string name="settings_hotword_failed">Download failed, tap to retry</string>
 </resources>
