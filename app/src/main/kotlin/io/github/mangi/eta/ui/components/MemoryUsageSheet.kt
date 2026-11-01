@@ -15,16 +15,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import io.github.mangi.eta.R
 import kotlinx.coroutines.delay
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.theme.MiuixTheme
 
 /**
  * 内存详情面板：显示内存总量/已用/可用/百分比。
- * 简化版：不含进程排行（无需 MemoryProcessProbe）。
+ * 简化版：不含进程排行。
  */
 @Composable
 internal fun MemoryUsageSheet(show: Boolean, onDismiss: () -> Unit) {
@@ -37,40 +35,40 @@ internal fun MemoryUsageSheet(show: Boolean, onDismiss: () -> Unit) {
             delay(MEMORY_REFRESH_MILLIS)
         }
     }
-    EtaWindowDialog(onDismiss = onDismiss) {
+    EtaWindowDialog(
+        show = true,
+        title = "内存详情",
+        summary = "每 5 秒刷新",
+        onDismissRequest = onDismiss,
+    ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp),
+                .padding(horizontal = 4.dp),
         ) {
-            Text(
-                text = stringResource(R.string.memory_sheet_title),
-                style = MiuixTheme.textStyles.title3,
-                color = MiuixTheme.colorScheme.onSurface,
-            )
-            Spacer(Modifier.height(12.dp))
             MemoryInfoRow(
-                label = stringResource(R.string.memory_sheet_used),
+                label = "已用 / 总量",
                 value = "${formatGigabytes(usage.usedBytes)} / ${formatGigabytes(usage.totalBytes)}",
             )
             MemoryInfoRow(
-                label = stringResource(R.string.memory_sheet_available),
+                label = "可用",
                 value = formatGigabytes(usage.availableBytes),
             )
             MemoryInfoRow(
-                label = stringResource(R.string.memory_sheet_percent_label),
+                label = "使用率",
                 value = "${usage.usedPercent}%",
             )
             if (usage.swapTotalBytes > 0) {
                 MemoryInfoRow(
-                    label = stringResource(R.string.memory_sheet_swap),
+                    label = "交换分区",
                     value = "${formatGigabytes(usage.swapUsedBytes)} / ${formatGigabytes(usage.swapTotalBytes)}",
                 )
             }
-            Spacer(Modifier.height(16.dp))
+            Spacer(Modifier.height(8.dp))
             MiuixDialogActions(
+                confirmText = "知道了",
+                onCancel = onDismiss,
                 onConfirm = onDismiss,
-                confirmText = stringResource(R.string.memory_sheet_confirm),
             )
         }
     }
