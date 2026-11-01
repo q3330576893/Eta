@@ -1241,7 +1241,7 @@ internal class AgentAppState(
                 requestInterruptCurrentRun()
             } else {
                 // 运行中直接发送：走 steering 通道，注入下一个 turn，不打断当前请求或工具批次。
-                updateCurrentConversation(homeState.copy(input = "", pendingMessageRefs = emptyList()))
+                updateCurrentConversation(homeState.copy(input = ""))
                 val conversationId = selectedConversationId.orEmpty()
                 scope.launch(Dispatchers.IO) {
                     AgentRuntimeClient(appContext, AndroidAgentLogger).steerRun(prompt, conversationId)
