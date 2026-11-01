@@ -888,11 +888,11 @@ internal class AgentRuntimeService : Service(), LifecycleOwner, SavedStateRegist
             activeRuns.singleOrNull()
         }
         if (target != null) {
-            requestSupplement(target.runId, supplementText)
+            requestSupplementByRunId(target.runId, supplementText)
         }
     }
 
-    private fun requestSupplement(runId: String?, text: String) {
+    private fun requestSupplementByRunId(runId: String?, text: String) {
         val supplementText = text.trim()
         if (supplementText.isBlank()) return
         val run = displayedRun?.takeIf { it.runId == runId } ?: return
