@@ -18,6 +18,7 @@ import io.github.mangi.eta.data.repository.AppearanceSettingsRepository
 import io.github.mangi.eta.data.repository.McpServerRepository
 import io.github.mangi.eta.data.repository.LinuxEnvironmentSettingsRepository
 import io.github.mangi.eta.data.repository.ProviderRepository
+import io.github.mangi.eta.data.repository.TokenUsageRepository
 import io.github.mangi.eta.ui.app.PredictiveBackController
 import io.github.libxposed.service.XposedService
 import io.github.libxposed.service.XposedServiceHelper
@@ -61,13 +62,8 @@ class EtaApp : Application(), XposedServiceHelper.OnServiceListener {
         AgentMemoryRepository.init(this)
         ProviderRepository.init(this)
         McpServerRepository.init(this)
+        TokenUsageRepository.init(this)
         XposedServiceHelper.registerListener(this)
-        // 定时任务：进程启动后重排所有启用任务（兜底开机/进程被杀场景）
-        applicationScope.launch {
-            runCatching {
-                io.github.mangi.eta.scheduler.ScheduledTaskScheduler.rescheduleAll(this@EtaApp)
-            }
-        }
         applicationScope.launch {
             try {
                 SpeechOssUpload(this@EtaApp).retryPending(this@EtaApp)

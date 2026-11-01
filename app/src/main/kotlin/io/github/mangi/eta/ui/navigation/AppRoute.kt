@@ -88,6 +88,9 @@ sealed interface AppRoute : NavKey {
     data object ModelProviders : AppRoute
 
     @Serializable
+    data object TokenUsageStats : AppRoute
+
+    @Serializable
     data object CommunityCatalog : AppRoute
 
     @Serializable
@@ -104,9 +107,6 @@ sealed interface AppRoute : NavKey {
 
     @Serializable
     data class ModelProviderNew(val providerType: NewProviderType) : AppRoute
-
-    @Serializable
-    data object ScheduledTasks : AppRoute
 }
 
 @Serializable

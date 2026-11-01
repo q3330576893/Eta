@@ -25,9 +25,9 @@ import androidx.room.migration.Migration
         McpServerEntity::class,
         CharacterEntity::class,
         UserPersonaEntity::class,
-        ScheduledTaskEntity::class,
+        TokenUsageEntity::class,
     ],
-    version = 24,
+    version = 25,
     exportSchema = false,
 )
 internal abstract class EtaDatabase : RoomDatabase() {
@@ -37,7 +37,7 @@ internal abstract class EtaDatabase : RoomDatabase() {
     abstract fun skillDao(): SkillDao
     abstract fun mcpServerDao(): McpServerDao
     abstract fun characterDao(): CharacterDao
-    abstract fun scheduledTaskDao(): ScheduledTaskDao
+    abstract fun tokenUsageDao(): TokenUsageDao
 
     companion object {
         @Volatile
@@ -68,7 +68,7 @@ internal abstract class EtaDatabase : RoomDatabase() {
                         MIGRATION_20_21,
                         MIGRATION_21_22,
                         MIGRATION_22_23,
-                        MIGRATION_23_24,
+                        MIGRATION_24_25,
                     )
                     .addCallback(object : Callback() {
                         override fun onCreate(db: androidx.sqlite.db.SupportSQLiteDatabase) { createTextChunkCleanup(db) }
@@ -121,24 +121,24 @@ internal abstract class EtaDatabase : RoomDatabase() {
             database.execSQL("ALTER TABLE model_providers ADD COLUMN auth_mode TEXT NOT NULL DEFAULT 'api_key'")
         }
 
-        internal val MIGRATION_23_24 = Migration(23, 24) { database ->
+        internal val MIGRATION_24_25 = Migration(24, 25) { database ->
             database.execSQL(
-                "CREATE TABLE IF NOT EXISTS scheduled_tasks (" +
-                    "id TEXT NOT NULL PRIMARY KEY, " +
-                    "title TEXT NOT NULL, " +
-                    "prompt TEXT NOT NULL, " +
-                    "scheduleType TEXT NOT NULL, " +
-                    "hour INTEGER NOT NULL, " +
-                    "minute INTEGER NOT NULL, " +
-                    "dayOfWeek INTEGER, " +
-                    "enabled INTEGER NOT NULL, " +
-                    "conditionType TEXT NOT NULL, " +
-                    "conditionParams TEXT NOT NULL, " +
-                    "createdAt INTEGER NOT NULL, " +
-                    "updatedAt INTEGER NOT NULL, " +
-                    "lastRunAt INTEGER, " +
-                    "lastResult TEXT NOT NULL)"
+                "CREATE TABLE IF NOT EXISTS token_usage (" +
+                    "id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, " +
+                    "timestamp INTEGER NOT NULL, " +
+                    "day TEXT NOT NULL, " +
+                    "provider_id TEXT NOT NULL, " +
+                    "provider_name TEXT NOT NULL, " +
+                    "model TEXT NOT NULL, " +
+                    "input_tokens INTEGER NOT NULL, " +
+                    "output_tokens INTEGER NOT NULL, " +
+                    "reasoning_tokens INTEGER NOT NULL, " +
+                    "cached_tokens INTEGER NOT NULL, " +
+                    "purpose TEXT NOT NULL)"
             )
+            database.execSQL("CREATE INDEX IF NOT EXISTS index_token_usage_day ON token_usage(day)")
+            database.execSQL("CREATE INDEX IF NOT EXISTS index_token_usage_provider_id ON token_usage(provider_id)")
+            database.execSQL("CREATE INDEX IF NOT EXISTS index_token_usage_timestamp ON token_usage(timestamp)")
         }
 
         private fun createTextChunkCleanup(database: androidx.sqlite.db.SupportSQLiteDatabase) {

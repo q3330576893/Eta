@@ -132,6 +132,9 @@ internal class AgentLoop(
                         }
                         if (providerEvent is ProviderEvent.Usage) {
                             roundInputTokens = providerEvent.contextInputTokens ?: roundInputTokens
+                            // Token 用量统计埋点：只记录，不影响调用逻辑。
+                            // 每次 Usage 事件对应一次真实的模型 API 调用（含重试）。
+                            TokenUsageRecorder.record(config, providerEvent.usage, purpose)
                         }
                         if (providerEvent is ProviderEvent.BlockDelta &&
                             providerEvent.kind == AssistantBlockKind.THINKING

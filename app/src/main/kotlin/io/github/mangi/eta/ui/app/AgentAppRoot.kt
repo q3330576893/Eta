@@ -68,7 +68,6 @@ import io.github.mangi.eta.ui.pages.providers.ModelProviderDetailScreen
 import io.github.mangi.eta.ui.pages.providers.ModelProviderListScreen
 import io.github.mangi.eta.ui.screens.backup.DataBackupScreen
 import io.github.mangi.eta.ui.screens.browser.AgentBrowserActivity
-import io.github.mangi.eta.ui.scheduler.ScheduledTasksRoute
 import io.github.mangi.eta.agent.browser.BrowserSessionRegistry
 import io.github.mangi.eta.ui.screens.characters.CharacterDetailScreen
 import io.github.mangi.eta.ui.screens.characters.CharacterEditorScreen
@@ -80,6 +79,7 @@ import io.github.mangi.eta.ui.screens.home.AgentHomeScreen
 import io.github.mangi.eta.ui.screens.mcp.McpServerDetailScreen
 import io.github.mangi.eta.ui.screens.mcp.McpServersScreen
 import io.github.mangi.eta.ui.screens.memory.AgentMemoryScreen
+import io.github.mangi.eta.ui.screens.tokenstats.TokenUsageStatsScreen
 import io.github.mangi.eta.ui.screens.permissions.PermissionHealthScreen
 import io.github.mangi.eta.ui.screens.skills.AgentSkillsScreen
 import io.github.mangi.eta.ui.screens.subagent.SubagentSettingsScreen
@@ -477,9 +477,6 @@ fun AgentAppRoot(
             entry<AppRoute.Subagents>(swipeDismiss = swipeDismiss) {
                 SubagentSettingsScreen(onBack = ::popRoute)
             }
-            entry<AppRoute.ScheduledTasks>(swipeDismiss = swipeDismiss) {
-                ScheduledTasksRoute(onBack = ::popRoute)
-            }
             entry<AppRoute.Skills>(swipeDismiss = swipeDismiss) {
                 LaunchedEffect(Unit) {
                     skills.refreshSkills()
@@ -742,6 +739,11 @@ fun AgentAppRoot(
             entry<AppRoute.ModelProviders>(swipeDismiss = swipeDismiss) {
                 ModelProviderListScreen(
                     onNavigate = { route -> pushRoute(route) },
+                    onBack = ::popRoute
+                )
+            }
+            entry<AppRoute.TokenUsageStats>(swipeDismiss = swipeDismiss) {
+                TokenUsageStatsScreen(
                     onBack = ::popRoute
                 )
             }
