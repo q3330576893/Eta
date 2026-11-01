@@ -77,6 +77,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import io.github.mangi.eta.R
 import io.github.mangi.eta.agent.browser.BrowserSessionSnapshot
+import io.github.mangi.eta.agent.overlay.AgentChoiceCardBridge
 import io.github.mangi.eta.data.model.ReasoningEffort
 import io.github.mangi.eta.ui.app.AgentConversationRevisionReducer
 import io.github.mangi.eta.ui.app.LocalBlurEnabled
@@ -1041,6 +1042,27 @@ private fun AgentChatBottomBar(
                 bottom = GlassInputBarBottomMargin,
             ),
     ) {
+            // 悬浮选择/复制卡片：Agent 工具 ask_user_choice / show_copyable_text 触发时弹出
+            val choiceReq by AgentChoiceCardBridge.choiceRequest.collectAsState()
+            val copyReq by AgentChoiceCardBridge.copyRequest.collectAsState()
+            choiceReq?.let { req ->
+                AgentChoiceCard(
+                    request = req,
+                    onSelect = { idx ->
+                        req.future.complete(idx)
+                        AgentChoiceCardBridge.choiceRequest.value = null
+                    },
+                )
+            }
+            copyReq?.let { req ->
+                AgentCopyCard(
+                    request = req,
+                    onDone = { copied ->
+                        req.future.complete(copied)
+                        AgentChoiceCardBridge.copyRequest.value = null
+                    },
+                )
+            }
             AgentChatInputBar(
                 input = input,
                 modelPickerState = modelPickerState,
