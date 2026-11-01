@@ -162,8 +162,9 @@ internal fun AgentChatInputBar(
     val textFieldState = rememberTextFieldState(initialText = input)
     val speechSettings by remember { SpeechSettingsRepository.settingsFlow() }.collectAsState(initial = null)
     val recognitionEnabled = speechSettings?.recognitionEnabled == true
+    val ttsProvider = speechSettings?.tts
     val voiceConversationAvailable = recognitionEnabled &&
-        speechSettings?.tts != null && speechSettings.tts != TtsProvider.NONE
+        ttsProvider != null && ttsProvider != TtsProvider.NONE
     val dictation = rememberSpeechInput { recognized ->
         textFieldState.edit {
             val range = selection

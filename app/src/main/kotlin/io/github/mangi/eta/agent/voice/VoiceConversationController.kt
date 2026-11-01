@@ -46,7 +46,7 @@ private data class ChatSnapshot(
  *
  * 复用现有组件：EtaSpeechInput（系统语音识别）、SpeechPlaybackController（TTS 朗读）。
  */
-class VoiceConversationController(
+internal class VoiceConversationController(
     private val appContext: Context,
     private val scope: CoroutineScope,
     private val playback: SpeechPlaybackController,
