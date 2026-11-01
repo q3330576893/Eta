@@ -67,6 +67,7 @@ import io.github.mangi.eta.ui.pages.providers.CommunityCatalogScreen
 import io.github.mangi.eta.ui.pages.providers.ModelProviderDetailScreen
 import io.github.mangi.eta.ui.pages.providers.ModelProviderListScreen
 import io.github.mangi.eta.ui.screens.tokenstats.TokenUsageStatsScreen
+import io.github.mangi.eta.ui.screens.scheduledtasks.ScheduledTasksScreen
 import io.github.mangi.eta.ui.screens.appknowledge.AppKnowledgeScreen
 import io.github.mangi.eta.ui.screens.backup.DataBackupScreen
 import io.github.mangi.eta.ui.screens.tokenstats.TokenUsageStatsScreen
