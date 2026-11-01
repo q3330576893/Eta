@@ -1172,6 +1172,7 @@ internal class AgentAppState(
     private fun submitOrQueueCurrentMessage(
         submittedText: String?,
         immediateInterrupt: Boolean,
+        queueOnly: Boolean = false,
     ) {
         if (!homeState.isConversationLoaded || homeState.isCompacting ||
             selectedConversationId in pendingConversationDeletes) return
@@ -1211,19 +1212,40 @@ internal class AgentAppState(
         }
 
         if (homeState.isStreaming) {
-            val queued = QueuedMessageUi(
-                id = "queue-${UUID.randomUUID()}",
-                content = prompt,
-                pendingImages = pendingImages,
-                pendingFileReferences = pendingFileReferences,
-                immediateInterrupt = immediateInterrupt,
-            )
-            updateCurrentConversation(
-                state = AgentMessageQueueReducer.enqueue(homeState, queued),
-                updateTimestamp = false,
-            )
-            if (immediateInterrupt) {
+            if (queueOnly) {
+                // 长按发送：只入队，等当前运行自然收尾后发出。
+                val queued = QueuedMessageUi(
+                    id = "queue-${UUID.randomUUID()}",
+                    content = prompt,
+                    pendingImages = pendingImages,
+                    pendingFileReferences = pendingFileReferences,
+                    immediateInterrupt = false,
+                )
+                updateCurrentConversation(
+                    state = AgentMessageQueueReducer.enqueue(homeState, queued),
+                    updateTimestamp = false,
+                )
+            } else if (immediateInterrupt) {
+                // 显式插话：入队置首并打断当前运行，收尾后自动发出。
+                val queued = QueuedMessageUi(
+                    id = "queue-${UUID.randomUUID()}",
+                    content = prompt,
+                    pendingImages = pendingImages,
+                    pendingFileReferences = pendingFileReferences,
+                    immediateInterrupt = true,
+                )
+                updateCurrentConversation(
+                    state = AgentMessageQueueReducer.enqueue(homeState, queued),
+                    updateTimestamp = false,
+                )
                 requestInterruptCurrentRun()
+            } else {
+                // 运行中直接发送：走 steering 通道，注入下一个 turn，不打断当前请求或工具批次。
+                updateCurrentConversation(homeState.copy(input = "", pendingMessageRefs = emptyList()))
+                val conversationId = selectedConversationId.orEmpty()
+                scope.launch(Dispatchers.IO) {
+                    AgentRuntimeClient(appContext, AndroidAgentLogger).steerRun(prompt, conversationId)
+                }
             }
             return
         }
