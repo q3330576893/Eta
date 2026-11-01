@@ -127,6 +127,38 @@ internal class AgentRuntimeClient(
         }
     }
 
+    /** 暂停指定 run（空 runId = 暂停全部）。 */
+    fun pauseRun(runId: String = "") {
+        withRuntimeMessenger(Unit) { serviceMessenger ->
+            val msg = Message.obtain(null, AgentRuntimeWire.MSG_PAUSE)
+            if (runId.isNotBlank()) msg.data = AgentRuntimeWire.ackBundle(runId)
+            serviceMessenger.send(msg)
+        }
+    }
+
+    /** 恢复指定 run（空 runId = 恢复全部）。 */
+    fun resumeRun(runId: String = "") {
+        withRuntimeMessenger(Unit) { serviceMessenger ->
+            val msg = Message.obtain(null, AgentRuntimeWire.MSG_RESUME)
+            if (runId.isNotBlank()) msg.data = AgentRuntimeWire.ackBundle(runId)
+            serviceMessenger.send(msg)
+        }
+    }
+
+    /** 运行中插话：steering 通道，在下一个 turn 注入，不取消当前请求或工具批次。 */
+    fun steerRun(text: String, conversationId: String = "") {
+        val trimmed = text.trim()
+        if (trimmed.isEmpty()) return
+        withRuntimeMessenger(Unit) { serviceMessenger ->
+            val msg = Message.obtain(null, AgentRuntimeWire.MSG_STEER)
+            msg.data = android.os.Bundle().apply {
+                putString(AgentRuntimeWire.KEY_PROMPT, trimmed)
+                putString(AgentRuntimeWire.KEY_CONVERSATION_ID, conversationId)
+            }
+            serviceMessenger.send(msg)
+        }
+    }
+
     fun ackResult(runId: String): Boolean {
         if (runId.isBlank()) return false
         return withRuntimeMessenger(false) { serviceMessenger ->
