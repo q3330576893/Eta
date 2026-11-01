@@ -89,7 +89,6 @@ internal fun AgentOverlayCapsule(
     expanded: Boolean,
     yielded: Boolean,
     onToggleExpanded: () -> Unit,
-    onDoubleTap: () -> Unit = {},
     onCollapsedSettled: () -> Unit,
     onPause: () -> Unit,
     onResume: () -> Unit,
@@ -130,30 +129,6 @@ internal fun AgentOverlayCapsule(
 
     LaunchedEffect(expanded) {
         if (!expanded && supplementMode) leaveSupplementMode()
-    }
-
-    // 双击检测：300ms 内两次点击视为双击（发送当前屏幕），单击则延迟 300ms 后展开/收起，
-    // 避免单击误触。双击时取消待执行的单击。
-    var lastTapTime by remember { mutableStateOf(0L) }
-    var pendingSingleTap by remember { mutableStateOf<kotlinx.coroutines.Job?>(null) }
-    fun handleCapsuleTap() {
-        val now = System.currentTimeMillis()
-        if (now - lastTapTime < 300) {
-            // 双击：取消单击，执行双击动作
-            pendingSingleTap?.cancel()
-            pendingSingleTap = null
-            lastTapTime = 0L
-            onDoubleTap()
-        } else {
-            // 可能是单击的第一次：延迟 300ms，等看有没有第二次
-            lastTapTime = now
-            pendingSingleTap?.cancel()
-            pendingSingleTap = scope.launch {
-                delay(300)
-                onToggleExpanded()
-                pendingSingleTap = null
-            }
-        }
     }
 
     // 为 Agent 手势让路：离开时快速上移收小淡出，回来时用弹簧落回，只改绘制层不触发重排。
@@ -223,7 +198,7 @@ internal fun AgentOverlayCapsule(
                         .clickable(
                             interactionSource = remember { MutableInteractionSource() },
                             indication = null,
-                            onClick = ::handleCapsuleTap,
+                            onClick = onToggleExpanded,
                         )
                         .semantics { contentDescription = expandDescription }
                         .padding(

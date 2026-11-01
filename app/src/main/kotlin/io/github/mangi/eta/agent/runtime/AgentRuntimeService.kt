@@ -1014,7 +1014,6 @@ internal class AgentRuntimeService : Service(), LifecycleOwner, SavedStateRegist
                 expanded = capsuleExpanded.value,
                 yielded = capsuleYielded.value,
                 onToggleExpanded = ::toggleCapsule,
-                onDoubleTap = ::onCapsuleDoubleTap,
                 onCollapsedSettled = ::onCapsuleCollapsedSettled,
                 onPause = {
                     VirtualDisplayController.setUserControlling(false)
@@ -1087,55 +1086,6 @@ internal class AgentRuntimeService : Service(), LifecycleOwner, SavedStateRegist
         // 先把窗口扩到展开档再开始动画；收起由胶囊在动画结束后回调 onCollapsedSettled 缩窗。
         if (expand) updateCapsuleWindowBounds(expanding = true)
         capsuleExpanded.value = expand
-    }
-
-    /**
-     * 双击胶囊：截取当前屏幕，打开 Eta 主界面并把截图作为图片消息发送，
-     * 文本预填「帮我看看这屏」。
-     */
-    private fun onCapsuleDoubleTap() {
-        serviceScope.launch(Dispatchers.IO) {
-            try {
-                val a11y = AgentAccessibilityService.current()
-                if (a11y == null) {
-                    AndroidAgentLogger.warnThrottled("capsule_doubletap_no_a11y") {
-                        "Double-tap screenshot: accessibility service not available"
-                    }
-                    return@launch
-                }
-                val result = a11y.captureDisplayScreenshot(android.view.Display.DEFAULT_DISPLAY)
-                val bitmap = result.bitmap
-                if (bitmap == null) {
-                    AndroidAgentLogger.warnThrottled("capsule_doubletap_no_bitmap") {
-                        "Double-tap screenshot: capture returned null bitmap"
-                    }
-                    return@launch
-                }
-                // 保存到 cache 目录
-                val file = java.io.File(cacheDir, "capsule_doubletap_${System.currentTimeMillis()}.png")
-                file.outputStream().use { out ->
-                    bitmap.compress(android.graphics.Bitmap.CompressFormat.PNG, 90, out)
-                }
-                val uri = androidx.core.content.FileProvider.getUriForFile(
-                    this@AgentRuntimeService,
-                    "${packageName}.fileprovider",
-                    file,
-                )
-                // 打开主界面并发送截图
-                val intent = android.content.Intent(this@AgentRuntimeService, MainActivity::class.java)
-                    .addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK or
-                        android.content.Intent.FLAG_ACTIVITY_CLEAR_TOP or
-                        android.content.Intent.FLAG_ACTIVITY_SINGLE_TOP)
-                    .setAction(MainActivity.ACTION_SEND_SCREENSHOT)
-                    .putExtra(MainActivity.EXTRA_SCREENSHOT_URI, uri.toString())
-                    .addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
-                startActivity(intent)
-            } catch (t: Throwable) {
-                AndroidAgentLogger.warnThrottled("capsule_doubletap_failed") {
-                    "Double-tap screenshot failed: ${t.javaClass.simpleName}"
-                }
-            }
-        }
     }
 
     private fun onCapsuleCollapsedSettled() {

@@ -12,15 +12,10 @@ internal data class MainActivityLaunchRequests(
     val archivedConversation: ArchivedConversationRequest? = null,
     val speechSettings: Boolean = false,
     val terminal: Boolean = false,
-    /** 双击胶囊发送的截图 URI，打开后自动附加到新会话并预填文本。 */
-    val screenshotUri: String? = null,
 ) {
     fun accept(intent: Intent?): MainActivityLaunchRequests = when (intent?.action) {
         MainActivity.ACTION_OPEN_TERMINAL -> copy(terminal = true)
         ACTION_SPEECH_SETTINGS -> copy(speechSettings = true)
-        MainActivity.ACTION_SEND_SCREENSHOT -> copy(
-            screenshotUri = intent.nonBlankExtra(MainActivity.EXTRA_SCREENSHOT_URI),
-        )
         MainActivity.ACTION_OPEN_CONVERSATION_ID -> copy(
             conversationId = intent.nonBlankExtra(MainActivity.EXTRA_CONVERSATION_ID),
         )
@@ -47,7 +42,6 @@ internal data class MainActivityLaunchRequests(
             putString("archive_conversation_key", archivedConversation?.conversationKey)
             putBoolean("speech_settings", speechSettings)
             putBoolean("terminal", terminal)
-            putString("screenshot_uri", screenshotUri)
         })
     }
 
@@ -68,7 +62,6 @@ internal data class MainActivityLaunchRequests(
                 } else null,
                 speechSettings = saved.getBoolean("speech_settings"),
                 terminal = saved.getBoolean("terminal"),
-                screenshotUri = saved.getString("screenshot_uri"),
             )
         }
     }

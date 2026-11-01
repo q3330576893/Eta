@@ -93,12 +93,6 @@ class MainActivity : ComponentActivity() {
                                 EtaAssistantOverlayService.notifyHandoffReady(this@MainActivity)
                             }
                         },
-                        screenshotUri = launchRequests.screenshotUri,
-                        screenshotPrefillText = SCREENSHOT_PREFILL_TEXT,
-                        onScreenshotHandled = {
-                            launchRequests = launchRequests.copy(screenshotUri = null)
-                            intent?.action = null
-                        },
                     )
                 }
             }
@@ -196,9 +190,5 @@ class MainActivity : ComponentActivity() {
         const val ACTION_OPEN_ARCHIVED_CONVERSATION = "io.github.mangi.eta.action.OPEN_ARCHIVED_CONVERSATION"
         const val EXTRA_HANDOFF_SOURCE = "io.github.mangi.eta.extra.HANDOFF_SOURCE"
         const val EXTRA_CONVERSATION_KEY = "io.github.mangi.eta.extra.CONVERSATION_KEY"
-        /** 双击胶囊发送当前屏幕：附带截图 URI，新建会话并预填文本。 */
-        const val ACTION_SEND_SCREENSHOT = "io.github.mangi.eta.action.SEND_SCREENSHOT"
-        const val EXTRA_SCREENSHOT_URI = "io.github.mangi.eta.extra.SCREENSHOT_URI"
-        const val SCREENSHOT_PREFILL_TEXT = "帮我看看这屏"
     }
 }
