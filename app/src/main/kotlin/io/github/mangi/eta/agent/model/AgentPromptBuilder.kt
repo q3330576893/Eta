@@ -1,6 +1,8 @@
 package io.github.mangi.eta.agent.model
 
 import io.github.mangi.eta.agent.memory.AgentMemoryContext
+import io.github.mangi.eta.agent.prompt.ActivePersonaStore
+import io.github.mangi.eta.agent.prompt.PromptPresetMode
 import io.github.mangi.eta.agent.skill.SkillContext
 import io.github.mangi.eta.agent.roleplay.RoleplayRunContext
 import io.github.mangi.eta.agent.terminal.TerminalExecutionContext
@@ -42,8 +44,12 @@ internal object AgentPromptBuilder {
         executionContext: TerminalExecutionContext? = null,
     ): JSONArray {
         val messages = JSONArray()
+        val activePersona = ActivePersonaStore.get()
         if (roleplayContext == null && config.systemPrompt.isNotBlank()) {
-            messages.put(systemMessage(config.systemPrompt))
+            messages.put(buildIdentityMessage(config.systemPrompt, activePersona))
+        }
+        activePersona?.let { persona ->
+            customPersonaMessage(persona)?.let(messages::put)
         }
         messages.put(
             systemMessage(
@@ -171,6 +177,9 @@ internal object AgentPromptBuilder {
             )
         }
         roleplayContext?.personaMessage()?.let(messages::put)
+        activePersona?.let { persona ->
+            customInstructionsMessage(persona)?.let(messages::put)
+        }
         buildMemorySystemMessage(memoryContext, writable = roleplayContext == null)?.let(messages::put)
         buildSkillSystemMessage(skillContext)?.let(messages::put)
         return messages
@@ -248,6 +257,42 @@ internal object AgentPromptBuilder {
             )
         }
         return systemMessage(body)
+    }
+
+    private fun buildIdentityMessage(base: String, persona: ActivePersonaStore.ActivePersona?): JSONObject {
+        if (persona == null || persona.baseSystemPrompt.isBlank()) return systemMessage(base)
+        return if (persona.mode == PromptPresetMode.REPLACE) {
+            systemMessage(
+                "<custom_identity>\\n" + persona.baseSystemPrompt.trim() + "\\n</custom_identity>\\n" +
+                    "以上是用户自定义的身份设定，优先级高于后文的内置身份描述；工具、设备与屏幕规则仍然有效，按其执行。\\n" +
+                    base
+            )
+        } else {
+            systemMessage(
+                "<custom_identity>\\n" + persona.baseSystemPrompt.trim() + "\\n</custom_identity>\\n" + base
+            )
+        }
+    }
+
+    private fun customPersonaMessage(persona: ActivePersonaStore.ActivePersona): JSONObject? {
+        val name = persona.personaName.trim()
+        val style = persona.personaStyle.trim()
+        if (name.isEmpty() && style.isEmpty()) return null
+        return systemMessage(
+            buildString {
+                appendLine("<custom_persona>")
+                if (name.isNotEmpty()) appendLine("名称：$name")
+                if (style.isNotEmpty()) appendLine(style)
+                appendLine("</custom_persona>")
+                append("用户已设定人格：按上面的名称与风格交流；事实、证据与工具结果的表述不因人格改写。")
+            }
+        )
+    }
+
+    private fun customInstructionsMessage(persona: ActivePersonaStore.ActivePersona): JSONObject? {
+        val instruction = persona.appendInstructions.trim()
+        if (instruction.isEmpty()) return null
+        return systemMessage("<custom_instructions>\\n$instruction\\n</custom_instructions>")
     }
 
     private fun systemMessage(content: String): JSONObject =
