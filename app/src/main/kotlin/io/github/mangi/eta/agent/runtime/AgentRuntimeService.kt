@@ -863,10 +863,12 @@ internal class AgentRuntimeService : Service(), LifecycleOwner, SavedStateRegist
 
     /** runId 为空 = 全部；指定了但已结束 = 什么都不做，别误伤别的会话。 */
     private fun pauseTargets(runId: String?): List<AgentRuntimeSession>? {
-        if (runId.isNullOrBlank()) return sessions.values.filter { !it.isTerminal }.ifEmpty { null }
-        val session = sessions[runId] ?: return null
-        if (session.isTerminal) return null
-        return listOf(session)
+        if (runId.isNullOrBlank()) {
+            return runs.all().map { it.session }.filter { !it.isTerminal }.ifEmpty { null }
+        }
+        val run = runs.get(runId) ?: return null
+        if (run.session.isTerminal) return null
+        return listOf(run.session)
     }
 
     /**
