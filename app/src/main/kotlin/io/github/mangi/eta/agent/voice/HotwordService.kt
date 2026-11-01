@@ -20,6 +20,7 @@ import androidx.core.content.ContextCompat
 import io.github.mangi.eta.R
 import io.github.mangi.eta.core.AndroidAgentLogger
 import io.github.mangi.eta.data.datastore.SettingsDataStore
+import io.github.mangi.eta.data.repository.SpeechSettingsRepository
 import io.github.mangi.eta.ui.MainActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -41,7 +42,7 @@ import java.io.IOException
 /**
  * 热词唤醒前台服务（Vosk 离线识别）
  *
- * 持续监听麦克风，检测到"艾塔"时触发语音会话。
+ * 持续监听麦克风，检测到用户自定义唤醒词（默认"艾塔助手"）时触发语音会话。
  * 参考 openclaw-assistant 的 HotwordService 实现。
  */
 class HotwordService : Service(), RecognitionListener {
@@ -51,8 +52,9 @@ class HotwordService : Service(), RecognitionListener {
         private const val NOTIFICATION_ID = 2001
         private const val CHANNEL_ID = "hotword_wakeup"
 
-        // 唤醒词（中文"艾塔"为主，英文"etta"为辅）
-        private val HOTWORDS = listOf("艾塔", "etta")
+        // 唤醒词：用户自定义（默认"艾塔助手"），英文"etta"为辅
+        // 注意：Vosk 中文模型对短词更敏感，建议 2-4 个字
+        private const val FALLBACK_HOTWORD_EN = "etta"
 
         // Vosk 采样率
         private const val SAMPLE_RATE = 16000f
@@ -64,6 +66,7 @@ class HotwordService : Service(), RecognitionListener {
         const val ACTION_STOP = "io.github.mangi.eta.hotword.STOP"
         const val ACTION_PAUSE = "io.github.mangi.eta.hotword.PAUSE"
         const val ACTION_RESUME = "io.github.mangi.eta.hotword.RESUME"
+        const val ACTION_RELOAD = "io.github.mangi.eta.hotword.RELOAD"
 
         fun start(context: Context) {
             val intent = Intent(context, HotwordService::class.java).setAction(ACTION_START)
@@ -77,6 +80,8 @@ class HotwordService : Service(), RecognitionListener {
         }
 
         fun stop(context: Context) {
+            // 取消看门狗重启计划（用户手动关闭）
+            HotwordBootReceiver.cancelRestart(context)
             val intent = Intent(context, HotwordService::class.java).setAction(ACTION_STOP)
             context.startService(intent)
         }
@@ -93,6 +98,16 @@ class HotwordService : Service(), RecognitionListener {
 
     @Volatile
     private var isModelReady = false
+
+    /** 当前生效的唤醒词列表（用户自定义 + 英文兜底） */
+    @Volatile
+    private var activeHotwords: List<String> = listOf("艾塔助手", FALLBACK_HOTWORD_EN)
+
+    /** 通知外部唤醒词已变更，重建识别器 */
+    fun reload(context: Context) {
+        val intent = Intent(context, HotwordService::class.java).setAction(ACTION_RELOAD)
+        context.startService(intent)
+    }
 
     private val pauseReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -132,6 +147,11 @@ class HotwordService : Service(), RecognitionListener {
             }
             ACTION_RESUME -> {
                 resumeListening()
+                return START_STICKY
+            }
+            ACTION_RELOAD -> {
+                // 唤醒词变更：重建识别器
+                scope.launch { reloadHotwords() }
                 return START_STICKY
             }
         }
@@ -255,6 +275,9 @@ class HotwordService : Service(), RecognitionListener {
      */
     private suspend fun initVosk() = withContext(Dispatchers.IO) {
         try {
+            // 先读取用户自定义唤醒词
+            loadHotwordsFromSettings()
+
             // 检查模型是否已下载
             val modelDir = HotwordModelManager.getModelDir(this@HotwordService)
             if (!HotwordModelManager.isModelReady(modelDir)) {
@@ -289,6 +312,42 @@ class HotwordService : Service(), RecognitionListener {
     }
 
     /**
+     * 从设置读取用户自定义唤醒词
+     */
+    private suspend fun loadHotwordsFromSettings() {
+        try {
+            val settings = SpeechSettingsRepository.settingsFlow()
+                .let { kotlinx.coroutines.flow.first(it) }
+            val phrase = settings.hotwordPhrase.trim().ifEmpty { "艾塔助手" }
+            activeHotwords = listOf(phrase, FALLBACK_HOTWORD_EN).distinct()
+            AndroidAgentLogger.debug { "热词已加载: ${activeHotwords.joinToString()}" }
+        } catch (e: Exception) {
+            AndroidAgentLogger.warnThrottled("hotword_phrase_load_failed") {
+                "唤醒词读取失败，使用默认: ${e.message}"
+            }
+        }
+    }
+
+    /**
+     * 唤醒词变更后重建识别器
+     */
+    private suspend fun reloadHotwords() {
+        loadHotwordsFromSettings()
+        withContext(Dispatchers.Main) {
+            if (isModelReady && !isPaused) {
+                // 停止旧监听，用新唤醒词重建
+                try {
+                    speechService?.stop()
+                    speechService?.shutdown()
+                } catch (_: Exception) {
+                }
+                speechService = null
+                startListening()
+            }
+        }
+    }
+
+    /**
      * 开始监听
      */
     private fun startListening() {
@@ -297,8 +356,9 @@ class HotwordService : Service(), RecognitionListener {
         try {
             val currentModel = model ?: return
 
-            // 构建热词语法（JSON 数组格式）
-            val hotwordsJson = (HOTWORDS + "[unk]").joinToString("\", \"", "[\"", "\"]")
+            // 构建热词语法（JSON 数组格式），用用户自定义唤醒词
+            val hotwords = activeHotwords
+            val hotwordsJson = (hotwords + "[unk]").joinToString("\", \"", "[\"", "\"]")
 
             val recognizer = Recognizer(currentModel, SAMPLE_RATE, hotwordsJson)
             // 启用词语时间戳（可选，用于置信度）
@@ -309,7 +369,7 @@ class HotwordService : Service(), RecognitionListener {
             }
 
             AndroidAgentLogger.debug {
-                "热词监听已启动: ${HOTWORDS.joinToString()}"
+                "热词监听已启动: ${hotwords.joinToString()}"
             }
         } catch (e: IOException) {
             AndroidAgentLogger.warnThrottled("hotword_listen_failed") {
@@ -401,7 +461,7 @@ class HotwordService : Service(), RecognitionListener {
             if (text.isEmpty()) return
 
             // 检查是否包含唤醒词
-            val matched = HOTWORDS.any { hotword ->
+            val matched = activeHotwords.any { hotword ->
                 text.contains(hotword, ignoreCase = true)
             }
 

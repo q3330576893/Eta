@@ -206,6 +206,18 @@
             android:exported="false"
             android:foregroundServiceType="microphone" />
 
+        <!-- 快捷设置磁贴：一键语音助手 -->
+        <service
+            android:name=".agent.voice.EtaVoiceTileService"
+            android:exported="true"
+            android:icon="@drawable/ic_assistant_voice"
+            android:label="@string/tile_voice_assistant_label"
+            android:permission="android.permission.BIND_QUICK_SETTINGS_TILE">
+            <intent-filter>
+                <action android:name="android.service.quicksettings.action.QS_TILE" />
+            </intent-filter>
+        </service>
+
         <!-- 热词唤醒：开机自启 + 看门狗重启 -->
         <receiver
             android:name=".agent.voice.HotwordBootReceiver"

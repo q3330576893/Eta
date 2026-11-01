@@ -97,5 +97,7 @@ internal fun SpeechSettingsScreen(onBack: () -> Unit, onNavigate: (AppRoute) -> 
                 SpeechNote(stringResource(R.string.speech_overview_note))
             }
         }
+        // ── 语音唤醒：热词唤醒 + 默认助手 ──
+        hotwordSettingsSection(current)
     }
 }
