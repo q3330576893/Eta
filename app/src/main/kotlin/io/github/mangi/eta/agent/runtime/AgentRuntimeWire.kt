@@ -104,7 +104,7 @@ internal object AgentRuntimeWire {
 
     private const val KEY_TYPE = "type"
     private const val KEY_RUN_ID = "run_id"
-    private const val KEY_PROMPT = "prompt"
+    const val KEY_PROMPT: String = "prompt"
     const val KEY_CONVERSATION_ID: String = "conversation_id"
     private const val KEY_ASSISTANT_SCREEN_CONTEXT = "assistant_screen_context"
     private const val KEY_MODEL_SESSION_ID = "model_session_id"
