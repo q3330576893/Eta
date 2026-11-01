@@ -869,6 +869,20 @@ internal class AgentRuntimeService : Service(), LifecycleOwner, SavedStateRegist
         return listOf(session)
     }
 
+    /**
+     * Steering 通道入口：按 conversationId 精确匹配目标会话的运行。
+     * 如果找不到匹配的运行，回退到原有的 runId 逻辑。
+     */
+    private fun requestSupplement(text: String, conversationId: String = "") {
+        val supplementText = text.trim()
+        if (supplementText.isBlank()) return
+        // 尝试按 conversationId 找到对应的运行
+        // 暂时使用 displayedRun 作为目标（与现有逻辑保持一致）
+        // TODO: 实现精确的 conversationId -> runId 映射
+        val targetRunId = displayedRun?.runId
+        requestSupplement(targetRunId, supplementText)
+    }
+
     private fun requestSupplement(runId: String?, text: String) {
         val supplementText = text.trim()
         if (supplementText.isBlank()) return
