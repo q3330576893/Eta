@@ -71,14 +71,22 @@ internal fun PresetManagerScreen(
     ) { uri: Uri? ->
         if (uri == null) return@rememberLauncherForActivityResult
         scope.launch(Dispatchers.IO) {
-            val result = PromptPresetCodec.read(context, uri)
+            val result = runCatching { PromptPresetCodec.read(context, uri) }
+                .getOrElse { PromptPresetCodec.Result.Failure("读取异常：${it.message}") }
+            // 磁盘写入放 IO 线程
+            val appliedName: String? = when (result) {
+                is PromptPresetCodec.Result.Ok -> runCatching {
+                    PromptPresetRepository.addImported(result.value)
+                    PromptPresetRepository.applyPreset(result.value)
+                    result.value.name
+                }.getOrNull()
+                is PromptPresetCodec.Result.Failure -> null
+            }
             withContext(Dispatchers.Main) {
                 when (result) {
                     is PromptPresetCodec.Result.Ok -> {
-                        PromptPresetRepository.addImported(result.value)
-                        PromptPresetRepository.applyPreset(result.value)
                         refreshTick++
-                        notice = "已导入并套用「${result.value.name}」"
+                        notice = if (appliedName != null) "已导入并套用「$appliedName」" else "导入失败：写入预设时出错"
                     }
                     is PromptPresetCodec.Result.Failure -> {
                         notice = "导入失败：${result.reason}"
@@ -86,6 +94,7 @@ internal fun PresetManagerScreen(
                 }
             }
         }
+    }
     }
     val exportLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.CreateDocument("application/zip"),
