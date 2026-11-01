@@ -77,6 +77,7 @@ internal fun SpeechRecognitionScreen(onBack: () -> Unit, onOpenOss: () -> Unit) 
                     SpeechNote(
                         stringResource(
                             when (settings.asr) {
+                                AsrProvider.SYSTEM -> R.string.speech_asr_note_system
                                 AsrProvider.QWEN_REALTIME, AsrProvider.DOUBAO -> R.string.speech_asr_note_streaming
                                 AsrProvider.QWEN_FLASH -> R.string.speech_asr_note_flash
                                 AsrProvider.QWEN_FILE -> R.string.speech_asr_note_file
@@ -85,10 +86,12 @@ internal fun SpeechRecognitionScreen(onBack: () -> Unit, onOpenOss: () -> Unit) 
                     )
                 }
             }
-            item(key = "connection") {
-                SpeechConnectionSection(store, synthesis = false)
+            if (settings.asr != AsrProvider.SYSTEM) {
+                item(key = "connection") {
+                    SpeechConnectionSection(store, synthesis = false)
+                }
             }
-            if (settings.asr != AsrProvider.DOUBAO) {
+            if (settings.asr != AsrProvider.SYSTEM && settings.asr != AsrProvider.DOUBAO) {
                 item(key = "language") {
                     EtaPreferenceGroup {
                         SpeechFieldColumn {
