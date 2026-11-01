@@ -250,6 +250,24 @@ internal class AgentRuntimeService : Service(), LifecycleOwner, SavedStateRegist
                     if (runId.isNotBlank()) cancelRun(runId)
                 }
 
+                AgentRuntimeWire.MSG_PAUSE -> {
+                    val runId = msg.data?.let(AgentRuntimeWire::runIdFromBundle)?.takeIf { it.isNotBlank() }
+                    requestPause(runId)
+                }
+
+                AgentRuntimeWire.MSG_RESUME -> {
+                    val runId = msg.data?.let(AgentRuntimeWire::runIdFromBundle)?.takeIf { it.isNotBlank() }
+                    requestResume(runId)
+                }
+
+                AgentRuntimeWire.MSG_STEER -> {
+                    val text = msg.data?.getString(AgentRuntimeWire.KEY_PROMPT).orEmpty().trim()
+                    val conversationId = msg.data
+                        ?.getString(AgentRuntimeWire.KEY_CONVERSATION_ID)
+                        .orEmpty()
+                    if (text.isNotBlank()) requestSupplement(text, conversationId)
+                }
+
                 AgentRuntimeWire.MSG_ACK_RESULT -> {
                     val runId = AgentRuntimeWire.runIdFromBundle(msg.data ?: return)
                     dispatchResultIo { AgentRuntimeResultStore.remove(this@AgentRuntimeService, runId) }
@@ -824,11 +842,31 @@ internal class AgentRuntimeService : Service(), LifecycleOwner, SavedStateRegist
     }
 
     private fun requestPause(runId: String?) {
+        val targets = pauseTargets(runId) ?: return
+        targets.forEach { session ->
+            session.controller.pause()
+            RunControl.setPaused(session.runId, true, "runtime.pause")
+        }
+        // 保留原有的 GUI 暂停行为
         if (runId != null) guiControl.pauseForUser(runId)
     }
 
-    private fun requestResume() {
+    private fun requestResume(runId: String? = null) {
+        val targets = pauseTargets(runId) ?: return
+        targets.forEach { session ->
+            session.controller.resume()
+            RunControl.setPaused(session.runId, false, "runtime.resume")
+        }
+        // 保留原有的 GUI 恢复行为
         guiControl.resumeForUser()
+    }
+
+    /** runId 为空 = 全部；指定了但已结束 = 什么都不做，别误伤别的会话。 */
+    private fun pauseTargets(runId: String?): List<AgentRuntimeSession>? {
+        if (runId.isNullOrBlank()) return sessions.values.filter { !it.isTerminal }.ifEmpty { null }
+        val session = sessions[runId] ?: return null
+        if (session.isTerminal) return null
+        return listOf(session)
     }
 
     private fun requestSupplement(runId: String?, text: String) {
