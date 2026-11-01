@@ -193,6 +193,60 @@ internal object AgentTextSystemToolCatalog {
                         )
                         .put("required", JSONArray().put("panel"))
                 )
+            .put(
+                AgentToolSchema.function(
+                    name = "ask_user_choice",
+                    description = "当需要用户做选择时调用：弹出悬浮选择卡片展示选项，用户点选后自动返回结果。" +
+                        "适合二选一/多选一场景（如先清哪个应用的缓存、执行哪个操作），无需用户打字回复。" +
+                        "调用后会阻塞等待用户点选（最长 120 秒），返回选项序号 index（从 0 开始）和标题 title。" +
+                        "options 最多 4 项，每项含 title（标题）、desc（描述，可空）、recommend（是否推荐，推荐项会高亮绿边）。",
+                    parameters = JSONObject()
+                        .put("type", "object")
+                        .put(
+                            "properties",
+                            JSONObject()
+                                .put("title", JSONObject().put("type", "string").put("description", "卡片标题，如\"请选择\""))
+                                .put("sub", JSONObject().put("type", "string").put("description", "副标题说明，可空"))
+                                .put(
+                                    "options",
+                                    JSONObject()
+                                        .put("type", "array")
+                                        .put("maxItems", 4)
+                                        .put("minItems", 1)
+                                        .put(
+                                            "items",
+                                            JSONObject()
+                                                .put("type", "object")
+                                                .put(
+                                                    "properties",
+                                                    JSONObject()
+                                                        .put("title", JSONObject().put("type", "string"))
+                                                        .put("desc", JSONObject().put("type", "string"))
+                                                        .put("recommend", JSONObject().put("type", "boolean"))
+                                                )
+                                                .put("required", JSONArray().put("title"))
+                                        )
+                                )
+                        )
+                        .put("required", JSONArray().put("title").put("options"))
+                )
+            )
+            .put(
+                AgentToolSchema.function(
+                    name = "show_copyable_text",
+                    description = "当生成了需要用户复制的内容（长文本、代码、链接、中文段落等）时调用：" +
+                        "弹出悬浮卡片展示文本并提供一键复制按钮，用户复制或关闭后返回结果。" +
+                        "调用后会阻塞等待用户操作（最长 120 秒），返回 copied 表示用户是否点了复制。",
+                    parameters = JSONObject()
+                        .put("type", "object")
+                        .put(
+                            "properties",
+                            JSONObject()
+                                .put("title", JSONObject().put("type", "string").put("description", "卡片标题，可空"))
+                                .put("text", JSONObject().put("type", "string").put("maxLength", 20_000))
+                        )
+                        .put("required", JSONArray().put("text"))
+                )
             )
     }
 }
