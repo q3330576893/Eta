@@ -451,7 +451,7 @@ private fun titleForRoute(route: AppRoute?): String = when (route) {
     is AppRoute.LinuxFiles -> stringResource(R.string.route_linux_files)
     is AppRoute.ModelProviders -> stringResource(R.string.route_model_providers)
     is AppRoute.TokenUsageStats -> stringResource(R.string.route_token_usage_stats)
-                AppRoute.ScheduledTasks -> ScheduledTasksScreen()
+                is AppRoute.ScheduledTasks -> "定时任务"
     is AppRoute.CommunityCatalog -> "从目录添加"
     is AppRoute.CommunityCatalogProvider -> "选择模型"
     is AppRoute.McpServers -> stringResource(R.string.route_mcp_servers)
