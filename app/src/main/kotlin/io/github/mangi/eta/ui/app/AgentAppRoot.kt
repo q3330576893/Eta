@@ -69,6 +69,7 @@ import io.github.mangi.eta.ui.pages.providers.ModelProviderListScreen
 import io.github.mangi.eta.ui.screens.tokenstats.TokenUsageStatsScreen
 import io.github.mangi.eta.ui.scheduler.ScheduledTasksScreen
 import io.github.mangi.eta.ui.screens.appknowledge.AppKnowledgeScreen
+import io.github.mangi.eta.ui.screens.presets.PresetManagerScreen
 import io.github.mangi.eta.ui.screens.backup.DataBackupScreen
 import io.github.mangi.eta.ui.screens.tokenstats.TokenUsageStatsScreen
 import io.github.mangi.eta.ui.screens.appknowledge.AppKnowledgeScreen
@@ -721,6 +722,9 @@ fun AgentAppRoot(
             }
             entry<AppRoute.AppKnowledge> {
                 AppKnowledgeScreen(onBack = ::popRoute)
+            }
+            entry<AppRoute.PresetManager> {
+                PresetManagerScreen(onBack = ::popRoute)
             }
             entry<AppRoute.SpeechSettings>(swipeDismiss = swipeDismiss) {
                 SpeechSettingsScreen(
