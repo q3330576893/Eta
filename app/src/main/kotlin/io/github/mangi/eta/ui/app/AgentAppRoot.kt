@@ -190,6 +190,10 @@ fun AgentAppRoot(
             onTerminalOpened()
         }
     }
+    val navigator = remember(backStack) { AgentNavigator(backStack) }
+    var navigationResetKey by rememberSaveable { mutableIntStateOf(0) }
+    val appViewModel = viewModel<AgentAppViewModel>()
+    val agentState = appViewModel.state
     // 外部分享：图片/视频/文件进入输入框附件，纯文字进入输入框
     LaunchedEffect(inboundShareUris) {
         if (inboundShareUris.isEmpty()) return@LaunchedEffect
@@ -204,10 +208,6 @@ fun AgentAppRoot(
         agentState.applySharedText(text)
         onInboundShareConsumed()
     }
-    val navigator = remember(backStack) { AgentNavigator(backStack) }
-    var navigationResetKey by rememberSaveable { mutableIntStateOf(0) }
-    val appViewModel = viewModel<AgentAppViewModel>()
-    val agentState = appViewModel.state
     val runtimeActive by AgentRuntimeService.keepScreenOn.collectAsState()
     val view = LocalView.current
     val keepScreenOn = backStack.lastOrNull() == AppRoute.Home &&
