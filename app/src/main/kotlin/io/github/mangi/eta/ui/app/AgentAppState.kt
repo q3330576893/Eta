@@ -1834,6 +1834,46 @@ internal class AgentAppState(
         }
     }
 
+    /**
+     * 外部分享入口：按类型分流到图片附件或文件附件。
+     * 图片走 attachImage（进输入框图片预览），其余（含视频）走 attachFiles。
+     */
+    fun attachSharedUris(uris: List<String>) {
+        if (uris.isEmpty()) return
+        val images = mutableListOf<String>()
+        val files = mutableListOf<String>()
+        uris.forEach { raw ->
+            val uri = runCatching { Uri.parse(raw) }.getOrNull() ?: return@forEach
+            runCatching {
+                appContext.contentResolver.takePersistableUriPermission(
+                    uri,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION,
+                )
+            }
+            val mime = runCatching { appContext.contentResolver.getType(uri) }.getOrNull().orEmpty()
+            val name = uri.lastPathSegment.orEmpty()
+            val isImage = mime.startsWith("image/") ||
+                name.endsWith(".png", true) || name.endsWith(".jpg", true) ||
+                name.endsWith(".jpeg", true) || name.endsWith(".webp", true) ||
+                name.endsWith(".gif", true) || name.endsWith(".bmp", true) ||
+                name.endsWith(".heic", true) || name.endsWith(".heif", true)
+            if (isImage) images += raw else files += raw
+        }
+        images.forEach(::attachImage)
+        if (files.isNotEmpty()) attachFiles(files)
+    }
+
+    /** 外部分享的纯文字：填入当前输入框（追加到已有草稿后）。 */
+    fun applySharedText(text: String) {
+        if (text.isBlank() || !homeState.isConversationLoaded) return
+        val current = homeState.input
+        val merged = if (current.isBlank()) text else "$current\n$text"
+        updateCurrentConversation(
+            homeState.copy(input = merged, inputSyncVersion = homeState.inputSyncVersion + 1),
+            updateTimestamp = false,
+        )
+    }
+
     fun attachFolder(uri: String) {
         resolveAndAttachFileReferences {
             val gateway = AgentFileReferenceGateway(appContext, AndroidAgentLogger)

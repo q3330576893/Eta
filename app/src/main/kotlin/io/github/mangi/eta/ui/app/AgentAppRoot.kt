@@ -26,6 +26,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -142,6 +143,7 @@ import io.github.mangi.eta.ui.voice.SpeechSettingsScreen
 import io.github.mangi.eta.ui.voice.SpeechSynthesisScreen
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import top.yukonga.miuix.kmp.basic.TextField
@@ -168,6 +170,9 @@ fun AgentAppRoot(
     onTerminalOpened: () -> Unit = {},
     onSpeechSettingsOpened: () -> Unit = {},
     onAssistantConversationOpened: (Boolean) -> Unit = {},
+    inboundShareUris: List<String> = emptyList(),
+    inboundShareText: String? = null,
+    onInboundShareConsumed: () -> Unit = {},
 ) {
     val context = LocalContext.current
     val resources = LocalResources.current
@@ -184,6 +189,20 @@ fun AgentAppRoot(
             if (backStack.lastOrNull() != AppRoute.Terminal) backStack.add(AppRoute.Terminal)
             onTerminalOpened()
         }
+    }
+    // 外部分享：图片/视频/文件进入输入框附件，纯文字进入输入框
+    LaunchedEffect(inboundShareUris) {
+        if (inboundShareUris.isEmpty()) return@LaunchedEffect
+        // 等待会话加载完成，避免附件落到空会话上
+        snapshotFlow { agentState.homeState.isConversationLoaded }.first { it }
+        agentState.attachSharedUris(inboundShareUris)
+        onInboundShareConsumed()
+    }
+    LaunchedEffect(inboundShareText) {
+        val text = inboundShareText?.takeIf { it.isNotBlank() } ?: return@LaunchedEffect
+        snapshotFlow { agentState.homeState.isConversationLoaded }.first { it }
+        agentState.applySharedText(text)
+        onInboundShareConsumed()
     }
     val navigator = remember(backStack) { AgentNavigator(backStack) }
     var navigationResetKey by rememberSaveable { mutableIntStateOf(0) }

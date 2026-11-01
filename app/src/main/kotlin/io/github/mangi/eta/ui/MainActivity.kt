@@ -93,6 +93,15 @@ class MainActivity : ComponentActivity() {
                                 EtaAssistantOverlayService.notifyHandoffReady(this@MainActivity)
                             }
                         },
+                        inboundShareUris = launchRequests.sharedUris,
+                        inboundShareText = launchRequests.sharedText,
+                        onInboundShareConsumed = {
+                            launchRequests = launchRequests.copy(
+                                sharedUris = emptyList(),
+                                sharedText = null,
+                            )
+                            intent?.action = null
+                        },
                     )
                 }
             }
