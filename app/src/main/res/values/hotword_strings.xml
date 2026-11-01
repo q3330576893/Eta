@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- 热词唤醒 -->
+    <string name="hotword_notification_channel">Hotword Wakeup</string>
+    <string name="hotword_notification_channel_desc">Shows when hotword wakeup is listening</string>
+    <string name="hotword_notification_title">Eta is listening for wake word</string>
+    <string name="hotword_notification_text">Say "艾塔" to wake up</string>
+    <string name="settings_hotword_title">Hotword Wakeup</string>
+    <string name="settings_hotword_summary">Say "艾塔" to wake up voice session (requires model download)</string>
+    <string name="settings_hotword_download_title">Download Model</string>
+    <string name="settings_hotword_download_summary">Download offline recognition model (~20MB)</string>
+    <string name="settings_hotword_downloading">Downloading model…</string>
+    <string name="settings_hotword_extracting">Extracting model…</string>
+    <string name="settings_hotword_ready">Model ready</string>
+    <string name="settings_hotword_failed">Download failed, tap to retry</string>
+    <string name="settings_hotword_delete_model">Delete Model</string>
+    <string name="settings_hotword_model_size">Model size: %1$s</string>
+</resources>

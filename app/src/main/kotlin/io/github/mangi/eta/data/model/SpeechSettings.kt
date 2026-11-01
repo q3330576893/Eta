@@ -89,6 +89,8 @@ data class SpeechSettings(
     val refineTranscript: Boolean = false,
     /** 只控制 Eta 自身的语音输入，关闭时保留服务配置以便再次开启。 */
     val recognitionEnabled: Boolean = true,
+    /** 热词唤醒开关：开启后喊"艾塔"可唤醒语音会话（需下载 Vosk 模型）。 */
+    val hotwordEnabled: Boolean = false,
 ) {
     companion object {
         const val DEFAULT_AUTO_SEND_SILENCE_MS = 2_000

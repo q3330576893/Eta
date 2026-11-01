@@ -176,6 +176,9 @@ dependencies {
     // WorkManager：定时任务调度（每小时周期任务）
     implementation(libs.work.runtime.ktx)
 
+    // Vosk：离线热词唤醒（语音识别）
+    implementation(libs.vosk.android)
+
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)

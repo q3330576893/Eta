@@ -27,6 +27,7 @@ json = "20260814"
 robolectric = "4.17"
 commonsCompress = "1.28.0"
 xz = "1.12"
+vosk = "0.3.47"
 
 [libraries]
 kotlin-gradle-plugin = { group = "org.jetbrains.kotlin", name = "kotlin-gradle-plugin", version.ref = "kotlin" }
@@ -62,6 +63,7 @@ kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 json = { group = "org.json", name = "json", version.ref = "json" }
 robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
+vosk-android = { group = "com.alphacephei", name = "vosk-android", version.ref = "vosk" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

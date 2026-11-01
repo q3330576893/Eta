@@ -25,6 +25,8 @@
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <uses-permission android:name="com.android.alarm.permission.SET_ALARM" />
+    <!-- 热词唤醒：息屏保活 -->
+    <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
@@ -195,6 +197,24 @@
             </intent-filter>
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <!-- 热词唤醒：Vosk 前台服务 -->
+        <service
+            android:name=".agent.voice.HotwordService"
+            android:exported="false"
+            android:foregroundServiceType="microphone" />
+
+        <!-- 热词唤醒：开机自启 + 看门狗重启 -->
+        <receiver
+            android:name=".agent.voice.HotwordBootReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+            <intent-filter>
+                <action android:name="io.github.mangi.eta.hotword.RESTART" />
             </intent-filter>
         </receiver>
     </application>

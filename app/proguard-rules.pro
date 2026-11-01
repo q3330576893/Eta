@@ -70,3 +70,12 @@
 -keep class io.github.mangi.eta.agent.virtualdisplay.VirtualDisplayCommandMain {
     public static void main(java.lang.String[]);
 }
+
+# ── Vosk 热词唤醒 ────────────────────────────────────────────────────────────
+# Vosk 通过 JNA 加载原生库，R8 不能裁剪相关类
+-keep class org.vosk.** { *; }
+-keep class org.vosk.android.** { *; }
+-dontwarn org.vosk.**
+# JNA 相关
+-keep class com.sun.jna.** { *; }
+-dontwarn com.sun.jna.**
