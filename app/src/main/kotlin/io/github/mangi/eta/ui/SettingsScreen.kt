@@ -282,7 +282,15 @@ private fun SettingsPageContent(
                         onClick = { onNavigate(AppRoute.TokenUsageStats) },
                     )
 
-                    EtaPreferenceDivider()
+                    
+    
+    EtaArrowPreference(
+        title = "App 知识库",
+        summary = "记住 App 操作流程，下次自动执行",
+        onClick = { onNavigate(AppRoute.AppKnowledge) },
+    ),
+
+    EtaPreferenceDivider()
                     SwitchPref(
                         context = context,
                         prefs = agentPrefs,
