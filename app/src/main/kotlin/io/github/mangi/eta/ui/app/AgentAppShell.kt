@@ -453,6 +453,7 @@ private fun titleForRoute(route: AppRoute?): String = when (route) {
     is AppRoute.TokenUsageStats -> stringResource(R.string.route_token_usage_stats)
                 is AppRoute.ScheduledTasks -> "定时任务"
             is AppRoute.AppKnowledge -> "App 知识库"
+            is AppRoute.PresetManager -> "预设管理"
     is AppRoute.CommunityCatalog -> "从目录添加"
     is AppRoute.CommunityCatalogProvider -> "选择模型"
     is AppRoute.McpServers -> stringResource(R.string.route_mcp_servers)
