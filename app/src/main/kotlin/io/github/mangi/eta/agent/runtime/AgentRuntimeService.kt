@@ -876,11 +876,18 @@ internal class AgentRuntimeService : Service(), LifecycleOwner, SavedStateRegist
     private fun requestSupplement(text: String, conversationId: String = "") {
         val supplementText = text.trim()
         if (supplementText.isBlank()) return
-        // 尝试按 conversationId 找到对应的运行
-        // 暂时使用 displayedRun 作为目标（与现有逻辑保持一致）
-        // TODO: 实现精确的 conversationId -> runId 映射
-        val targetRunId = displayedRun?.runId
-        requestSupplement(targetRunId, supplementText)
+        // 按 conversationId 精确匹配目标运行，避免串会话。
+        // 以前取 displayedRun，本机在跑长任务时别的会话发的内容会被吸进来，所以必须精确匹配。
+        val activeRuns = runs.all().filter { !it.session.isTerminal }
+        val target = if (conversationId.isNotBlank()) {
+            activeRuns.lastOrNull { it.conversationId == conversationId }
+        } else {
+            // 调用方没给会话信息：只有唯一候选时才敢投，避免误伤别的会话。
+            activeRuns.singleOrNull()
+        }
+        if (target != null) {
+            requestSupplement(target.runId, supplementText)
+        }
     }
 
     private fun requestSupplement(runId: String?, text: String) {
