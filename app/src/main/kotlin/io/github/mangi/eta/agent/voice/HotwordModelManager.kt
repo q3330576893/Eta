@@ -27,8 +27,9 @@ object HotwordModelManager {
     // 如需更小，可考虑自定义裁剪版
     private const val MODEL_URL =
         "https://alphacephei.com/vosk/models/vosk-model-small-cn-0.22.zip"
-    private const val MODEL_DIR_NAME = "vosk-model-small-cn"
-    private const val MODEL_ZIP_NAME = "vosk-model-small-cn.zip"
+    // The official archive extracts into this versioned directory name.
+    private const val MODEL_DIR_NAME = "vosk-model-small-cn-0.22"
+    private const val MODEL_ZIP_NAME = "vosk-model-small-cn-0.22.zip"
 
     // 下载状态
     sealed interface DownloadState {
@@ -221,7 +222,10 @@ object HotwordModelManager {
         ZipInputStream(BufferedInputStream(zipFile.inputStream())).use { zis ->
             var entry = zis.nextEntry
             while (entry != null) {
-                val file = File(destDir, entry.name)
+                val file = File(destDir, entry.name).canonicalFile
+                require(file.toPath().startsWith(destDir.canonicalFile.toPath())) {
+                    "Invalid model archive entry"
+                }
                 if (entry.isDirectory) {
                     file.mkdirs()
                 } else {
