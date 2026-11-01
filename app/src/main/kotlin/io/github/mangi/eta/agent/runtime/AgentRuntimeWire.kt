@@ -90,12 +90,22 @@ internal object AgentRuntimeWire {
     /** service -> client：返回各运行的会话归属与当前阶段。 */
     const val MSG_QUERY_ACTIVE_RUNS_RESPONSE = 17
 
+    /** client -> service：暂停指定运行（空 = 全部）。 */
+    const val MSG_PAUSE = 18
+
+    /** client -> service：恢复指定运行（空 = 全部）。 */
+    const val MSG_RESUME = 19
+
+    /** client -> service：运行中插话，注入下一个 turn，不取消当前请求。 */
+    const val MSG_STEER = 20
+
     private const val MODULE_PACKAGE = "io.github.mangi.eta"
     private const val SERVICE_CLASS = "io.github.mangi.eta.agent.runtime.AgentRuntimeService"
 
     private const val KEY_TYPE = "type"
     private const val KEY_RUN_ID = "run_id"
     private const val KEY_PROMPT = "prompt"
+    const val KEY_CONVERSATION_ID: String = "conversation_id"
     private const val KEY_ASSISTANT_SCREEN_CONTEXT = "assistant_screen_context"
     private const val KEY_MODEL_SESSION_ID = "model_session_id"
     private const val KEY_PROVIDER_ID = "provider_id"
