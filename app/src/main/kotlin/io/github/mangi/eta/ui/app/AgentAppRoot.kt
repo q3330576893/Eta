@@ -717,7 +717,7 @@ fun AgentAppRoot(
                 TokenUsageStatsScreen(onBack = ::popRoute)
             }
             entry<AppRoute.ScheduledTasks>(swipeDismiss = swipeDismiss) {
-                ScheduledTasksScreen(onBack = ::popRoute)
+                ScheduledTasksScreen(context = LocalContext.current, onBack = ::popRoute)
             }
             entry<AppRoute.AppKnowledge> {
                 AppKnowledgeScreen(onBack = ::popRoute)
