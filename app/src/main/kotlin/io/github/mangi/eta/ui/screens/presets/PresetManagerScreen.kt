@@ -95,7 +95,6 @@ internal fun PresetManagerScreen(
             }
         }
     }
-    }
     val exportLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.CreateDocument("application/zip"),
     ) { uri: Uri? ->
