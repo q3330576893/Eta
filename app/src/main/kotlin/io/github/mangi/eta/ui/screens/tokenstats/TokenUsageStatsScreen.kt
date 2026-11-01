@@ -428,7 +428,7 @@ private fun PriceTextField(
         decorationBox = { innerTextField ->
             Column {
                 if (value.isEmpty()) {
-                    Text(text = placeholder, fontSize = 14.sp, color = colors.onSurfaceVariant)
+                    Text(text = placeholder, fontSize = 14.sp, color = colors.onSurfaceVariantSummary)
                 }
                 innerTextField()
             }
