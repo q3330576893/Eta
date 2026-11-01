@@ -1483,4 +1483,14 @@
     <string name="token_usage_input_price_hint">Input $/1M</string>
     <string name="token_usage_output_price_hint">Output $/1M</string>
 
+
+    <string name="msg_action_copy">Copy</string>
+    <string name="msg_action_read_aloud">Read aloud</string>
+    <string name="msg_action_stop_reading">Stop</string>
+    <string name="msg_action_translate">Translate</string>
+    <string name="msg_translate_title">Translate</string>
+    <string name="msg_translate_loading">Translating…</string>
+    <string name="msg_translate_failed">Translation failed, please retry</string>
+    <string name="msg_translate_retry">Retry</string>
+    <string name="msg_translate_copy">Copy translation</string>
 </resources>
