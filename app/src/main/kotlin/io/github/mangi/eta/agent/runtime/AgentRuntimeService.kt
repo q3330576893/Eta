@@ -1086,7 +1086,7 @@ internal class AgentRuntimeService : Service(), LifecycleOwner, SavedStateRegist
                 },
                 onStop = { requestStop(controlRunId) },
                 onSupplementModeChange = ::setCapsuleInputMode,
-                onSupplement = { requestSupplement(controlRunId, it) },
+                onSupplement = { requestSupplementByRunId(controlRunId, it) },
                 virtualDisplay = virtualDisplayState.value,
                 onTakeOverVirtualDisplay = {
                     VirtualDisplayController.setUserControlling(true)
