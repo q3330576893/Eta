@@ -205,7 +205,7 @@ internal fun TokenUsageStatsScreen(
                                         Text(
                                             text = formatUsd(cost),
                                             fontSize = 12.sp,
-                                            color = MiuixTheme.colorScheme.onSurfaceVariant,
+                                            color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
                                         )
                                     }
                                 }
@@ -249,7 +249,7 @@ internal fun TokenUsageStatsScreen(
                                     Icon(
                                         imageVector = Icons.Rounded.DeleteOutline,
                                         contentDescription = null,
-                                        tint = MiuixTheme.colorScheme.onSurfaceVariant,
+                                        tint = MiuixTheme.colorScheme.onSurfaceVariantSummary,
                                     )
                                 }
                             }
@@ -335,7 +335,7 @@ private fun OverviewRow(
                     Text(
                         text = "≈ ${formatUsd(costUsd)}",
                         fontSize = 12.sp,
-                        color = MiuixTheme.colorScheme.onSurfaceVariant,
+                        color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
                     )
                 }
             }

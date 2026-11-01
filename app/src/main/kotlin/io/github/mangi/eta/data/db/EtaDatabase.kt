@@ -26,6 +26,7 @@ import androidx.room.migration.Migration
         CharacterEntity::class,
         UserPersonaEntity::class,
         TokenUsageEntity::class,
+        ScheduledTaskEntity::class,
     ],
     version = 25,
     exportSchema = false,
@@ -38,6 +39,7 @@ internal abstract class EtaDatabase : RoomDatabase() {
     abstract fun mcpServerDao(): McpServerDao
     abstract fun characterDao(): CharacterDao
     abstract fun tokenUsageDao(): TokenUsageDao
+    abstract fun scheduledTaskDao(): ScheduledTaskDao
 
     companion object {
         @Volatile

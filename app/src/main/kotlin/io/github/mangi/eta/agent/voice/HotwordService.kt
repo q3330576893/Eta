@@ -214,7 +214,7 @@ class HotwordService : Service(), RecognitionListener {
         return NotificationCompat.Builder(this, CHANNEL_ID)
             .setContentTitle(getString(R.string.hotword_notification_title))
             .setContentText(getString(R.string.hotword_notification_text))
-            .setSmallIcon(R.drawable.ic_mic)
+            .setSmallIcon(R.drawable.ic_assistant_voice)
             .setContentIntent(pendingIntent)
             .setOngoing(true)
             .setSilent(true)
