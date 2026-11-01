@@ -1149,6 +1149,7 @@
   <string name="chat_edit_replace_message">Sending will replace this message</string>
   <string name="chat_eta_working">Eta is working…</string>
   <string name="chat_input_hint">交给 Eta 去完成 · @添加上下文，/调用技能与指令</string>
+    <string name="memory_inline_label">内存 %1$d%%</string>
   <string name="chat_stop">Stop</string>
   <string name="chat_send">Send</string>
   <string name="chat_reasoning_effort">Reasoning effort: %1$s</string>
