@@ -66,10 +66,10 @@ internal object RunControl {
             }
         }
         if (changed) {
-            AndroidAgentLogger.info {
+            AndroidAgentLogger.info(
                 "run.control: runId=$runId ${if (value) "暂停" else "恢复"} from=$source " +
                     "剩余暂停=${_state.value.pausedRuns.size}"
-            }
+            )
         }
     }
 
@@ -86,7 +86,7 @@ internal object RunControl {
                 )
             }
         }
-        AndroidAgentLogger.info { "run.control: runId=$runId 清理 from=$reason" }
+        AndroidAgentLogger.info("run.control: runId=$runId 清理 from=$reason")
     }
 
     fun observe(consumer: (RunControlState) -> Unit) {
