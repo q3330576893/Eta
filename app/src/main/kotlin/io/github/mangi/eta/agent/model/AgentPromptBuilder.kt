@@ -263,13 +263,13 @@ internal object AgentPromptBuilder {
         if (persona == null || persona.baseSystemPrompt.isBlank()) return systemMessage(base)
         return if (persona.mode == PromptPresetMode.REPLACE) {
             systemMessage(
-                "<custom_identity>\\n" + persona.baseSystemPrompt.trim() + "\\n</custom_identity>\\n" +
-                    "以上是用户自定义的身份设定，优先级高于后文的内置身份描述；工具、设备与屏幕规则仍然有效，按其执行。\\n" +
+                "<custom_identity>\n" + persona.baseSystemPrompt.trim() + "\n</custom_identity>\n" +
+                    "以上是用户自定义的身份设定，优先级高于后文的内置身份描述；工具、设备与屏幕规则仍然有效，按其执行。\n" +
                     base
             )
         } else {
             systemMessage(
-                "<custom_identity>\\n" + persona.baseSystemPrompt.trim() + "\\n</custom_identity>\\n" + base
+                "<custom_identity>\n" + persona.baseSystemPrompt.trim() + "\n</custom_identity>\n" + base
             )
         }
     }
@@ -292,7 +292,7 @@ internal object AgentPromptBuilder {
     private fun customInstructionsMessage(persona: ActivePersonaStore.ActivePersona): JSONObject? {
         val instruction = persona.appendInstructions.trim()
         if (instruction.isEmpty()) return null
-        return systemMessage("<custom_instructions>\\n$instruction\\n</custom_instructions>")
+        return systemMessage("<custom_instructions>\n$instruction\n</custom_instructions>")
     }
 
     private fun systemMessage(content: String): JSONObject =
