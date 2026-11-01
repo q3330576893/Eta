@@ -200,7 +200,7 @@ internal class EtaSpeechInput(
         val delegate = try {
             SystemSpeechRecognizer.create(context) ?: throw RuntimeException("no speech service")
         } catch (error: RuntimeException) {
-            AndroidAgentLogger.warn("Eta speech model request failed: source=${sourceLabel} type=${error.javaClass.simpleName}")
+            AndroidAgentLogger.warn("Eta speech model request failed: source=system type=${error.javaClass.simpleName}")
             onDownloadStatus(EtaSpeechDownloadStatus.FAILED)
             return
         }
@@ -221,27 +221,27 @@ internal class EtaSpeechInput(
                 }
                 override fun onSuccess() {
                     if (!current()) return
-                    AndroidAgentLogger.info("Eta speech model ready: source=${sourceLabel}")
+                    AndroidAgentLogger.info("Eta speech model ready: source=system")
                     downloadSource = null
                     releaseDownload()
                     onDownloadStatus(EtaSpeechDownloadStatus.READY)
                 }
                 override fun onScheduled() {
                     if (!current()) return
-                    AndroidAgentLogger.info("Eta speech model scheduled: source=${sourceLabel}")
+                    AndroidAgentLogger.info("Eta speech model scheduled: source=system")
                     downloadSource = null
                     releaseDownload()
                     onDownloadStatus(EtaSpeechDownloadStatus.SCHEDULED)
                 }
                 override fun onError(error: Int) {
                     if (!current()) return
-                    AndroidAgentLogger.warn("Eta speech model request failed: source=${sourceLabel} code=$error")
+                    AndroidAgentLogger.warn("Eta speech model request failed: source=system code=$error")
                     releaseDownload()
                     onDownloadStatus(EtaSpeechDownloadStatus.FAILED)
                 }
             })
         } catch (error: RuntimeException) {
-            AndroidAgentLogger.warn("Eta speech model request failed: source=${sourceLabel} type=${error.javaClass.simpleName}")
+            AndroidAgentLogger.warn("Eta speech model request failed: source=system type=${error.javaClass.simpleName}")
             releaseDownload()
             onDownloadStatus(EtaSpeechDownloadStatus.FAILED)
         }
