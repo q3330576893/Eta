@@ -93,6 +93,30 @@ internal fun SpeechSettingsScreen(onBack: () -> Unit, onNavigate: (AppRoute) -> 
                             }
                         },
                     )
+                    EtaPreferenceDivider()
+                    EtaSwitchPreference(
+                        title = "热词唤醒",
+                        summary = if (current.hotwordEnabled) "喊“艾塔”唤醒" else "关闭",
+                        checked = current.hotwordEnabled,
+                        startAction = {
+                            EtaPreferenceIcon(
+                                icon = Icons.Rounded.Mic,
+                                tint = EtaPreferenceColors.Blue,
+                            )
+                        },
+                        onCheckedChange = { enabled ->
+                            scope.launch {
+                                if (enabled) {
+                                    // Start hotword: permission -> model -> service
+                                    // Actual implementation in HotwordController
+                                    io.github.mangi.eta.agent.voice.HotwordController.enable(context)
+                                } else {
+                                    io.github.mangi.eta.agent.voice.HotwordController.disable(context)
+                                }
+                                SpeechSettingsRepository.save(current.copy(hotwordEnabled = enabled))
+                            }
+                        },
+                    )
                 }
                 SpeechNote(stringResource(R.string.speech_overview_note))
             }
