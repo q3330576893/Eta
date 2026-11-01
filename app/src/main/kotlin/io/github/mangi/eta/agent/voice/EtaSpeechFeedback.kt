@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.sp
 import io.github.mangi.eta.R
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.theme.MiuixTheme
+import android.speech.SpeechRecognizer
 
 internal enum class EtaSpeechPhase { IDLE, STARTING, LISTENING, RECOGNIZING }
 
@@ -142,5 +143,25 @@ internal fun EtaSpeechFeedback(
                 }
             }
         }
+    }
+}
+
+/** 系统语音识别的错误码 → 提示文案。 */
+internal fun speechIssueMessage(issue: EtaSpeechIssue): Int = when (issue.kind) {
+    EtaSpeechIssueKind.NO_SERVICE -> R.string.voice_speech_no_service
+    EtaSpeechIssueKind.SERVICE_TIMEOUT -> R.string.voice_speech_service_timeout
+    EtaSpeechIssueKind.DOWNLOAD_AVAILABLE -> R.string.voice_model_needed
+    EtaSpeechIssueKind.DOWNLOAD_PENDING -> R.string.voice_model_pending
+    EtaSpeechIssueKind.RECOGNITION -> when (issue.errorCode) {
+        SpeechRecognizer.ERROR_INSUFFICIENT_PERMISSIONS -> R.string.voice_audio_permission
+        SpeechRecognizer.ERROR_NO_MATCH, SpeechRecognizer.ERROR_SPEECH_TIMEOUT -> R.string.voice_no_speech
+        SpeechRecognizer.ERROR_NETWORK, SpeechRecognizer.ERROR_NETWORK_TIMEOUT -> R.string.voice_speech_network_error
+        SpeechRecognizer.ERROR_SERVER, SpeechRecognizer.ERROR_SERVER_DISCONNECTED -> R.string.voice_speech_service_error
+        SpeechRecognizer.ERROR_AUDIO -> R.string.voice_speech_audio_error
+        SpeechRecognizer.ERROR_RECOGNIZER_BUSY -> R.string.voice_speech_busy
+        SpeechRecognizer.ERROR_TOO_MANY_REQUESTS -> R.string.voice_speech_rate_limited
+        SpeechRecognizer.ERROR_LANGUAGE_NOT_SUPPORTED -> R.string.voice_language_not_supported
+        SpeechRecognizer.ERROR_LANGUAGE_UNAVAILABLE -> R.string.voice_language_unavailable
+        else -> R.string.voice_speech_unavailable
     }
 }
