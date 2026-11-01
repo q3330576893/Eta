@@ -14,13 +14,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Mic
 import androidx.compose.material.icons.rounded.Psychology
 import androidx.compose.material.icons.rounded.RecordVoiceOver
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
+import top.yukonga.miuix.kmp.basic.Text
+import top.yukonga.miuix.kmp.basic.TextField
+import top.yukonga.miuix.kmp.theme.MiuixTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -32,7 +32,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import io.github.mangi.eta.R
@@ -50,6 +49,7 @@ import io.github.mangi.eta.ui.components.EtaSwitchPreference
 import io.github.mangi.eta.ui.components.EtaWindowDialog
 import io.github.mangi.eta.ui.components.MiuixDialogActions
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 /**
@@ -84,8 +84,7 @@ private fun HotwordSettingsContent(current: SpeechSettings) {
         if (granted) {
             // 授权后如果开关开着，启动服务
             scope.launch {
-                val settings = SpeechSettingsRepository.settingsFlow()
-                    .let { kotlinx.coroutines.flow.first(it) }
+                val settings = SpeechSettingsRepository.settingsFlow().first()
                 if (settings.hotwordEnabled && HotwordModelManager.isModelReady(context)) {
                     HotwordService.start(context)
                 }
@@ -262,9 +261,7 @@ private fun HotwordSettingsContent(current: SpeechSettings) {
             onDismiss = { showPhraseDialog = false },
             onConfirm = { phrase ->
                 scope.launch {
-                    val latest = kotlinx.coroutines.flow.first(
-                        SpeechSettingsRepository.settingsFlow()
-                    )
+                    val latest = SpeechSettingsRepository.settingsFlow().first()
                     SpeechSettingsRepository.save(
                         latest.copy(hotwordPhrase = phrase)
                     )
@@ -302,15 +299,17 @@ private fun HotwordPhraseDialog(
                     input = it
                     error = null
                 },
-                placeholder = {
-                    Text(stringResource(R.string.hotword_phrase_dialog_hint))
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
+                label = stringResource(R.string.hotword_phrase_dialog_hint),
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth(),
-                isError = error != null,
-                supportingText = error?.let { { Text(it) } },
             )
+            if (error != null) {
+                Spacer(Modifier.height(4.dp))
+                Text(
+                    text = error!!,
+                    color = MiuixTheme.colorScheme.error,
+                )
+            }
             Spacer(Modifier.height(8.dp))
             MiuixDialogActions(
                 confirmText = stringResource(R.string.hotword_phrase_dialog_confirm),

@@ -28,6 +28,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -85,6 +86,12 @@ class HotwordService : Service(), RecognitionListener {
             val intent = Intent(context, HotwordService::class.java).setAction(ACTION_STOP)
             context.startService(intent)
         }
+
+        /** 通知服务唤醒词已变更，重建识别器 */
+        fun reload(context: Context) {
+            val intent = Intent(context, HotwordService::class.java).setAction(ACTION_RELOAD)
+            context.startService(intent)
+        }
     }
 
     private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
@@ -102,12 +109,6 @@ class HotwordService : Service(), RecognitionListener {
     /** 当前生效的唤醒词列表（用户自定义 + 英文兜底） */
     @Volatile
     private var activeHotwords: List<String> = listOf("艾塔助手", FALLBACK_HOTWORD_EN)
-
-    /** 通知外部唤醒词已变更，重建识别器 */
-    fun reload(context: Context) {
-        val intent = Intent(context, HotwordService::class.java).setAction(ACTION_RELOAD)
-        context.startService(intent)
-    }
 
     private val pauseReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context?, intent: Intent?) {
@@ -316,8 +317,7 @@ class HotwordService : Service(), RecognitionListener {
      */
     private suspend fun loadHotwordsFromSettings() {
         try {
-            val settings = SpeechSettingsRepository.settingsFlow()
-                .let { kotlinx.coroutines.flow.first(it) }
+            val settings = SpeechSettingsRepository.settingsFlow().first()
             val phrase = settings.hotwordPhrase.trim().ifEmpty { "艾塔助手" }
             activeHotwords = listOf(phrase, FALLBACK_HOTWORD_EN).distinct()
             AndroidAgentLogger.debug { "热词已加载: ${activeHotwords.joinToString()}" }
