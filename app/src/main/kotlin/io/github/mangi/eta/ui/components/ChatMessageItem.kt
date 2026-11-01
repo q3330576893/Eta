@@ -38,6 +38,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.ChevronLeft
@@ -48,9 +49,12 @@ import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Edit
 import androidx.compose.material.icons.rounded.Lightbulb
 import androidx.compose.material.icons.rounded.Refresh
+import androidx.compose.material.icons.rounded.Stop
+import androidx.compose.material.icons.rounded.Translate
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -102,6 +106,8 @@ import io.github.mangi.eta.ui.model.ThinkingMessageUi
 import io.github.mangi.eta.ui.model.ToolActivityMessageUi
 import io.github.mangi.eta.ui.model.ToolSummaryMessageUi
 import io.github.mangi.eta.ui.model.UserMessageUi
+import io.github.mangi.eta.ui.voice.LocalSpeechPlayback
+import io.github.mangi.eta.ui.voice.LocalSpeechPlaybackEnabled
 import io.github.mangi.eta.ui.voice.SpeechReadAloudButton
 import kotlinx.coroutines.delay
 import top.yukonga.miuix.kmp.basic.Icon
@@ -584,6 +590,18 @@ private fun AgentMessageBlock(
 
     val character = LocalRoleplayChat.current.takeUnless { assistantOverlay }
     val isGreeting = character != null && message.id.startsWith(GreetingMessagePrefix)
+    // 长按快捷操作：复制 / 朗读 / 翻译（Miuix Tooltip 风格，与用户气泡一致）。
+    // 朗读复用聊天已有的 TTS 控制器；流式输出中或内容为空时禁用，避免复制半截文本。
+    val tooltipState = rememberTooltipState(isPersistent = true)
+    val speechController = LocalSpeechPlayback.current
+    val canReadAloud = allowSpeech && LocalSpeechPlaybackEnabled.current && speechController != null
+    val speakingMessageId = speechController?.state?.collectAsState()?.value?.messageId
+    var translateSource by remember(message.id) { mutableStateOf<String?>(null) }
+    LaunchedEffect(tooltipState) {
+        snapshotFlow { tooltipState.isVisible }.collect { visible ->
+            if (visible) haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+        }
+    }
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -592,48 +610,97 @@ private fun AgentMessageBlock(
                 vertical = 8.dp,
             ),
     ) {
-        if (character != null) {
-            CharacterReplyHeader(character = character, isGreeting = isGreeting)
-        }
-        when {
-            message.content.isBlank() && message.isStreaming -> {
-                AITypingIndicator(
-                    modifier = Modifier.padding(top = 4.dp)
-                )
-            }
-            streamingState != null && !revealComplete -> {
-                StreamingMarkdown(
-                    state = streamingState,
-                    content = message.content,
-                    isStreaming = message.isStreaming,
-                    tone = MarkdownTone.Answer,
-                    onRevealCompleteChange = { streamingRevealComplete = it },
-                    modifier = Modifier.fillMaxWidth(),
-                )
-            }
-            message.renderMarkdown -> {
-                SelectionContainer {
-                    StaticMarkdown(
-                        content = message.content,
-                        tone = MarkdownTone.Answer,
-                        parsed = completedDocument,
-                        modifier = Modifier.fillMaxWidth(),
-                    )
+        TooltipBox(
+            positionProvider = TooltipDefaults.rememberTooltipPositionProvider(
+                positioning = TooltipAnchorPosition.Below,
+            ),
+            tooltip = {
+                RichTooltip(insideMargin = PaddingValues(horizontal = 8.dp, vertical = 6.dp)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(2.dp)) {
+                        MessageTooltipAction(
+                            icon = Icons.Rounded.ContentCopy,
+                            label = stringResource(R.string.msg_action_copy),
+                            onClick = {
+                                @Suppress("DEPRECATION")
+                                clipboardManager.setText(AnnotatedString(message.content))
+                                haptic.performHapticFeedback(HapticFeedbackType.Confirm)
+                                tooltipState.dismiss()
+                            },
+                        )
+                        if (canReadAloud) {
+                            val speaking = speakingMessageId == message.id
+                            MessageTooltipAction(
+                                icon = if (speaking) Icons.Rounded.Stop else Icons.AutoMirrored.Rounded.VolumeUp,
+                                label = stringResource(
+                                    if (speaking) R.string.msg_action_stop_reading else R.string.msg_action_read_aloud,
+                                ),
+                                onClick = {
+                                    if (speaking) speechController?.stop()
+                                    else speechController?.speak(message.id, message.content)
+                                    tooltipState.dismiss()
+                                },
+                            )
+                        }
+                        MessageTooltipAction(
+                            icon = Icons.Rounded.Translate,
+                            label = stringResource(R.string.msg_action_translate),
+                            onClick = {
+                                translateSource = message.content
+                                tooltipState.dismiss()
+                            },
+                        )
+                    }
                 }
-            }
-            message.content.isNotBlank() -> {
-                SelectionContainer {
-                    Text(
-                        text = message.content,
-                        style = MiuixTheme.textStyles.body1,
-                        color = MiuixTheme.colorScheme.onSurface,
-                    )
+            },
+            state = tooltipState,
+            focusable = true,
+            enableUserInput = !message.isStreaming && message.content.isNotBlank(),
+        ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                if (character != null) {
+                    CharacterReplyHeader(character = character, isGreeting = isGreeting)
                 }
-            }
-        }
+                when {
+                    message.content.isBlank() && message.isStreaming -> {
+                        AITypingIndicator(
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
+                    streamingState != null && !revealComplete -> {
+                        StreamingMarkdown(
+                            state = streamingState,
+                            content = message.content,
+                            isStreaming = message.isStreaming,
+                            tone = MarkdownTone.Answer,
+                            onRevealCompleteChange = { streamingRevealComplete = it },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                    message.renderMarkdown -> {
+                        SelectionContainer {
+                            StaticMarkdown(
+                                content = message.content,
+                                tone = MarkdownTone.Answer,
+                                parsed = completedDocument,
+                                modifier = Modifier.fillMaxWidth(),
+                            )
+                        }
+                    }
+                    message.content.isNotBlank() -> {
+                        SelectionContainer {
+                            Text(
+                                text = message.content,
+                                style = MiuixTheme.textStyles.body1,
+                                color = MiuixTheme.colorScheme.onSurface,
+                            )
+                        }
+                    }
+                }
 
-        message.searchSuggestionsHtml.forEach { html ->
-            SearchSuggestionsView(html = html, modifier = Modifier.padding(top = 8.dp))
+                message.searchSuggestionsHtml.forEach { html ->
+                    SearchSuggestionsView(html = html, modifier = Modifier.padding(top = 8.dp))
+                }
+            }
         }
 
         // 回答显现完成后才出现操作行；淡入展开避免贴底滚动时整页突然跳动一行高度。
@@ -703,6 +770,9 @@ private fun AgentMessageBlock(
                     }
                 }
             }
+        }
+        translateSource?.let { src ->
+            MessageTranslateDialog(text = src, onDismiss = { translateSource = null })
         }
     }
 }
