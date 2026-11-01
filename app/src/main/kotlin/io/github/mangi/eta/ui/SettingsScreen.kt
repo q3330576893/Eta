@@ -289,6 +289,12 @@ private fun SettingsPageContent(
                         onClick = { onNavigate(AppRoute.AppKnowledge) },
                     )
 
+                    EtaArrowPreference(
+                        title = "预设管理",
+                        summary = "导入预设包，一键套用自定义人格",
+                        onClick = { onNavigate(AppRoute.PresetManager) },
+                    )
+
                     EtaPreferenceDivider()
                     SwitchPref(
                         context = context,
