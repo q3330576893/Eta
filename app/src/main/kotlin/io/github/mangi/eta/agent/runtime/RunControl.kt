@@ -2,7 +2,7 @@ package io.github.mangi.eta.agent.runtime
 
 import android.os.Handler
 import android.os.Looper
-import io.github.mangi.eta.core.EtaTrace
+import io.github.mangi.eta.core.AndroidAgentLogger
 import java.util.concurrent.CopyOnWriteArrayList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -66,11 +66,10 @@ internal object RunControl {
             }
         }
         if (changed) {
-            EtaTrace.log(
-                "run.control",
-                "runId=$runId ${if (value) "暂停" else "恢复"} from=$source " +
-                    "剩余暂停=${_state.value.pausedRuns.size}",
-            )
+            AndroidAgentLogger.info {
+                "run.control: runId=$runId ${if (value) "暂停" else "恢复"} from=$source " +
+                    "剩余暂停=${_state.value.pausedRuns.size}"
+            }
         }
     }
 
@@ -87,7 +86,7 @@ internal object RunControl {
                 )
             }
         }
-        EtaTrace.log("run.control", "runId=$runId 清理 from=$reason")
+        AndroidAgentLogger.info { "run.control: runId=$runId 清理 from=$reason" }
     }
 
     fun observe(consumer: (RunControlState) -> Unit) {
