@@ -1479,4 +1479,7 @@
   <string name="voice_conv_stop">结束</string>
   <string name="voice_conv_tap_to_interrupt">点按打断</string>
   <string name="voice_conv_you_said">你说：%1$s</string>
+  <!-- 语音磁贴 / 语音对话（原 hotword_strings.xml 迁移，热词已移除） -->
+  <string name="tile_voice_assistant_label">Eta 语音</string>
+  <string name="voice_conversation_need_tts">请先在语音设置中配置语音播报服务</string>
 </resources>

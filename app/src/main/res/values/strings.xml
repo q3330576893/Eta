@@ -1527,4 +1527,7 @@
   <string name="voice_conv_stop">End</string>
   <string name="voice_conv_tap_to_interrupt">Tap to interrupt</string>
   <string name="voice_conv_you_said">You: %1$s</string>
+  <!-- 语音磁贴 / 语音对话（原 hotword_strings.xml 迁移，热词已移除） -->
+  <string name="tile_voice_assistant_label">Eta Voice</string>
+  <string name="voice_conversation_need_tts">Please configure a speech synthesis service in voice settings first</string>
 </resources>
