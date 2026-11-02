@@ -39,6 +39,8 @@ internal object MediaGenClient {
         val model: String,
         val prompt: String,
         val size: String = "1K",
+        // 与服务端默认一致（1:1），显式发出以便排错；如需默认横屏可改为 16:9
+        val ratio: String = "1:1",
         val extra_body: ExtraBody = ExtraBody("url"),
     )
 

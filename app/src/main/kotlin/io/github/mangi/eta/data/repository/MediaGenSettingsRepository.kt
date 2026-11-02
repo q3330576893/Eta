@@ -3,6 +3,7 @@ package io.github.mangi.eta.data.repository
 import android.content.Context
 import android.security.keystore.KeyGenParameterSpec
 import android.security.keystore.KeyProperties
+import android.util.Log
 import io.github.mangi.eta.data.datastore.SettingsDataStore
 import io.github.mangi.eta.data.model.MediaGenSettings
 import java.security.KeyStore
@@ -35,7 +36,8 @@ internal object MediaGenSettingsRepository {
             val cipher = Cipher.getInstance("AES/GCM/NoPadding")
             cipher.init(Cipher.DECRYPT_MODE, secretKey(), GCMParameterSpec(128, bytes, 0, 12))
             cipher.doFinal(bytes, 12, bytes.size - 12).toString(Charsets.UTF_8)
-        } catch (_: Exception) {
+        } catch (e: Exception) {
+            Log.w("MediaGen", "apiKey decrypt failed, treating as not configured", e)
             ""
         }
     }
