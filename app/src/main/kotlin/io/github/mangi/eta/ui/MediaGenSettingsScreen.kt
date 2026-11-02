@@ -171,9 +171,7 @@ internal fun MediaGenSettingsScreen(onBack: () -> Unit) {
                             )
                         }
                     }
-                    if (modelsError != null) {
-                        Text(text = modelsError!!)
-                    }
+                    // 刷新失败仅 Toast 提示（见 refreshModels），不阻塞；模型名可手动填写
                 }
             }
         }

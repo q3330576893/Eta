@@ -87,7 +87,7 @@ internal object MediaGenClient {
         withContext(Dispatchers.IO) {
             runCatching {
                 val req = Request.Builder()
-                    .url("${baseUrl.trimEnd('/')}/v1/models")
+                    .url("${baseUrl.trimEnd('/')}/models")
                     .header("Authorization", "Bearer $apiKey")
                     .get()
                     .build()
@@ -112,7 +112,7 @@ internal object MediaGenClient {
                 ImageGenRequest(model = model, prompt = prompt, size = size),
             )
             val req = Request.Builder()
-                .url("${baseUrl.trimEnd('/')}/v1/images/generations")
+                .url("${baseUrl.trimEnd('/')}/images/generations")
                 .header("Authorization", "Bearer $apiKey")
                 .post(payload.toRequestBody(jsonMediaType))
                 .build()
@@ -145,7 +145,7 @@ internal object MediaGenClient {
                 VideoGenRequest(model = model, prompt = prompt, seconds = seconds),
             )
             val req = Request.Builder()
-                .url("${baseUrl.trimEnd('/')}/v1/videos")
+                .url("${baseUrl.trimEnd('/')}/videos")
                 .header("Authorization", "Bearer $apiKey")
                 .post(payload.toRequestBody(jsonMediaType))
                 .build()
