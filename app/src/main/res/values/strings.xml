@@ -1378,6 +1378,8 @@
   <string name="chat_character_typing">%1$s is replying…</string>
   <string name="speech_tts_gemini">Gemini</string>
   <string name="speech_tts_minimax">MiniMax</string>
+  <string name="speech_tts_system">System</string>
+  <string name="speech_tts_note_system">Uses the device's built-in speech engine, no API key needed. Voice packs can be changed in system settings.</string>
   <string name="speech_tts_service">播报服务</string>
   <string name="speech_tts_model">语音模型</string>
   <string name="speech_gemini_flash">Gemini 3.8 Flash · 品质优先</string>

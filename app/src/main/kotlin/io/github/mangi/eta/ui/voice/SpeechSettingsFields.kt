@@ -53,6 +53,7 @@ internal fun AsrProvider.label(): String = stringResource(
 internal fun TtsProvider.label(): String = stringResource(
     when (this) {
         TtsProvider.NONE -> R.string.speech_tts_none
+        TtsProvider.SYSTEM -> R.string.speech_tts_system
         TtsProvider.QWEN -> R.string.speech_tts_qwen
         TtsProvider.DOUBAO -> R.string.speech_tts_doubao
         TtsProvider.GEMINI -> R.string.speech_tts_gemini

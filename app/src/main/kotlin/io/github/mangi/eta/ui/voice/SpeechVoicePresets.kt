@@ -76,6 +76,6 @@ internal object SpeechVoicePresets {
         TtsProvider.DOUBAO -> doubao
         TtsProvider.GEMINI -> gemini
         TtsProvider.MINIMAX -> minimax
-        TtsProvider.NONE -> emptyList()
+        TtsProvider.NONE, TtsProvider.SYSTEM -> emptyList()
     }
 }

@@ -1354,6 +1354,8 @@
   <string name="chat_character_typing">%1$s 正在回复…</string>
   <string name="speech_tts_gemini">Gemini</string>
   <string name="speech_tts_minimax">MiniMax</string>
+  <string name="speech_tts_system">系统语音</string>
+  <string name="speech_tts_note_system">使用设备自带语音引擎朗读，无需配置 API Key；可在系统设置中更换语音包。</string>
   <string name="speech_tts_service">播报服务</string>
   <string name="speech_tts_model">语音模型</string>
   <string name="speech_gemini_flash">Gemini 3.8 Flash · 品质优先</string>

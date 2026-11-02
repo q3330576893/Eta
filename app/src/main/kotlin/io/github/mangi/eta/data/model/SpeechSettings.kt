@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 enum class AsrProvider { SYSTEM, QWEN_REALTIME, QWEN_FLASH, QWEN_FILE, DOUBAO }
 
 @Serializable
-enum class TtsProvider { NONE, QWEN, DOUBAO, GEMINI, MINIMAX }
+enum class TtsProvider { NONE, SYSTEM, QWEN, DOUBAO, GEMINI, MINIMAX }
 
 @Serializable
 enum class SpeechRegion { BEIJING, SINGAPORE }

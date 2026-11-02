@@ -41,6 +41,7 @@ internal class SpeechPlaybackController(
     private var output: SpeechAudioOutput? = null
     private var lease: SpeechAudioLease? = null
     private var playbackActive = false
+    private var systemTts: SystemTtsEngine? = null
 
     fun speak(messageId: String, text: String, settings: SpeechSettings? = null, credentials: SpeechCredentials? = null) {
         stop()
@@ -50,12 +51,20 @@ internal class SpeechPlaybackController(
             try {
                 lease = SpeechAudioLease(context, interruptOnScreenOff) { stop() }.also { it.acquire(playback = false) }
                 val config = settings ?: SpeechSettingsRepository.settings()
-                val secrets = credentials ?: SpeechSettingsRepository.credentials(context)
+                val secrets = credentials ?: if (config.tts == TtsProvider.SYSTEM) SpeechCredentials()
+                    else SpeechSettingsRepository.credentials(context)
                 validateSpeechSettings(config, secrets, synthesis = true)
                 val readable = withContext(Dispatchers.Default) { SpeechText.readable(text) }
                 if (readable.isBlank()) throw SpeechFailure(SpeechErrorCode.NO_SPEECH, "这条消息没有可朗读的正文")
                 if (readable.length > 30_000) throw SpeechFailure(SpeechErrorCode.CONFIGURATION, "正文过长，请选择较短的回答朗读")
                 lease?.requestPlaybackFocus { beforePlayback(); playbackActive = true }
+                if (config.tts == TtsProvider.SYSTEM) {
+                    // 系统 TTS：不走网络合成，直接用设备引擎播报
+                    mutableState.value = SpeechPlaybackState(messageId)
+                    speakSystemTts(readable)
+                    if (session == generation) stop()
+                    return@launch
+                }
                 val player = createOutput()
                 output = player
                 playChunks(config, secrets, SpeechText.chunks(readable), player) {
@@ -151,12 +160,29 @@ internal class SpeechPlaybackController(
 
     fun stop() {
         generation++
+        systemTts?.stop(); systemTts = null
         output?.close(); output = null
         job?.cancel(); job = null
         lease?.close(); lease = null
         if (playbackActive) afterPlayback()
         playbackActive = false
         mutableState.value = SpeechPlaybackState()
+    }
+
+    /**
+     * 系统 TTS 播报（[TtsProvider.SYSTEM]）：整段文本一次交给设备引擎，
+     * QUEUE_FLUSH 保证打断时直接停掉当前句。
+     */
+    private suspend fun speakSystemTts(text: String) {
+        val engine = SystemTtsEngine(context)
+        systemTts = engine
+        try {
+            engine.awaitReady()
+            engine.speakAndAwait(text)
+        } finally {
+            if (systemTts === engine) systemTts = null
+            engine.shutdown()
+        }
     }
 }
 

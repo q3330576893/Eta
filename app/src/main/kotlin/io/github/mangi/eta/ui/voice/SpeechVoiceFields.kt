@@ -21,7 +21,7 @@ import top.yukonga.miuix.kmp.basic.DropdownItem
 internal fun SpeechVoiceSection(store: SpeechSettingsStore) {
     val settings = store.settings
     val voice = when (settings.tts) {
-        TtsProvider.NONE -> return
+        TtsProvider.NONE, TtsProvider.SYSTEM -> return
         TtsProvider.QWEN -> settings.qwenVoice
         TtsProvider.DOUBAO -> settings.doubaoVoice
         TtsProvider.GEMINI -> settings.geminiTts.voice
@@ -33,7 +33,7 @@ internal fun SpeechVoiceSection(store: SpeechSettingsStore) {
     val custom = editingCustom || presetIndex < 0
     val change: (String) -> Unit = {
         store.edit(when (settings.tts) {
-            TtsProvider.NONE -> settings
+            TtsProvider.NONE, TtsProvider.SYSTEM -> settings
             TtsProvider.QWEN -> settings.copy(qwenVoice = it)
             TtsProvider.DOUBAO -> settings.copy(doubaoVoice = it)
             TtsProvider.GEMINI -> settings.copy(geminiTts = settings.geminiTts.copy(voice = it))
@@ -78,7 +78,7 @@ internal fun SpeechVoiceSection(store: SpeechSettingsStore) {
                     TtsProvider.DOUBAO -> R.string.speech_doubao_voice_note
                     TtsProvider.GEMINI -> R.string.speech_gemini_voice_note
                     TtsProvider.MINIMAX -> R.string.speech_minimax_voice_note
-                    TtsProvider.NONE -> error("No synthesis provider")
+                    TtsProvider.NONE, TtsProvider.SYSTEM -> error("No synthesis provider")
                 },
             ),
         )

@@ -46,15 +46,20 @@ internal fun SpeechSynthesisScreen(onBack: () -> Unit) {
             EtaPreferenceGroupTitle(stringResource(R.string.speech_group_service))
         }
         item(key = "service") {
-            EtaPreferenceGroup {
-                EtaOverlayDropdownPreference(
-                    title = stringResource(R.string.speech_tts_service),
-                    items = TtsProvider.entries.map { it.label() },
-                    selectedIndex = settings.tts.ordinal,
-                    onSelectedIndexChange = { index ->
-                        TtsProvider.entries.getOrNull(index)?.let { store.edit(settings.copy(tts = it)) }
-                    },
-                )
+            Column {
+                EtaPreferenceGroup {
+                    EtaOverlayDropdownPreference(
+                        title = stringResource(R.string.speech_tts_service),
+                        items = TtsProvider.entries.map { it.label() },
+                        selectedIndex = settings.tts.ordinal,
+                        onSelectedIndexChange = { index ->
+                            TtsProvider.entries.getOrNull(index)?.let { store.edit(settings.copy(tts = it)) }
+                        },
+                    )
+                }
+                if (settings.tts == TtsProvider.SYSTEM) {
+                    SpeechNote(stringResource(R.string.speech_tts_note_system))
+                }
             }
         }
         if (settings.tts != TtsProvider.NONE) {

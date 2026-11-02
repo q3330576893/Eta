@@ -92,6 +92,7 @@ private fun SpeechApiKeyConnectionSection(
 @Composable
 internal fun SpeechDeliveryFields(store: SpeechSettingsStore) {
     when (store.settings.tts) {
+        TtsProvider.NONE, TtsProvider.SYSTEM -> Unit
         TtsProvider.GEMINI -> {
             val config = store.settings.geminiTts
             EtaPreferenceDivider(hasLeading = false)
