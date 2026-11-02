@@ -32,6 +32,7 @@ internal suspend fun streamSpeech(
         TtsProvider.QWEN -> streamQwen(settings, credentials, chunks, onAudio)
         TtsProvider.DOUBAO -> streamDoubao(settings, credentials, chunks, onAudio)
         TtsProvider.NONE -> throw SpeechFailure(SpeechErrorCode.CONFIGURATION, "请先选择语音播报服务")
+        TtsProvider.SYSTEM -> throw SpeechFailure(SpeechErrorCode.CONFIGURATION, "系统语音不走网络合成")
         TtsProvider.GEMINI, TtsProvider.MINIMAX ->
             throw SpeechFailure(SpeechErrorCode.CONFIGURATION, "当前语音服务使用逐段流式合成")
     }
