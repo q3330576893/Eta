@@ -1215,7 +1215,7 @@
   <string name="media_gen_settings_summary">通过 OpenAI 兼容网关生图、生视频</string>
   <string name="media_gen_group_service">服务</string>
   <string name="media_gen_base_url">服务地址</string>
-  <string name="media_gen_base_url_hint">http://服务器IP:18610/v1</string>
+  <string name="media_gen_base_url_hint">https://api.agnes-ai.cn/v1</string>
   <string name="media_gen_api_key">API Key</string>
   <string name="media_gen_api_key_hint">m2a-…</string>
   <string name="media_gen_group_models">模型</string>

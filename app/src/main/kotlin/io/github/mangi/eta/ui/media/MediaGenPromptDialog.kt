@@ -82,11 +82,11 @@ internal fun MediaGenPromptDialog(
                     return@launch
                 }
                 statusText = context.getString(R.string.media_gen_video_queued)
-                // 轮询，最多 10 分钟
+                // 轮询，最多 10 分钟（Agnes 走 /agnesapi?video_id=..&model_name=..）
                 var done = false
                 repeat(120) {
                     delay(5000)
-                    val poll = MediaGenClient.pollVideo(baseUrl, apiKey, taskId)
+                    val poll = MediaGenClient.pollVideo(baseUrl, apiKey, taskId, model)
                     val st = poll.getOrNull()
                     if (st == null) {
                         statusText = context.getString(R.string.media_gen_failed, poll.exceptionOrNull()?.message ?: "")
@@ -99,7 +99,7 @@ internal fun MediaGenPromptDialog(
                     }
                     when {
                         s.contains("complet") || s.contains("success") || s == "done" -> {
-                            val url = st.result?.url.orEmpty()
+                            val url = st.videoUrl()
                             if (url.isNotEmpty()) {
                                 uiState.showVideoResult(p, url)
                                 onDismiss()
@@ -110,7 +110,7 @@ internal fun MediaGenPromptDialog(
                             return@repeat
                         }
                         s.contains("fail") || s.contains("error") -> {
-                            statusText = context.getString(R.string.media_gen_failed, st.error ?: s)
+                            statusText = context.getString(R.string.media_gen_failed, st.error?.message ?: s)
                             done = true
                             return@repeat
                         }

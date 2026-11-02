@@ -10,10 +10,12 @@ import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 
 /**
- * 图片/视频生成网关客户端（对接 muse-bridge 这类 OpenAI 兼容接口）。
+ * 图片/视频生成网关客户端（对接 Agnes AI，中国站 https://api.agnes-ai.cn/v1）。
  *
- * - 图片：POST {base}/v1/images/generations（同步返回）
- * - 视频：POST {base}/v1/videos（返回 task_id）→ 轮询 GET {base}/v1/videos/{task_id}
+ * - 图片：POST {base}/v1/images/generations
+ *   注意：response_format 必须放在 extra_body 里，不能放顶层；size 用 1K/2K 档位。
+ * - 视频：POST {base}/v1/videos（返回 video_id）→ 轮询 GET {base}/agnesapi?video_id=..&model_name=..
+ *   注意：seconds 是字符串 "4"~"12"；flash 模型 size 固定 720P；mode 必填。
  * - 模型：GET {base}/v1/models
  */
 internal object MediaGenClient {
@@ -27,11 +29,14 @@ internal object MediaGenClient {
     private data class ModelsResponse(val data: List<ModelInfo> = emptyList())
 
     @Serializable
+    private data class ExtraBody(val response_format: String = "url")
+
+    @Serializable
     private data class ImageGenRequest(
         val model: String,
         val prompt: String,
-        val size: String = "1024x1024",
-        val response_format: String = "url",
+        val size: String = "1K",
+        val extra_body: ExtraBody = ExtraBody("url"),
     )
 
     @Serializable
@@ -44,24 +49,34 @@ internal object MediaGenClient {
     private data class VideoGenRequest(
         val model: String,
         val prompt: String,
-        val size: String = "1024x1024",
-        val duration: Int = 5,
+        val mode: String = "text",
+        val seconds: String = "5",
+        val size: String = "720P",
+        val aspect_ratio: String = "16:9",
     )
 
     @Serializable
-    private data class VideoSubmitResponse(val id: String = "", val task_id: String = "")
+    private data class VideoSubmitResponse(
+        val id: String = "",
+        val task_id: String = "",
+        val video_id: String = "",
+        val status: String = "",
+    )
 
     @Serializable
     data class VideoStatus(
-        val id: String = "",
+        val video_id: String = "",
         val status: String = "",
         val progress: Int = 0,
-        val result: VideoResult? = null,
-        val error: String? = null,
-    )
+        val url: String = "",
+        val error: VideoError? = null,
+    ) {
+        /** 完成时取视频地址（兼容 metadata.url 回退） */
+        fun videoUrl(): String = url
+    }
 
     @Serializable
-    data class VideoResult(val url: String = "")
+    data class VideoError(val message: String = "")
 
     sealed interface ImageResult {
         data class Url(val url: String) : ImageResult
@@ -108,8 +123,8 @@ internal object MediaGenClient {
                 val first = parsed.data.firstOrNull()
                     ?: error("生图返回为空")
                 when {
-                    first.b64_json.isNotEmpty() -> ImageResult.Base64(first.b64_json)
                     first.url.isNotEmpty() -> ImageResult.Url(first.url)
+                    first.b64_json.isNotEmpty() -> ImageResult.Base64(first.b64_json)
                     else -> error("生图返回无可用数据")
                 }
             }
@@ -124,9 +139,10 @@ internal object MediaGenClient {
         duration: Int,
     ): Result<String> = withContext(Dispatchers.IO) {
         runCatching {
+            val seconds = duration.coerceIn(4, 12).toString()
             val payload = json.encodeToString(
                 VideoGenRequest.serializer(),
-                VideoGenRequest(model = model, prompt = prompt, duration = duration),
+                VideoGenRequest(model = model, prompt = prompt, seconds = seconds),
             )
             val req = Request.Builder()
                 .url("${baseUrl.trimEnd('/')}/v1/videos")
@@ -137,9 +153,9 @@ internal object MediaGenClient {
                 val body = resp.body?.string().orEmpty()
                 check(resp.isSuccessful) { "视频任务提交失败(${resp.code}): ${body.take(200)}" }
                 val parsed = json.decodeFromString<VideoSubmitResponse>(body)
-                val taskId = parsed.task_id.ifEmpty { parsed.id }
-                check(taskId.isNotEmpty()) { "视频任务提交无返回 id" }
-                taskId
+                val videoId = parsed.video_id.ifEmpty { parsed.task_id.ifEmpty { parsed.id } }
+                check(videoId.isNotEmpty()) { "视频任务提交无返回 id" }
+                videoId
             }
         }
     }
@@ -147,11 +163,14 @@ internal object MediaGenClient {
     suspend fun pollVideo(
         baseUrl: String,
         apiKey: String,
-        taskId: String,
+        videoId: String,
+        model: String,
     ): Result<VideoStatus> = withContext(Dispatchers.IO) {
         runCatching {
+            // Agnes 视频轮询走 /agnesapi?video_id=..&model_name=..（非 OpenAI 标准路径）
+            val url = "${baseUrl.trimEnd('/')}/agnesapi?video_id=$videoId&model_name=$model"
             val req = Request.Builder()
-                .url("${baseUrl.trimEnd('/')}/v1/videos/$taskId")
+                .url(url)
                 .header("Authorization", "Bearer $apiKey")
                 .get()
                 .build()

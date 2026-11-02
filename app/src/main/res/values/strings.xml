@@ -1239,7 +1239,7 @@
   <string name="media_gen_settings_summary">Generate images and videos via an OpenAI-compatible gateway</string>
   <string name="media_gen_group_service">Service</string>
   <string name="media_gen_base_url">Base URL</string>
-  <string name="media_gen_base_url_hint">http://server-ip:18610/v1</string>
+  <string name="media_gen_base_url_hint">https://api.agnes-ai.cn/v1</string>
   <string name="media_gen_api_key">API Key</string>
   <string name="media_gen_api_key_hint">m2a-…</string>
   <string name="media_gen_group_models">Models</string>
