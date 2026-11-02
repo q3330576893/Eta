@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.FormatQuote
+import androidx.compose.material.icons.rounded.FormatQuote
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
@@ -99,7 +99,7 @@ internal fun QuoteStrip(
         )
         Spacer(Modifier.width(8.dp))
         Icon(
-            imageVector = Icons.AutoMirrored.Rounded.FormatQuote,
+            imageVector = Icons.Rounded.FormatQuote,
             contentDescription = null,
             modifier = Modifier.size(16.dp),
             tint = MiuixTheme.colorScheme.primary,

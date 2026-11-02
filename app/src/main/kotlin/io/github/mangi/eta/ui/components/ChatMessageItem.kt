@@ -38,7 +38,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.FormatQuote
+import androidx.compose.material.icons.rounded.FormatQuote
 import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Check
@@ -355,7 +355,7 @@ private fun UserMessageBubble(
                         val quoteState = LocalChatQuote.current
                         if (quoteState != null && message.content.isNotBlank()) {
                             MessageTooltipAction(
-                                icon = Icons.AutoMirrored.Rounded.FormatQuote,
+                                icon = Icons.Rounded.FormatQuote,
                                 label = stringResource(R.string.msg_action_quote),
                                 onClick = {
                                     quoteState.quote(
@@ -662,7 +662,7 @@ private fun AgentMessageBlock(
                         val quoteState = LocalChatQuote.current
                         if (quoteState != null && message.content.isNotBlank() && !message.isStreaming) {
                             MessageTooltipAction(
-                                icon = Icons.AutoMirrored.Rounded.FormatQuote,
+                                icon = Icons.Rounded.FormatQuote,
                                 label = stringResource(R.string.msg_action_quote),
                                 onClick = {
                                     quoteState.quote(

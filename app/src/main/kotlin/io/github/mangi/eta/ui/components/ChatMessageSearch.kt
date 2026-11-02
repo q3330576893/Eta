@@ -19,7 +19,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.FormatQuote
+import androidx.compose.material.icons.rounded.FormatQuote
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Search
@@ -328,7 +328,7 @@ private fun MessageSearchResultItem(
                 },
             ) {
                 Icon(
-                    imageVector = Icons.AutoMirrored.Rounded.FormatQuote,
+                    imageVector = Icons.Rounded.FormatQuote,
                     contentDescription = stringResource(R.string.msg_action_quote),
                     modifier = Modifier.size(20.dp),
                     tint = MiuixTheme.colorScheme.primary,
