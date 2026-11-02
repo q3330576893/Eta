@@ -85,9 +85,88 @@ internal fun MediaGenPromptDialog(
                     return@launch
                 }
                 if (isVideo) {
-                    doGenerateVideo(p, settings, baseUrl, apiKey)
+                    val model = settings.videoModel.trim()
+                    if (model.isEmpty()) {
+                        val msg = context.getString(R.string.media_gen_need_model)
+                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+                        statusText = msg
+                        return@launch
+                    }
+                    // 提交视频任务
+                    val submit = MediaGenClient.submitVideo(baseUrl, apiKey, model, p, settings.videoDuration)
+                    val taskId = submit.getOrElse {
+                        val msg = context.getString(R.string.media_gen_failed, it.message ?: "")
+                        statusText = msg
+                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+                        return@launch
+                    }
+                    statusText = context.getString(R.string.media_gen_video_queued)
+                    // 轮询，最多 10 分钟（Agnes 走 /agnesapi?video_id=..&model_name=..）
+                    var done = false
+                    repeat(120) {
+                        delay(5000)
+                        val poll = MediaGenClient.pollVideo(baseUrl, apiKey, taskId, model)
+                        val st = poll.getOrNull()
+                        if (st == null) {
+                            val msg = context.getString(R.string.media_gen_failed, poll.exceptionOrNull()?.message ?: "")
+                            statusText = msg
+                            Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+                            return@launch
+                        }
+                        val s = st.status.lowercase()
+                        if (st.progress > 0) {
+                            progress = st.progress
+                            statusText = context.getString(R.string.media_gen_video_progress, st.progress)
+                        }
+                        when {
+                            s.contains("complet") || s.contains("success") || s == "done" -> {
+                                val url = st.videoUrl()
+                                if (url.isNotEmpty()) {
+                                    uiState.showVideoResult(p, url)
+                                    onDismiss()
+                                } else {
+                                    val msg = context.getString(R.string.media_gen_failed, "empty result")
+                                    statusText = msg
+                                    Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+                                }
+                                done = true
+                                return@launch
+                            }
+                            s.contains("fail") || s.contains("error") -> {
+                                val msg = context.getString(R.string.media_gen_failed, st.error?.message ?: s)
+                                statusText = msg
+                                Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+                                done = true
+                                return@launch
+                            }
+                        }
+                    }
+                    if (!done) {
+                        val msg = context.getString(R.string.media_gen_failed, "timeout")
+                        statusText = msg
+                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+                    }
                 } else {
-                    doGenerateImage(p, settings, baseUrl, apiKey)
+                    val model = settings.imageModel.trim()
+                    if (model.isEmpty()) {
+                        val msg = context.getString(R.string.media_gen_need_model)
+                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+                        statusText = msg
+                        return@launch
+                    }
+                    MediaGenClient.generateImage(baseUrl, apiKey, model, p, settings.imageSize)
+                        .onSuccess { result ->
+                            when (result) {
+                                is MediaGenClient.ImageResult.Url -> uiState.showImageResult(p, result.url, null)
+                                is MediaGenClient.ImageResult.Base64 -> uiState.showImageResult(p, null, result.data)
+                            }
+                            onDismiss()
+                        }
+                        .onFailure {
+                            val msg = context.getString(R.string.media_gen_failed, it.message ?: "")
+                            statusText = msg
+                            Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
+                        }
                 }
             } catch (e: Exception) {
                 Log.w("MediaGen", "doGenerate crashed", e)
@@ -105,103 +184,6 @@ internal fun MediaGenPromptDialog(
             statusText = msg
             Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
         }
-    }
-
-    suspend fun doGenerateVideo(
-        p: String,
-        settings: io.github.mangi.eta.data.model.MediaGenSettings,
-        baseUrl: String,
-        apiKey: String,
-    ) {
-        val model = settings.videoModel.trim()
-        if (model.isEmpty()) {
-            val msg = context.getString(R.string.media_gen_need_model)
-            Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
-            statusText = msg
-            return
-        }
-        // 提交视频任务
-        val submit = MediaGenClient.submitVideo(baseUrl, apiKey, model, p, settings.videoDuration)
-        val taskId = submit.getOrElse {
-            val msg = context.getString(R.string.media_gen_failed, it.message ?: "")
-            statusText = msg
-            Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
-            return
-        }
-        statusText = context.getString(R.string.media_gen_video_queued)
-        // 轮询，最多 10 分钟（Agnes 走 /agnesapi?video_id=..&model_name=..）
-        var done = false
-        repeat(120) {
-            delay(5000)
-            val poll = MediaGenClient.pollVideo(baseUrl, apiKey, taskId, model)
-            val st = poll.getOrNull()
-            if (st == null) {
-                val msg = context.getString(R.string.media_gen_failed, poll.exceptionOrNull()?.message ?: "")
-                statusText = msg
-                Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
-                return
-            }
-            val s = st.status.lowercase()
-            if (st.progress > 0) {
-                progress = st.progress
-                statusText = context.getString(R.string.media_gen_video_progress, st.progress)
-            }
-            when {
-                s.contains("complet") || s.contains("success") || s == "done" -> {
-                    val url = st.videoUrl()
-                    if (url.isNotEmpty()) {
-                        uiState.showVideoResult(p, url)
-                        onDismiss()
-                    } else {
-                        val msg = context.getString(R.string.media_gen_failed, "empty result")
-                        statusText = msg
-                        Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
-                    }
-                    done = true
-                    return
-                }
-                s.contains("fail") || s.contains("error") -> {
-                    val msg = context.getString(R.string.media_gen_failed, st.error?.message ?: s)
-                    statusText = msg
-                    Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
-                    done = true
-                    return
-                }
-            }
-        }
-        if (!done) {
-            val msg = context.getString(R.string.media_gen_failed, "timeout")
-            statusText = msg
-            Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
-        }
-    }
-
-    suspend fun doGenerateImage(
-        p: String,
-        settings: io.github.mangi.eta.data.model.MediaGenSettings,
-        baseUrl: String,
-        apiKey: String,
-    ) {
-        val model = settings.imageModel.trim()
-        if (model.isEmpty()) {
-            val msg = context.getString(R.string.media_gen_need_model)
-            Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
-            statusText = msg
-            return
-        }
-        MediaGenClient.generateImage(baseUrl, apiKey, model, p, settings.imageSize)
-            .onSuccess { result ->
-                when (result) {
-                    is MediaGenClient.ImageResult.Url -> uiState.showImageResult(p, result.url, null)
-                    is MediaGenClient.ImageResult.Base64 -> uiState.showImageResult(p, null, result.data)
-                }
-                onDismiss()
-            }
-            .onFailure {
-                val msg = context.getString(R.string.media_gen_failed, it.message ?: "")
-                statusText = msg
-                Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
-            }
     }
 
     WindowDialog(
