@@ -54,14 +54,26 @@ internal fun MediaGenPromptDialog(
     var statusText by remember { mutableStateOf("") }
 
     fun doGenerate() {
+        Log.d("MediaGen", "doGenerate CLICKED isVideo=$isVideo generating=$generating promptLen=${prompt.trim().length}")
         val p = prompt.trim()
-        if (p.isEmpty() || generating) return
-        Log.d("MediaGen", "doGenerate isVideo=$isVideo prompt=${p.take(30)}")
+        if (p.isEmpty()) {
+            Log.d("MediaGen", "doGenerate: prompt empty, ignored")
+            Toast.makeText(context, "请输入提示词", Toast.LENGTH_SHORT).show()
+            return
+        }
+        if (generating) {
+            Log.d("MediaGen", "doGenerate: already generating, ignored")
+            Toast.makeText(context, context.getString(R.string.media_gen_generating), Toast.LENGTH_SHORT).show()
+            return
+        }
+        Log.d("MediaGen", "doGenerate START isVideo=$isVideo prompt=${p.take(30)}")
+        Toast.makeText(context, context.getString(R.string.media_gen_generating), Toast.LENGTH_SHORT).show()
         generating = true
         progress = 0
         statusText = context.getString(R.string.media_gen_generating)
-        scope.launch {
-            try {
+        try {
+            scope.launch {
+                try {
                 val settings = MediaGenSettingsRepository.settings()
                 val apiKey = MediaGenSettingsRepository.apiKey(context)
                 val baseUrl = settings.endpoint()
@@ -85,6 +97,13 @@ internal fun MediaGenPromptDialog(
             } finally {
                 generating = false
             }
+        }
+        } catch (e: Exception) {
+            Log.w("MediaGen", "doGenerate launch failed", e)
+            generating = false
+            val msg = context.getString(R.string.media_gen_failed, e.message ?: "")
+            statusText = msg
+            Toast.makeText(context, msg, Toast.LENGTH_LONG).show()
         }
     }
 

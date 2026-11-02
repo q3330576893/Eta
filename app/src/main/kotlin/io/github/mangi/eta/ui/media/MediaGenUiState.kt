@@ -1,5 +1,6 @@
 package io.github.mangi.eta.ui.media
 
+import android.util.Log
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -18,8 +19,14 @@ internal class MediaGenUiState {
     var viewerVideoUrl by mutableStateOf<String?>(null)
     var viewerPrompt by mutableStateOf("")
 
-    fun openImageDialog() { showImageDialog = true }
-    fun openVideoDialog() { showVideoDialog = true }
+    fun openImageDialog() {
+        Log.d("MediaGen", "openImageDialog clicked")
+        showImageDialog = true
+    }
+    fun openVideoDialog() {
+        Log.d("MediaGen", "openVideoDialog clicked")
+        showVideoDialog = true
+    }
     fun closeDialogs() { showImageDialog = false; showVideoDialog = false }
 
     fun showImageResult(prompt: String, url: String?, base64: String?) {
