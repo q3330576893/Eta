@@ -22,7 +22,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
  */
 internal object MediaGenClient {
     private const val TAG = "MediaGen"
-    private val json = Json { ignoreUnknownKeys = true; isLenient = true }
+    private val json = Json { ignoreUnknownKeys = true; isLenient = true; encodeDefaults = true }
     private val jsonMediaType = "application/json; charset=utf-8".toMediaType()
 
     @Serializable

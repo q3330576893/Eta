@@ -127,7 +127,7 @@ internal fun MediaGenSettingsScreen(onBack: () -> Unit) {
 
     MiuixScaffoldPage(
         title = stringResource(R.string.media_gen_settings_title),
-        onBack = { if (dirty) save() else Unit; onBack() },
+        onBack = onBack,
     ) {
         if (current == null || !apiKeyLoaded) {
             item(key = "loading") {
