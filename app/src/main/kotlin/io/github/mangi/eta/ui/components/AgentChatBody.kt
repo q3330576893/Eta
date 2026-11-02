@@ -226,8 +226,6 @@ internal fun AgentChatBody(
     }
     var sentFromKeyboard by remember { mutableStateOf(false) }
     var keepBottomAnchored by rememberSaveable { mutableStateOf(true) }
-    // 会话内搜索定位到消息后短暂高亮，2 秒后消失。
-    var searchHighlightId by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(isStreaming) {
         if (isStreaming && sentFromKeyboard) {
@@ -458,6 +456,8 @@ private fun AgentChatScaffold(
                 historyLoadState = historyLoadState,
                 onLoadEarlierMessages = onLoadEarlierMessages,
                 onHistoryViewportChanged = onHistoryViewportChanged,
+                searchTargetMessageId = searchTargetMessageId,
+                onSearchTargetConsumed = onSearchTargetConsumed,
                 modifier = Modifier
                     .fillMaxSize()
                     .then(if (frostEnabled) Modifier.layerBackdrop(messageBackdrop) else Modifier),
@@ -491,6 +491,9 @@ internal fun AgentConversationMessages(
     historyLoadState: ConversationHistoryLoadState = ConversationHistoryLoadState.Idle,
     onLoadEarlierMessages: () -> Unit = {},
     onHistoryViewportChanged: (Boolean) -> Unit = {},
+    /** 会话内搜索点选结果后待滚动定位的消息 id；消费后通过回调清空。 */
+    searchTargetMessageId: String? = null,
+    onSearchTargetConsumed: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     // 上一版条目只作复用比对，不参与组合观察。
@@ -499,6 +502,8 @@ internal fun AgentConversationMessages(
         visibleMessages.toTimelineEntries(previous = previousTimelineEntries[0])
     }
     SideEffect { previousTimelineEntries[0] = timelineEntries }
+    // 会话内消息搜索定位到的消息短暂高亮，2 秒后消失。
+    var searchHighlightId by remember { mutableStateOf<String?>(null) }
 
     // 会话内消息搜索：点选结果后滚动定位到对应消息。
     // 目标不在已加载窗口且还有更早历史时，自动加载上一页后重试。
