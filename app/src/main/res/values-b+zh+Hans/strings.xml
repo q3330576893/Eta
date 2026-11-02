@@ -56,6 +56,14 @@
   <string name="action_new_conversation">新建对话</string>
   <string name="action_conversation_history">会话历史</string>
   <string name="action_more">更多选项</string>
+  <string name="action_search_messages">搜索消息</string>
+  <string name="message_search_hint">搜索当前会话的消息</string>
+  <string name="message_search_close">关闭搜索</string>
+  <string name="message_search_searching">搜索中…</string>
+  <string name="message_search_no_result">没有匹配的消息</string>
+  <string name="message_search_result_count">共 %1$d 条结果</string>
+  <string name="message_search_sender_user">我</string>
+  <string name="message_search_sender_assistant">助手</string>
   <string name="action_open_terminal">打开终端</string>
   <string name="action_open_browser">打开浏览器</string>
   <string name="action_launch_kimi_web">启动 Kimi Web</string>

@@ -145,6 +145,14 @@ internal interface ConversationDao : ChunkedTextDao {
     @Query("SELECT id, content FROM conversation_messages WHERE conversation_id = :conversationId AND id IN (:messageIds)")
     suspend fun messageContents(conversationId: String, messageIds: List<String>): List<ConversationMessageContent>
 
+    /** 会话内消息搜索：按时间倒序返回用户/助手消息的 id 与 type，正文用 restoreText 还原后匹配。 */
+    @Query(
+        "SELECT id, type, sort_index FROM conversation_messages " +
+            "WHERE conversation_id = :conversationId AND type IN ('user', 'assistant') " +
+            "ORDER BY sort_index DESC"
+    )
+    suspend fun messageSearchCandidates(conversationId: String): List<MessageSearchCandidate>
+
     @Query("SELECT EXISTS(SELECT 1 FROM conversation_messages WHERE conversation_id = :conversationId AND id = :messageId)")
     suspend fun hasMessage(conversationId: String, messageId: String): Boolean
 

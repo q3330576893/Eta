@@ -35,6 +35,7 @@ import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowDownward
 import androidx.compose.material.icons.rounded.DocumentScanner
@@ -180,6 +181,9 @@ internal fun AgentChatBody(
     onLoadEarlierMessages: () -> Unit = {},
     onHistoryViewportChanged: (Boolean) -> Unit = {},
     isDrawerOpen: Boolean = false,
+    /** 会话内搜索点选结果后待滚动定位的消息 id；消费后通过回调清空。 */
+    searchTargetMessageId: String? = null,
+    onSearchTargetConsumed: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberLazyListState(initialFirstVisibleItemIndex = messages.size + if (hasEarlierMessages) 1 else 0)
@@ -222,6 +226,8 @@ internal fun AgentChatBody(
     }
     var sentFromKeyboard by remember { mutableStateOf(false) }
     var keepBottomAnchored by rememberSaveable { mutableStateOf(true) }
+    // 会话内搜索定位到消息后短暂高亮，2 秒后消失。
+    var searchHighlightId by remember { mutableStateOf<String?>(null) }
 
     LaunchedEffect(isStreaming) {
         if (isStreaming && sentFromKeyboard) {
@@ -233,6 +239,37 @@ internal fun AgentChatBody(
     LaunchedEffect(isDrawerOpen) {
         if (isDrawerOpen) {
             keyboard?.hide()
+        }
+    }
+
+    // 会话内消息搜索：点选结果后滚动定位到对应消息。
+    // 目标不在已加载窗口且还有更早历史时，自动加载上一页后重试。
+    LaunchedEffect(searchTargetMessageId, timelineEntries.size) {
+        val targetId = searchTargetMessageId ?: return@LaunchedEffect
+        val index = timelineEntries.indexOfFirst { entry ->
+            when (entry) {
+                is AgentTimelineEntry.Message -> entry.message.id == targetId
+                is AgentTimelineEntry.WorkProcess -> entry.messages.any { it.id == targetId }
+            }
+        }
+        if (index >= 0) {
+            val listIndex = index + if (hasEarlierMessages) 1 else 0
+            scrollState.animateScrollToItem(listIndex)
+            searchHighlightId = targetId
+            onSearchTargetConsumed()
+        } else if (hasEarlierMessages) {
+            onLoadEarlierMessages()
+            // 不消费 target，timelineEntries.size 变化后本 effect 重跑继续找。
+        } else {
+            // 历史已全部加载仍找不到（理论上不会发生），直接消费避免卡死。
+            onSearchTargetConsumed()
+        }
+    }
+
+    LaunchedEffect(searchHighlightId) {
+        if (searchHighlightId != null) {
+            kotlinx.coroutines.delay(2000)
+            searchHighlightId = null
         }
     }
 
@@ -770,6 +807,15 @@ internal fun AgentConversationMessages(
                 when (entry) {
                     is AgentTimelineEntry.Message -> {
                         val message = entry.message
+                        // 搜索定位到的消息短暂高亮。
+                        val highlightModifier = if (message.id == searchHighlightId) {
+                            itemModifier.background(
+                                color = MiuixTheme.colorScheme.primary.copy(alpha = 0.10f),
+                                shape = RoundedCornerShape(12.dp),
+                            )
+                        } else {
+                            itemModifier
+                        }
                         ChatMessageItem(
                             message = message,
                             assistantOverlay = assistantOverlay,
@@ -796,7 +842,7 @@ internal fun AgentConversationMessages(
                             onDeleteMessage = onDeleteMessage,
                             onRegenerateMessage = onRegenerateMessage,
                             onSelectReplyCandidate = onSelectReplyCandidate,
-                            modifier = itemModifier,
+                            modifier = highlightModifier,
                         )
                     }
 

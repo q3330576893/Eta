@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableIntStateOf
@@ -51,6 +52,8 @@ import io.github.mangi.eta.core.AndroidAgentLogger
 import io.github.mangi.eta.data.repository.RuntimeConfigRepository
 import io.github.mangi.eta.ui.AppearanceSettingsScreen
 import io.github.mangi.eta.ui.SettingsScreen
+import io.github.mangi.eta.ui.components.ChatMessageSearchState
+import io.github.mangi.eta.ui.components.LocalChatMessageSearch
 import io.github.mangi.eta.ui.components.MiuixDialogActions
 import io.github.mangi.eta.ui.model.AgentHomeAction
 import io.github.mangi.eta.ui.model.AgentMemoryAction
@@ -356,6 +359,9 @@ fun AgentAppRoot(
         route: AppRoute,
         content: @Composable () -> Unit,
     ) {
+        // 会话内消息搜索状态：顶栏搜索入口与聊天屏搜索面板共享。
+        val messageSearchState = remember { ChatMessageSearchState() }
+        CompositionLocalProvider(LocalChatMessageSearch provides messageSearchState) {
         AgentAppShell(
             currentRoute = route,
             isCurrentRoute = backStack.lastOrNull() == route,
@@ -426,6 +432,7 @@ fun AgentAppRoot(
                 content()
             }
         }
+        } // LocalChatMessageSearch
     }
 
     val swipeBackDirection = if (LocalLayoutDirection.current == LayoutDirection.Rtl) {

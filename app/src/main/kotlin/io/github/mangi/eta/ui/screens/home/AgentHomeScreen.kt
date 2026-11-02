@@ -1,12 +1,17 @@
 package io.github.mangi.eta.ui.screens.home
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import io.github.mangi.eta.ui.components.AgentChatBody
 import io.github.mangi.eta.ui.components.AgentConversationLoadState
+import io.github.mangi.eta.ui.components.ChatMessageSearchOverlay
+import io.github.mangi.eta.ui.components.LocalChatMessageSearch
 import io.github.mangi.eta.ui.components.LocalRoleplayChat
 import io.github.mangi.eta.ui.components.LocalAgentBrowserSession
 import io.github.mangi.eta.agent.browser.BrowserSessionRegistry
@@ -35,6 +40,11 @@ internal fun AgentHomeScreen(
     isDrawerOpen: Boolean = false,
     modifier: Modifier = Modifier,
 ) {
+    val messageSearch = LocalChatMessageSearch.current
+    // 切换会话时关闭搜索面板，避免串会话。
+    LaunchedEffect(conversationKey) {
+        messageSearch?.close()
+    }
     // key 内保持完整分支，避免提前返回遗留无法转换为 DEX 的编译器标记。
     key(chatConversationCompositionKey(conversationKey)) {
         if (!state.isConversationLoaded) {
@@ -52,8 +62,9 @@ internal fun AgentHomeScreen(
                 LocalRoleplayChat provides state.roleplayChatUi(),
                 LocalAgentBrowserSession provides browser,
             ) {
-                AgentChatBody(
-                    messages = state.messages,
+                Box(modifier = modifier.fillMaxSize()) {
+                    AgentChatBody(
+                        messages = state.messages,
                     modelPickerState = modelPickerState,
                     isCompacting = state.isCompacting,
                     input = state.input,
@@ -97,8 +108,18 @@ internal fun AgentHomeScreen(
                     onLoadEarlierMessages = { onAction(AgentHomeAction.LoadEarlierMessages) },
                     onHistoryViewportChanged = { onAction(AgentHomeAction.HistoryViewportChanged(it)) },
                     isDrawerOpen = isDrawerOpen,
+                    searchTargetMessageId = messageSearch?.scrollTargetMessageId,
+                    onSearchTargetConsumed = { messageSearch?.consumeScrollTarget() },
                     modifier = modifier,
                 )
+                // 会话内消息搜索面板：覆盖在聊天界面上层。
+                if (messageSearch?.isOpen == true) {
+                    ChatMessageSearchOverlay(
+                        state = messageSearch,
+                        conversationId = conversationKey,
+                    )
+                }
+                }
             }
         }
     }

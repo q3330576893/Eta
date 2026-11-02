@@ -54,6 +54,14 @@
   <string name="action_new_conversation">New conversation</string>
   <string name="action_conversation_history">Conversation history</string>
   <string name="action_more">More options</string>
+  <string name="action_search_messages">Search messages</string>
+  <string name="message_search_hint">Search in this conversation</string>
+  <string name="message_search_close">Close search</string>
+  <string name="message_search_searching">Searching…</string>
+  <string name="message_search_no_result">No matching messages</string>
+  <string name="message_search_result_count">%1$d results</string>
+  <string name="message_search_sender_user">You</string>
+  <string name="message_search_sender_assistant">Assistant</string>
   <string name="action_open_terminal">Open terminal</string>
   <string name="action_open_browser">Open browser</string>
   <string name="action_launch_kimi_web">Launch Kimi Web</string>

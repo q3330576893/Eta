@@ -63,6 +63,13 @@ internal data class ConversationIdentity(
 
 internal data class ConversationMessageContent(val id: String, val content: String)
 
+/** 会话内消息搜索的候选行：正文需经 restoreText 还原（可能分块存储）。 */
+internal data class MessageSearchCandidate(
+    val id: String,
+    val type: String,
+    @ColumnInfo(name = "sort_index") val sortIndex: Int,
+)
+
 @Serializable
 @Entity(
     tableName = "conversation_context_checkpoints",
