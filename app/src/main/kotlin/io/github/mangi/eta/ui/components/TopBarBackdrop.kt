@@ -40,6 +40,10 @@ internal fun TopBarBackdrop(
     content: @Composable () -> Unit,
 ) {
     val surfaceColor = MiuixTheme.colorScheme.surface
+    // v4 玻璃质感：顶栏底部发丝线颜色（@Composable 上下文外不能读 colorScheme，先取出）
+    val dark = MiuixTheme.colorScheme.background.luminance() < 0.5f
+    val hairlineColor = if (dark) Color.White.copy(alpha = 0.10f)
+    else Color.Black.copy(alpha = 0.08f)
     val modifier = when {
         backdrop == null -> Modifier.background(surfaceColor)
         LocalTopBarBlurStyle.current == AppearanceTopBarBlurStyle.PROGRESSIVE -> {
@@ -73,11 +77,8 @@ internal fun TopBarBackdrop(
             // v4 玻璃质感：顶栏底部发丝线（深色白 10% / 浅色黑 8%）
             .drawWithContent {
                 drawContent()
-                val dark = MiuixTheme.colorScheme.background.luminance() < 0.5f
-                val lineColor = if (dark) Color.White.copy(alpha = 0.10f)
-                else Color.Black.copy(alpha = 0.08f)
                 drawLine(
-                    color = lineColor,
+                    color = hairlineColor,
                     start = Offset(0f, size.height - 0.5.dp.toPx()),
                     end = Offset(size.width, size.height - 0.5.dp.toPx()),
                     strokeWidth = 0.5.dp.toPx(),
