@@ -67,9 +67,6 @@ sealed interface AppRoute : NavKey {
     data object SpeechOss : AppRoute
 
     @Serializable
-    data object MediaGenSettings : AppRoute
-
-    @Serializable
     data object DataBackup : AppRoute
 
     @Serializable
@@ -94,8 +91,6 @@ sealed interface AppRoute : NavKey {
     data object TokenUsageStats : AppRoute
     @Serializable
     data object ScheduledTasks : AppRoute
-    @Serializable
-    data object AppKnowledge : AppRoute
     @Serializable
     data object PresetManager : AppRoute
 

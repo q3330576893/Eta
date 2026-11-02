@@ -453,7 +453,6 @@ private fun titleForRoute(route: AppRoute?): String = when (route) {
     is AppRoute.SpeechRecognition -> stringResource(R.string.speech_recognition_title)
     is AppRoute.SpeechSynthesis -> stringResource(R.string.speech_synthesis_title)
     is AppRoute.SpeechOss -> stringResource(R.string.speech_oss_title)
-    is AppRoute.MediaGenSettings -> stringResource(R.string.media_gen_settings_title)
     is AppRoute.AppearanceSettings -> stringResource(R.string.appearance_title)
     is AppRoute.DataBackup -> stringResource(R.string.data_backup_title)
     is AppRoute.Memory -> stringResource(R.string.route_memory)
@@ -464,7 +463,6 @@ private fun titleForRoute(route: AppRoute?): String = when (route) {
     is AppRoute.ModelProviders -> stringResource(R.string.route_model_providers)
     is AppRoute.TokenUsageStats -> stringResource(R.string.route_token_usage_stats)
                 is AppRoute.ScheduledTasks -> "定时任务"
-            is AppRoute.AppKnowledge -> "App 知识库"
             is AppRoute.PresetManager -> "预设管理"
     is AppRoute.CommunityCatalog -> "从目录添加"
     is AppRoute.CommunityCatalogProvider -> "选择模型"

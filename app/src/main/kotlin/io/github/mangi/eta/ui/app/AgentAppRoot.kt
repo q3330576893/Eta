@@ -72,78 +72,55 @@ import io.github.mangi.eta.ui.pages.providers.ModelProviderDetailScreen
 import io.github.mangi.eta.ui.pages.providers.ModelProviderListScreen
 import io.github.mangi.eta.ui.screens.tokenstats.TokenUsageStatsScreen
 import io.github.mangi.eta.ui.scheduler.ScheduledTasksScreen
-import io.github.mangi.eta.ui.screens.appknowledge.AppKnowledgeScreen
 import io.github.mangi.eta.ui.screens.presets.PresetManagerScreen
 import io.github.mangi.eta.ui.screens.backup.DataBackupScreen
 import io.github.mangi.eta.ui.screens.tokenstats.TokenUsageStatsScreen
-import io.github.mangi.eta.ui.screens.appknowledge.AppKnowledgeScreen
 import io.github.mangi.eta.ui.screens.browser.AgentBrowserActivity
 import io.github.mangi.eta.agent.browser.BrowserSessionRegistry
 import io.github.mangi.eta.ui.screens.tokenstats.TokenUsageStatsScreen
-import io.github.mangi.eta.ui.screens.appknowledge.AppKnowledgeScreen
 import io.github.mangi.eta.ui.screens.characters.CharacterDetailScreen
 import io.github.mangi.eta.ui.screens.tokenstats.TokenUsageStatsScreen
-import io.github.mangi.eta.ui.screens.appknowledge.AppKnowledgeScreen
 import io.github.mangi.eta.ui.screens.characters.CharacterEditorScreen
 import io.github.mangi.eta.ui.screens.tokenstats.TokenUsageStatsScreen
-import io.github.mangi.eta.ui.screens.appknowledge.AppKnowledgeScreen
 import io.github.mangi.eta.ui.screens.characters.CharacterLibraryScreen
 import io.github.mangi.eta.ui.screens.tokenstats.TokenUsageStatsScreen
-import io.github.mangi.eta.ui.screens.appknowledge.AppKnowledgeScreen
 import io.github.mangi.eta.ui.screens.characters.CharacterMemoryScreen
 import io.github.mangi.eta.ui.screens.tokenstats.TokenUsageStatsScreen
-import io.github.mangi.eta.ui.screens.appknowledge.AppKnowledgeScreen
 import io.github.mangi.eta.ui.screens.characters.CharacterPersonaScreen
 import io.github.mangi.eta.ui.screens.tokenstats.TokenUsageStatsScreen
-import io.github.mangi.eta.ui.screens.appknowledge.AppKnowledgeScreen
 import io.github.mangi.eta.ui.screens.enhance.SystemEnhanceScreen
 import io.github.mangi.eta.ui.screens.tokenstats.TokenUsageStatsScreen
-import io.github.mangi.eta.ui.screens.appknowledge.AppKnowledgeScreen
 import io.github.mangi.eta.ui.screens.home.AgentHomeScreen
 import io.github.mangi.eta.ui.screens.tokenstats.TokenUsageStatsScreen
-import io.github.mangi.eta.ui.screens.appknowledge.AppKnowledgeScreen
 import io.github.mangi.eta.ui.screens.mcp.McpServerDetailScreen
 import io.github.mangi.eta.ui.screens.tokenstats.TokenUsageStatsScreen
-import io.github.mangi.eta.ui.screens.appknowledge.AppKnowledgeScreen
 import io.github.mangi.eta.ui.screens.github.GitHubAccountScreen
 import io.github.mangi.eta.ui.screens.mcp.McpServersScreen
 import io.github.mangi.eta.ui.screens.tokenstats.TokenUsageStatsScreen
-import io.github.mangi.eta.ui.screens.appknowledge.AppKnowledgeScreen
 import io.github.mangi.eta.ui.screens.memory.AgentMemoryScreen
 import io.github.mangi.eta.ui.screens.tokenstats.TokenUsageStatsScreen
-import io.github.mangi.eta.ui.screens.appknowledge.AppKnowledgeScreen
 import io.github.mangi.eta.ui.screens.permissions.PermissionHealthScreen
 import io.github.mangi.eta.ui.screens.tokenstats.TokenUsageStatsScreen
-import io.github.mangi.eta.ui.screens.appknowledge.AppKnowledgeScreen
 import io.github.mangi.eta.ui.screens.skills.AgentSkillsScreen
 import io.github.mangi.eta.ui.screens.tokenstats.TokenUsageStatsScreen
-import io.github.mangi.eta.ui.screens.appknowledge.AppKnowledgeScreen
 import io.github.mangi.eta.ui.screens.subagent.SubagentSettingsScreen
 import io.github.mangi.eta.ui.screens.tokenstats.TokenUsageStatsScreen
-import io.github.mangi.eta.ui.screens.appknowledge.AppKnowledgeScreen
 import io.github.mangi.eta.ui.screens.terminal.LinuxEnvironmentScreen
 import io.github.mangi.eta.ui.screens.tokenstats.TokenUsageStatsScreen
-import io.github.mangi.eta.ui.screens.appknowledge.AppKnowledgeScreen
 import io.github.mangi.eta.ui.screens.terminal.LinuxFilesScreen
 import io.github.mangi.eta.ui.screens.tokenstats.TokenUsageStatsScreen
-import io.github.mangi.eta.ui.screens.appknowledge.AppKnowledgeScreen
 import io.github.mangi.eta.ui.screens.terminal.SharedFoldersScreen
 import io.github.mangi.eta.ui.screens.tokenstats.TokenUsageStatsScreen
-import io.github.mangi.eta.ui.screens.appknowledge.AppKnowledgeScreen
 import io.github.mangi.eta.ui.screens.terminal.TerminalEntryScreen
 import io.github.mangi.eta.ui.screens.tokenstats.TokenUsageStatsScreen
-import io.github.mangi.eta.ui.screens.appknowledge.AppKnowledgeScreen
 import io.github.mangi.eta.ui.screens.terminal.WorkspaceScreen
 import io.github.mangi.eta.ui.screens.tokenstats.TokenUsageStatsScreen
-import io.github.mangi.eta.ui.screens.appknowledge.AppKnowledgeScreen
 import io.github.mangi.eta.ui.screens.tools.AgentToolsScreen
 import io.github.mangi.eta.ui.screens.tokenstats.TokenUsageStatsScreen
-import io.github.mangi.eta.ui.screens.appknowledge.AppKnowledgeScreen
 import io.github.mangi.eta.ui.screens.tools.WebToolsSettingsScreen
 import io.github.mangi.eta.ui.voice.SpeechOssScreen
 import io.github.mangi.eta.ui.voice.SpeechRecognitionScreen
 import io.github.mangi.eta.ui.voice.SpeechSettingsScreen
-import io.github.mangi.eta.ui.MediaGenSettingsScreen
 import io.github.mangi.eta.ui.voice.SpeechSynthesisScreen
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -748,9 +725,6 @@ fun AgentAppRoot(
             entry<AppRoute.ScheduledTasks>(swipeDismiss = swipeDismiss) {
                 ScheduledTasksScreen(context = LocalContext.current, onBack = ::popRoute)
             }
-            entry<AppRoute.AppKnowledge> {
-                AppKnowledgeScreen(onBack = ::popRoute)
-            }
             entry<AppRoute.PresetManager> {
                 PresetManagerScreen(onBack = ::popRoute)
             }
@@ -759,9 +733,6 @@ fun AgentAppRoot(
                     onBack = ::popRoute,
                     onNavigate = { route -> pushRoute(route) },
                 )
-            }
-            entry<AppRoute.MediaGenSettings>(swipeDismiss = swipeDismiss) {
-                MediaGenSettingsScreen(onBack = ::popRoute)
             }
             entry<AppRoute.SpeechRecognition>(swipeDismiss = swipeDismiss) {
                 SpeechRecognitionScreen(

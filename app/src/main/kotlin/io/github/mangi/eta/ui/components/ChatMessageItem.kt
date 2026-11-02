@@ -97,6 +97,7 @@ import io.github.mangi.eta.ui.markdown.StreamingMarkdown
 import io.github.mangi.eta.ui.markdown.StreamingMarkdownState
 import io.github.mangi.eta.ui.markdown.THINKING_LINE_HEIGHT_SP
 import io.github.mangi.eta.ui.model.AgentChatMessageUi
+import io.github.mangi.eta.ui.app.glassTopHighlight
 import io.github.mangi.eta.ui.model.AgentMessageUi
 import io.github.mangi.eta.ui.model.RunTraceMessageUi
 import io.github.mangi.eta.ui.model.SuggestionChipsMessageUi
@@ -399,6 +400,16 @@ private fun UserMessageBubble(
                         } else {
                             Modifier
                         }
+                    )
+                    // v4 玻璃质感：顶部高光（气泡不用真实模糊，用高光+边框模拟，省性能）
+                    .glassTopHighlight(
+                        shape = RoundedCornerShape(
+                            topStart = 20.dp,
+                            topEnd = 20.dp,
+                            bottomEnd = if (isEditing) 20.dp else 6.dp,
+                            bottomStart = 20.dp,
+                        ),
+                        highlightAlpha = 0.06f,
                     )
                     .padding(
                         horizontal = if (assistantOverlay) 12.dp else 16.dp,

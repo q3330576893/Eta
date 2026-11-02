@@ -27,9 +27,8 @@ import androidx.room.migration.Migration
         UserPersonaEntity::class,
         TokenUsageEntity::class,
         ScheduledTaskEntity::class,
-        AppKnowledgeEntity::class,
     ],
-    version = 26,
+    version = 27,
     exportSchema = false,
 )
 internal abstract class EtaDatabase : RoomDatabase() {
@@ -41,7 +40,6 @@ internal abstract class EtaDatabase : RoomDatabase() {
     abstract fun characterDao(): CharacterDao
     abstract fun tokenUsageDao(): TokenUsageDao
     abstract fun scheduledTaskDao(): ScheduledTaskDao
-    abstract fun appKnowledgeDao(): AppKnowledgeDao
 
     companion object {
         @Volatile
@@ -75,6 +73,7 @@ internal abstract class EtaDatabase : RoomDatabase() {
                         MIGRATION_23_24,
                         MIGRATION_24_25,
         MIGRATION_25_26,
+        MIGRATION_26_27,
                     )
                     .addCallback(object : Callback() {
                         override fun onCreate(db: androidx.sqlite.db.SupportSQLiteDatabase) { createTextChunkCleanup(db) }
@@ -365,4 +364,9 @@ internal val MIGRATION_25_26 = Migration(25, 26) { database ->
             "createdAt INTEGER NOT NULL)"
     )
     database.execSQL("CREATE INDEX IF NOT EXISTS index_app_knowledge_packageName ON app_knowledge(packageName)")
+}
+
+internal val MIGRATION_26_27 = Migration(26, 27) { database ->
+    database.execSQL("DROP INDEX IF EXISTS index_app_knowledge_packageName")
+    database.execSQL("DROP TABLE IF EXISTS app_knowledge")
 }

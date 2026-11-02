@@ -45,6 +45,8 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import io.github.mangi.eta.R
 import io.github.mangi.eta.data.repository.ConversationSearchRepository
+import io.github.mangi.eta.ui.app.glassHairlineBorder
+import io.github.mangi.eta.ui.app.glassTopHighlight
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -167,6 +169,9 @@ internal fun ChatMessageSearchOverlay(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 12.dp, vertical = 8.dp)
+                // v4 玻璃质感：发丝边框 + 顶部高光
+                .glassHairlineBorder()
+                .glassTopHighlight()
                 .clickable(
                     indication = null,
                     interactionSource = remember { MutableInteractionSource() },

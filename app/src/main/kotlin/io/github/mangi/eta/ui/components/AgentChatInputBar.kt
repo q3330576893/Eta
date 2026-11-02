@@ -47,13 +47,11 @@ import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowUpward
 import androidx.compose.material.icons.rounded.Close
-import androidx.compose.material.icons.rounded.Image
-import androidx.compose.material.icons.rounded.Movie
 import androidx.compose.material.icons.rounded.Stop
-import io.github.mangi.eta.ui.media.LocalMediaGenUi
 import androidx.compose.runtime.Composable
 import io.github.mangi.eta.ui.app.LocalBlurEnabled
 import io.github.mangi.eta.ui.app.glassTextureBlur
+import io.github.mangi.eta.ui.app.glassTopHighlight
 import top.yukonga.miuix.kmp.blur.LayerBackdrop
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.LaunchedEffect
@@ -311,6 +309,8 @@ internal fun AgentChatInputBar(
                         color = MiuixTheme.colorScheme.outline.copy(alpha = 0.55f),
                         cornerRadius = 20.dp,
                     )
+                    // v4 玻璃质感：顶部高光 + 发丝边框（与模糊叠加，玻璃感翻倍）
+                    .glassTopHighlight(InputContainerShape, highlightAlpha = 0.10f)
                     .padding(horizontal = 10.dp, vertical = 8.dp),
             ) {
                 // 状态行：内存百分比（右对齐，可点击看详情）。
@@ -396,39 +396,6 @@ internal fun AgentChatInputBar(
                                 onAttachFolder = onAttachFolder,
                                 onAttachFilePath = onAttachFilePath,
                             )
-
-                            Spacer(modifier = Modifier.width(2.dp))
-
-                            // 生图/生视频入口（经 CompositionLocal 拿状态，避免参数透传）
-                            val mediaGenUi = LocalMediaGenUi.current
-                            if (mediaGenUi != null) {
-                                IconButton(
-                                    onClick = { mediaGenUi.openImageDialog() },
-                                    minWidth = ChatInputActionSize,
-                                    minHeight = ChatInputActionSize,
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Image,
-                                        contentDescription = stringResource(R.string.media_gen_title_image),
-                                        modifier = Modifier.size(ChatInputActionIconSize),
-                                        tint = MiuixTheme.colorScheme.onSurface,
-                                    )
-                                }
-                                Spacer(modifier = Modifier.width(2.dp))
-                                IconButton(
-                                    onClick = { mediaGenUi.openVideoDialog() },
-                                    minWidth = ChatInputActionSize,
-                                    minHeight = ChatInputActionSize,
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Rounded.Movie,
-                                        contentDescription = stringResource(R.string.media_gen_title_video),
-                                        modifier = Modifier.size(ChatInputActionIconSize),
-                                        tint = MiuixTheme.colorScheme.onSurface,
-                                    )
-                                }
-                                Spacer(modifier = Modifier.width(2.dp))
-                            }
 
                             if (availableReasoningEfforts.isNotEmpty()) {
                                 ThinkingEffortChip(

@@ -4,6 +4,7 @@ import androidx.compose.foundation.Indication
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.layout
@@ -11,6 +12,8 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
+import io.github.mangi.eta.ui.app.glassHairlineBorder
+import io.github.mangi.eta.ui.app.glassTopHighlight
 import top.yukonga.miuix.kmp.basic.ButtonDefaults
 import top.yukonga.miuix.kmp.basic.Switch
 import top.yukonga.miuix.kmp.basic.TextButton
@@ -61,7 +64,11 @@ internal fun EtaWindowDialog(
 ) {
     EtaPreferenceTheme {
         WindowDialog(
-            show = show, title = title, summary = summary, modifier = modifier,
+            show = show, title = title, summary = summary,
+            // v4 玻璃质感：发丝边框 + 顶部高光（所有 Eta 弹窗统一生效）
+            modifier = modifier
+                .glassHairlineBorder(RoundedCornerShape(DialogDefaults.CornerRadius))
+                .glassTopHighlight(RoundedCornerShape(DialogDefaults.CornerRadius), highlightAlpha = 0.10f),
             backgroundColor = MiuixTheme.colorScheme.surfaceContainer,
             onDismissRequest = onDismissRequest, onDismissFinished = onDismissFinished,
             cornerRadius = DialogDefaults.CornerRadius,
@@ -85,7 +92,11 @@ internal fun EtaOverlayDialog(
 ) {
     EtaPreferenceTheme {
         OverlayDialog(
-            show = show, title = title, summary = summary, modifier = modifier,
+            show = show, title = title, summary = summary,
+            // v4 玻璃质感：发丝边框 + 顶部高光（所有 Eta 弹窗统一生效）
+            modifier = modifier
+                .glassHairlineBorder(RoundedCornerShape(DialogDefaults.CornerRadius))
+                .glassTopHighlight(RoundedCornerShape(DialogDefaults.CornerRadius), highlightAlpha = 0.10f),
             backgroundColor = MiuixTheme.colorScheme.surfaceContainer,
             onDismissRequest = onDismissRequest, onDismissFinished = onDismissFinished,
             cornerRadius = DialogDefaults.CornerRadius,

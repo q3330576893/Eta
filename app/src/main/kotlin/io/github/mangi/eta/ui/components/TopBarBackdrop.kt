@@ -4,8 +4,12 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.drawWithContent
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.graphics.luminance
+import androidx.compose.ui.unit.dp
 import io.github.mangi.eta.data.model.AppearanceTopBarBlurStyle
 import io.github.mangi.eta.ui.app.LocalBlurEnabled
 import io.github.mangi.eta.ui.app.LocalTopBarBlurStyle
@@ -64,7 +68,22 @@ internal fun TopBarBackdrop(
             )
         }
     }
-    Box(modifier = modifier) { content() }
+    Box(
+        modifier = modifier
+            // v4 玻璃质感：顶栏底部发丝线（深色白 10% / 浅色黑 8%）
+            .drawWithContent {
+                drawContent()
+                val dark = MiuixTheme.colorScheme.background.luminance() < 0.5f
+                val lineColor = if (dark) Color.White.copy(alpha = 0.10f)
+                else Color.Black.copy(alpha = 0.08f)
+                drawLine(
+                    color = lineColor,
+                    start = Offset(0f, size.height - 0.5.dp.toPx()),
+                    end = Offset(size.width, size.height - 0.5.dp.toPx()),
+                    strokeWidth = 0.5.dp.toPx(),
+                )
+            }
+    ) { content() }
 }
 
 internal fun Modifier.captureForTopBar(backdrop: LayerBackdrop?): Modifier =
