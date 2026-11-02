@@ -1267,7 +1267,7 @@
   <string name="media_gen_title_video">Generate Video</string>
   <string name="media_gen_size">Size</string>
   <string name="media_gen_duration">Duration (s)</string>
-  <string name="media_gen_saved">Saved</string>
+  <string name="media_gen_settings_saved">Settings saved</string>
   <string name="speech_recognition_title">Speech Recognition</string>
   <string name="speech_synthesis_title">Spoken Answers</string>
   <string name="speech_oss_title">Recording Storage</string>

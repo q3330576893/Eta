@@ -1243,7 +1243,7 @@
   <string name="media_gen_title_video">生成视频</string>
   <string name="media_gen_size">尺寸</string>
   <string name="media_gen_duration">时长（秒）</string>
-  <string name="media_gen_saved">已保存</string>
+  <string name="media_gen_settings_saved">设置已保存</string>
   <string name="speech_recognition_title">语音识别</string>
   <string name="speech_synthesis_title">语音播报</string>
   <string name="speech_oss_title">录音存储</string>

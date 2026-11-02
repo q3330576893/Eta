@@ -89,7 +89,7 @@ internal fun MediaGenSettingsScreen(onBack: () -> Unit) {
             )
             MediaGenSettingsRepository.saveApiKey(context, apiKey.trim())
             dirty = false
-            Toast.makeText(context, R.string.media_gen_saved, Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, R.string.media_gen_settings_saved, Toast.LENGTH_SHORT).show()
         }
     }
 
