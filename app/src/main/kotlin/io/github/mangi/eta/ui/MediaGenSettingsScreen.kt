@@ -156,7 +156,7 @@ internal fun MediaGenSettingsScreen(onBack: () -> Unit) {
                     SpeechField(
                         label = stringResource(R.string.media_gen_api_key),
                         value = apiKey,
-                        secret = <redacted>
+                        secret = true,
                         onChange = { apiKey = it; dirty = true },
                     )
                     Row(modifier = Modifier.fillMaxWidth()) {

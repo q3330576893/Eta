@@ -52,7 +52,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Download
 import androidx.compose.material.icons.rounded.Share
-import androidx.compose.material3.Icon
+import top.yukonga.miuix.kmp.basic.Icon
 import java.io.ByteArrayOutputStream
 import java.net.URL
 

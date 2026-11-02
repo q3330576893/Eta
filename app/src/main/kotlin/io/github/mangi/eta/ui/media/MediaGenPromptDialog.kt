@@ -30,9 +30,9 @@ import top.yukonga.miuix.kmp.basic.Button
 import top.yukonga.miuix.kmp.basic.CircularProgressIndicator
 import top.yukonga.miuix.kmp.basic.Text
 import top.yukonga.miuix.kmp.basic.TextField
-import top.yukonga.miuix.kmp.extra.WindowDialog
-import top.yukonga.miuix.kmp.basic.DialogDefaults
-import top.yukonga.miuix.kmp.extra.MiuixDialogActions
+import top.yukonga.miuix.kmp.layout.DialogDefaults
+import top.yukonga.miuix.kmp.window.WindowDialog
+import io.github.mangi.eta.ui.components.MiuixDialogActions
 
 /**
  * 生图/生视频的提示词输入弹窗。
