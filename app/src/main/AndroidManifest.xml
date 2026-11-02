@@ -219,12 +219,6 @@
             </intent-filter>
         </receiver>
 
-        <!-- 热词唤醒：Vosk 前台服务 -->
-        <service
-            android:name=".agent.voice.HotwordService"
-            android:exported="false"
-            android:foregroundServiceType="microphone" />
-
         <!-- 快捷设置磁贴：一键语音助手 -->
         <service
             android:name=".agent.voice.EtaVoiceTileService"
@@ -237,17 +231,6 @@
             </intent-filter>
         </service>
 
-        <!-- 热词唤醒：开机自启 + 看门狗重启 -->
-        <receiver
-            android:name=".agent.voice.HotwordBootReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-            <intent-filter>
-                <action android:name="io.github.mangi.eta.hotword.RESTART" />
-            </intent-filter>
-        </receiver>
     </application>
 
 </manifest>

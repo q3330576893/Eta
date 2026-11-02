@@ -6,7 +6,7 @@ import android.content.Intent
 /**
  * 实时语音对话的外部启动入口。
  *
- * 热词唤醒（HotwordService）或系统助手唤醒后，调用 [start] 即可让当前聊天页
+ * 系统助手唤醒后，调用 [start] 即可让当前聊天页
  * 打开实时语音对话面板。聊天页通过广播接收，处于前台时响应。
  */
 object VoiceConversationStarter {

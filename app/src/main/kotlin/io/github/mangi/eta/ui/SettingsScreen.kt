@@ -611,16 +611,6 @@ private fun SettingsPageContent(
                             SwitchPref(
                                 context = context,
                                 prefs = prefs,
-                                title = stringResource(R.string.ui_maintain_hey_google_detection_after_screen_rest_9d6877),
-                                key = Prefs.Keys.HOTWORD_SELF_HEAL,
-                                icon = Icons.Rounded.Hearing,
-                                iconTint = EtaPreferenceColors.Green,
-                            )
-
-                            EtaPreferenceDivider()
-                            SwitchPref(
-                                context = context,
-                                prefs = prefs,
                                 title = stringResource(R.string.ui_lock_screen_evokes_automatic_voice_input_1cde18),
                                 key = Prefs.Keys.LOCKSCREEN_VOICE_COMMAND,
                                 icon = Icons.Rounded.Lock,
