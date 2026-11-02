@@ -107,7 +107,7 @@ internal fun MediaGenPromptDialog(
         }
     }
 
-    private suspend fun doGenerateVideo(
+    suspend fun doGenerateVideo(
         p: String,
         settings: io.github.mangi.eta.data.model.MediaGenSettings,
         baseUrl: String,
@@ -176,7 +176,7 @@ internal fun MediaGenPromptDialog(
         }
     }
 
-    private suspend fun doGenerateImage(
+    suspend fun doGenerateImage(
         p: String,
         settings: io.github.mangi.eta.data.model.MediaGenSettings,
         baseUrl: String,
