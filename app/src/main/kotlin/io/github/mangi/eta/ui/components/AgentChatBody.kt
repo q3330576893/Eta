@@ -187,6 +187,9 @@ internal fun AgentChatBody(
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberLazyListState(initialFirstVisibleItemIndex = messages.size + if (hasEarlierMessages) 1 else 0)
+    // 会话内搜索参数提前解包，避免 trailing lambda 作用域解析问题。
+    val messageSearchTargetId = searchTargetMessageId
+    val onMessageSearchTargetConsumed = onSearchTargetConsumed
     val keyboard = LocalSoftwareKeyboardController.current
     val density = LocalDensity.current
     val imeBottomPx = WindowInsets.ime.getBottom(density)
@@ -456,8 +459,8 @@ private fun AgentChatScaffold(
                 historyLoadState = historyLoadState,
                 onLoadEarlierMessages = onLoadEarlierMessages,
                 onHistoryViewportChanged = onHistoryViewportChanged,
-                searchTargetMessageId = searchTargetMessageId,
-                onSearchTargetConsumed = onSearchTargetConsumed,
+                searchTargetMessageId = messageSearchTargetId,
+                onSearchTargetConsumed = onMessageSearchTargetConsumed,
                 modifier = Modifier
                     .fillMaxSize()
                     .then(if (frostEnabled) Modifier.layerBackdrop(messageBackdrop) else Modifier),
