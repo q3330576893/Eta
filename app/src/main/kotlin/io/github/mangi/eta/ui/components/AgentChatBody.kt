@@ -104,7 +104,6 @@ import io.github.mangi.eta.ui.model.UserMessageUi
 import io.github.mangi.eta.ui.model.latestContextUsage
 import io.github.mangi.eta.ui.voice.SpeechAutoReadAloud
 import io.github.mangi.eta.ui.voice.SpeechPlaybackHost
-import io.github.mangi.eta.ui.voice.VoiceConversationHost
 import kotlin.math.exp
 import kotlin.math.min
 import kotlinx.coroutines.CancellationException
@@ -244,12 +243,6 @@ internal fun AgentChatBody(
 
     SpeechPlaybackHost {
         SpeechAutoReadAloud(messages = messages, isStreaming = isStreaming)
-        VoiceConversationHost(
-            messages = messages,
-            isStreaming = isStreaming,
-            onSubmit = onSubmit,
-            onStop = onStop,
-        ) {
         // 图片/视频生成：经 CompositionLocal 向输入栏提供入口状态
         val mediaGenUi = remember { MediaGenUiState() }
         CompositionLocalProvider(LocalMediaGenUi provides mediaGenUi) {
@@ -336,7 +329,6 @@ internal fun AgentChatBody(
             modifier = modifier,
         )
         } // CompositionLocalProvider(LocalMediaGenUi)
-        }
     }
 }
 

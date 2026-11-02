@@ -31,7 +31,6 @@ import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Close
 import androidx.compose.material.icons.rounded.Mic
-import androidx.compose.material.icons.rounded.RecordVoiceOver
 import androidx.compose.material.icons.rounded.Stop
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -163,29 +162,6 @@ internal fun SpeechDictationButton(
             } else {
                 MiuixTheme.colorScheme.onSurface
             },
-        )
-    }
-}
-
-/** 输入栏实时语音对话入口：打开语音对话面板，进入"说话→模型回复→语音播报"循环。 */
-@Composable
-internal fun VoiceConversationButton(
-    onClick: () -> Unit,
-    enabled: Boolean,
-    modifier: Modifier = Modifier,
-) {
-    IconButton(
-        onClick = onClick,
-        enabled = enabled,
-        minWidth = ChatInputActionSize,
-        minHeight = ChatInputActionSize,
-        modifier = modifier,
-    ) {
-        Icon(
-            imageVector = Icons.Rounded.RecordVoiceOver,
-            contentDescription = stringResource(R.string.voice_conv_title),
-            modifier = Modifier.size(ChatInputActionIconSize),
-            tint = MiuixTheme.colorScheme.onSurface,
         )
     }
 }

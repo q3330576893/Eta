@@ -1558,17 +1558,6 @@
     <string name="speech_asr_system">系统语音服务</string>
     <string name="speech_asr_note_system">使用设备已有的语音服务；云端服务不依赖系统识别引擎。</string>
 
-  <string name="voice_conv_title">Voice conversation</string>
-  <string name="voice_conv_idle">Voice conversation</string>
-  <string name="voice_conv_listening">Listening… speak now</string>
-  <string name="voice_conv_thinking">Thinking…</string>
-  <string name="voice_conv_speaking">Speaking… tap to interrupt</string>
-  <string name="voice_conv_error">Voice conversation failed</string>
-  <string name="voice_conv_close">End voice conversation</string>
-  <string name="voice_conv_stop">End</string>
-  <string name="voice_conv_tap_to_interrupt">Tap to interrupt</string>
-  <string name="voice_conv_you_said">You: %1$s</string>
-  <!-- 语音磁贴 / 语音对话（原 hotword_strings.xml 迁移，热词已移除） -->
+  <!-- 语音磁贴（原 hotword_strings.xml 迁移，热词已移除） -->
   <string name="tile_voice_assistant_label">Eta Voice</string>
-  <string name="voice_conversation_need_tts">Please configure a speech synthesis service in voice settings first</string>
 </resources>
