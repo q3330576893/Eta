@@ -242,37 +242,6 @@ internal fun AgentChatBody(
         }
     }
 
-    // 会话内消息搜索：点选结果后滚动定位到对应消息。
-    // 目标不在已加载窗口且还有更早历史时，自动加载上一页后重试。
-    LaunchedEffect(searchTargetMessageId, timelineEntries.size) {
-        val targetId = searchTargetMessageId ?: return@LaunchedEffect
-        val index = timelineEntries.indexOfFirst { entry ->
-            when (entry) {
-                is AgentTimelineEntry.Message -> entry.message.id == targetId
-                is AgentTimelineEntry.WorkProcess -> entry.messages.any { it.id == targetId }
-            }
-        }
-        if (index >= 0) {
-            val listIndex = index + if (hasEarlierMessages) 1 else 0
-            scrollState.animateScrollToItem(listIndex)
-            searchHighlightId = targetId
-            onSearchTargetConsumed()
-        } else if (hasEarlierMessages) {
-            onLoadEarlierMessages()
-            // 不消费 target，timelineEntries.size 变化后本 effect 重跑继续找。
-        } else {
-            // 历史已全部加载仍找不到（理论上不会发生），直接消费避免卡死。
-            onSearchTargetConsumed()
-        }
-    }
-
-    LaunchedEffect(searchHighlightId) {
-        if (searchHighlightId != null) {
-            kotlinx.coroutines.delay(2000)
-            searchHighlightId = null
-        }
-    }
-
     SpeechPlaybackHost {
         SpeechAutoReadAloud(messages = messages, isStreaming = isStreaming)
         VoiceConversationHost(
@@ -530,6 +499,38 @@ internal fun AgentConversationMessages(
         visibleMessages.toTimelineEntries(previous = previousTimelineEntries[0])
     }
     SideEffect { previousTimelineEntries[0] = timelineEntries }
+
+    // 会话内消息搜索：点选结果后滚动定位到对应消息。
+    // 目标不在已加载窗口且还有更早历史时，自动加载上一页后重试。
+    LaunchedEffect(searchTargetMessageId, timelineEntries.size) {
+        val targetId = searchTargetMessageId ?: return@LaunchedEffect
+        val index = timelineEntries.indexOfFirst { entry ->
+            when (entry) {
+                is AgentTimelineEntry.Message -> entry.message.id == targetId
+                is AgentTimelineEntry.WorkProcess -> entry.messages.any { it.id == targetId }
+            }
+        }
+        if (index >= 0) {
+            val listIndex = index + if (hasEarlierMessages) 1 else 0
+            scrollState.animateScrollToItem(listIndex)
+            searchHighlightId = targetId
+            onSearchTargetConsumed()
+        } else if (hasEarlierMessages) {
+            onLoadEarlierMessages()
+            // 不消费 target，timelineEntries.size 变化后本 effect 重跑继续找。
+        } else {
+            // 历史已全部加载仍找不到（理论上不会发生），直接消费避免卡死。
+            onSearchTargetConsumed()
+        }
+    }
+
+    LaunchedEffect(searchHighlightId) {
+        if (searchHighlightId != null) {
+            kotlinx.coroutines.delay(2000)
+            searchHighlightId = null
+        }
+    }
+
     val activeWorkProcessKey = if (isStreaming) {
         (timelineEntries.lastOrNull() as? AgentTimelineEntry.WorkProcess)?.key
     } else {

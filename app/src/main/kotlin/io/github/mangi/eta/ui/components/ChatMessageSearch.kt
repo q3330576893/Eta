@@ -221,14 +221,14 @@ internal fun ChatMessageSearchOverlay(
                     state.isSearching -> {
                         Text(
                             text = stringResource(R.string.message_search_searching),
-                            color = MiuixTheme.colorScheme.onSurfaceVariant,
+                            color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
                             modifier = Modifier.padding(vertical = 12.dp),
                         )
                     }
                     state.query.isNotBlank() && state.results.isEmpty() -> {
                         Text(
                             text = stringResource(R.string.message_search_no_result),
-                            color = MiuixTheme.colorScheme.onSurfaceVariant,
+                            color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
                             modifier = Modifier.padding(vertical = 12.dp),
                         )
                     }
@@ -238,7 +238,7 @@ internal fun ChatMessageSearchOverlay(
                                 R.string.message_search_result_count,
                                 state.results.size,
                             ),
-                            color = MiuixTheme.colorScheme.onSurfaceVariant,
+                            color = MiuixTheme.colorScheme.onSurfaceVariantSummary,
                         )
                         Spacer(Modifier.height(4.dp))
                         LazyColumn(
@@ -293,14 +293,14 @@ private fun MessageSearchResultItem(
                 } else {
                     stringResource(R.string.message_search_sender_assistant)
                 },
-                fontSize = MiuixTheme.textStyles.footnote.fontSize,
+                style = MiuixTheme.textStyles.footnote1,
                 fontWeight = FontWeight.SemiBold,
                 color = MiuixTheme.colorScheme.primary,
             )
             Spacer(Modifier.height(2.dp))
             Text(
                 text = highlightKeyword(hit.snippet, query),
-                fontSize = MiuixTheme.textStyles.body2.fontSize,
+                style = MiuixTheme.textStyles.body2,
                 color = MiuixTheme.colorScheme.onSurface,
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
