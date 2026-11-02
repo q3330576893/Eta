@@ -1499,6 +1499,10 @@
     <string name="msg_action_read_aloud">Read aloud</string>
     <string name="msg_action_stop_reading">Stop</string>
     <string name="msg_action_translate">Translate</string>
+    <string name="msg_action_quote">Quote</string>
+    <string name="quote_sender_user">You</string>
+    <string name="quote_sender_assistant">AI</string>
+    <string name="quote_cancel">Cancel quote</string>
     <string name="msg_translate_title">Translate</string>
     <string name="msg_translate_loading">Translating…</string>
     <string name="msg_translate_failed">Translation failed, please retry</string>

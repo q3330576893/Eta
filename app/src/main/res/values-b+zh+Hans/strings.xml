@@ -1471,6 +1471,10 @@
     <string name="msg_action_read_aloud">朗读</string>
     <string name="msg_action_stop_reading">停止朗读</string>
     <string name="msg_action_translate">翻译</string>
+    <string name="msg_action_quote">引用</string>
+    <string name="quote_sender_user">我</string>
+    <string name="quote_sender_assistant">AI</string>
+    <string name="quote_cancel">取消引用</string>
     <string name="msg_translate_title">翻译</string>
     <string name="msg_translate_loading">翻译中…</string>
     <string name="msg_translate_failed">翻译失败，请重试</string>

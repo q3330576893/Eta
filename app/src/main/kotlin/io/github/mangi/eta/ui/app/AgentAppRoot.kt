@@ -53,7 +53,9 @@ import io.github.mangi.eta.data.repository.RuntimeConfigRepository
 import io.github.mangi.eta.ui.AppearanceSettingsScreen
 import io.github.mangi.eta.ui.SettingsScreen
 import io.github.mangi.eta.ui.components.ChatMessageSearchState
+import io.github.mangi.eta.ui.components.ChatQuoteState
 import io.github.mangi.eta.ui.components.LocalChatMessageSearch
+import io.github.mangi.eta.ui.components.LocalChatQuote
 import io.github.mangi.eta.ui.components.MiuixDialogActions
 import io.github.mangi.eta.ui.model.AgentHomeAction
 import io.github.mangi.eta.ui.model.AgentMemoryAction
@@ -339,7 +341,12 @@ fun AgentAppRoot(
     ) {
         // 会话内消息搜索状态：顶栏搜索入口与聊天屏搜索面板共享。
         val messageSearchState = remember { ChatMessageSearchState() }
-        CompositionLocalProvider(LocalChatMessageSearch provides messageSearchState) {
+        // 对话内引用状态：消息气泡长按引用、搜索结果引用、输入栏引用条共享。
+        val chatQuoteState = remember { ChatQuoteState() }
+        CompositionLocalProvider(
+            LocalChatMessageSearch provides messageSearchState,
+            LocalChatQuote provides chatQuoteState,
+        ) {
         AgentAppShell(
             currentRoute = route,
             isCurrentRoute = backStack.lastOrNull() == route,

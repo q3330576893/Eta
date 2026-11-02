@@ -158,6 +158,8 @@ internal fun AgentChatInputBar(
     val hapticFeedback = LocalHapticFeedback.current
     val focusRequester = remember { FocusRequester() }
     val textFieldState = rememberTextFieldState(initialText = input)
+    // 对话内引用状态（消息气泡长按引用 / 搜索结果引用 / 输入栏引用条共享）。
+    val quoteState = LocalChatQuote.current
     val speechSettings by remember { SpeechSettingsRepository.settingsFlow() }.collectAsState(initial = null)
     val recognitionEnabled = speechSettings?.recognitionEnabled == true
     val dictation = rememberSpeechInput { recognized ->
@@ -313,6 +315,15 @@ internal fun AgentChatInputBar(
                     .glassTopHighlight(InputContainerShape, highlightAlpha = 0.10f)
                     .padding(horizontal = 10.dp, vertical = 8.dp),
             ) {
+                // 对话内引用条：显示被引用消息的发送者+内容摘要，带关闭按钮。
+                val quoted = quoteState?.quoted
+                if (quoted != null) {
+                    QuoteStrip(
+                        quoted = quoted,
+                        onClear = { quoteState?.clear() },
+                        modifier = Modifier.padding(start = 8.dp, end = 4.dp, bottom = 4.dp),
+                    )
+                }
                 // 状态行：内存百分比（右对齐，可点击看详情）。
                 Row(
                     modifier = Modifier
@@ -436,10 +447,13 @@ internal fun AgentChatInputBar(
                                 dictation.cancel()
                                 val submittedText = textFieldState.text.toString()
                                 textFieldState.clearText()
+                                // 对话内引用：把引用拼进 prompt 发给模型，发送后清空引用条。
+                                val finalText = quoteState?.applyToPrompt(submittedText) ?: submittedText
+                                quoteState?.clear()
                                 if (interrupt) {
-                                    onInterruptAndSubmit(submittedText)
+                                    onInterruptAndSubmit(finalText)
                                 } else {
-                                    onSubmit(submittedText)
+                                    onSubmit(finalText)
                                 }
                             }
                         }

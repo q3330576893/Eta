@@ -19,6 +19,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.FormatQuote
 import androidx.compose.material.icons.outlined.Close
 import androidx.compose.material.icons.outlined.Person
 import androidx.compose.material.icons.outlined.Search
@@ -310,6 +311,29 @@ private fun MessageSearchResultItem(
                 maxLines = 3,
                 overflow = TextOverflow.Ellipsis,
             )
+        }
+        // 搜→引→问闭环：搜索结果直接引用进输入框。
+        val quoteState = LocalChatQuote.current
+        if (quoteState != null) {
+            Spacer(Modifier.width(4.dp))
+            IconButton(
+                onClick = {
+                    quoteState.quote(
+                        QuotedMessageUi(
+                            messageId = hit.messageId,
+                            isUser = hit.type == "user",
+                            content = hit.snippet,
+                        )
+                    )
+                },
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Rounded.FormatQuote,
+                    contentDescription = stringResource(R.string.msg_action_quote),
+                    modifier = Modifier.size(20.dp),
+                    tint = MiuixTheme.colorScheme.primary,
+                )
+            }
         }
     }
 }

@@ -38,6 +38,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.FormatQuote
 import androidx.compose.material.icons.automirrored.rounded.VolumeUp
 import androidx.compose.material.icons.rounded.AutoAwesome
 import androidx.compose.material.icons.rounded.Check
@@ -350,6 +351,25 @@ private fun UserMessageBubble(
                                 tooltipState.dismiss()
                             },
                         )
+                        // 对话内引用：把这条消息送进输入框引用条，追问时一起发给模型。
+                        val quoteState = LocalChatQuote.current
+                        if (quoteState != null && message.content.isNotBlank()) {
+                            MessageTooltipAction(
+                                icon = Icons.AutoMirrored.Rounded.FormatQuote,
+                                label = stringResource(R.string.msg_action_quote),
+                                onClick = {
+                                    quoteState.quote(
+                                        QuotedMessageUi(
+                                            messageId = message.id,
+                                            isUser = true,
+                                            content = message.content,
+                                        )
+                                    )
+                                    haptic.performHapticFeedback(HapticFeedbackType.Confirm)
+                                    tooltipState.dismiss()
+                                },
+                            )
+                        }
                         MessageTooltipAction(
                             icon = Icons.Rounded.Edit,
                             label = stringResource(R.string.ui_edit_a7f814),
@@ -638,6 +658,25 @@ private fun AgentMessageBlock(
                                 tooltipState.dismiss()
                             },
                         )
+                        // 对话内引用：把这条消息送进输入框引用条，追问时一起发给模型。
+                        val quoteState = LocalChatQuote.current
+                        if (quoteState != null && message.content.isNotBlank() && !message.isStreaming) {
+                            MessageTooltipAction(
+                                icon = Icons.AutoMirrored.Rounded.FormatQuote,
+                                label = stringResource(R.string.msg_action_quote),
+                                onClick = {
+                                    quoteState.quote(
+                                        QuotedMessageUi(
+                                            messageId = message.id,
+                                            isUser = false,
+                                            content = message.content,
+                                        )
+                                    )
+                                    haptic.performHapticFeedback(HapticFeedbackType.Confirm)
+                                    tooltipState.dismiss()
+                                },
+                            )
+                        }
                         if (canReadAloud) {
                             val speaking = speakingMessageId == message.id
                             MessageTooltipAction(
