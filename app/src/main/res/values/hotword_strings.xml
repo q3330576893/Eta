@@ -40,4 +40,11 @@
     <string name="settings_hotword_model_size">模型大小：%1$s</string>
     <!-- 快捷磁贴 -->
     <string name="tile_voice_assistant_label">Eta 语音</string>
+    <!-- 模型删除确认 -->
+    <string name="hotword_model_delete_title">删除离线模型</string>
+    <string name="hotword_model_delete_message">确定删除离线模型吗？删除后热词唤醒将无法使用。</string>
+    <string name="hotword_model_delete_confirm">删除</string>
+    <string name="hotword_model_delete_cancel">取消</string>
+    <!-- 语音对话 -->
+    <string name="voice_conversation_need_tts">请先在语音设置中配置语音播报服务</string>
 </resources>

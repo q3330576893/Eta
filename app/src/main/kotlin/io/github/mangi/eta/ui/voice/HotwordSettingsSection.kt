@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.provider.Settings
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Column
@@ -89,10 +90,18 @@ private fun HotwordSettingsContent(current: SpeechSettings) {
                     HotwordService.start(context)
                 }
             }
+        } else {
+            // Bug 2 修复：拒绝权限时给明确提示，而不是静默
+            Toast.makeText(
+                context,
+                context.getString(R.string.hotword_need_permission),
+                Toast.LENGTH_LONG
+            ).show()
         }
     }
 
     var showPhraseDialog by remember { mutableStateOf(false) }
+    var showDeleteConfirmDialog by remember { mutableStateOf(false) }
     val downloadState by HotwordModelManager.downloadState.collectAsState()
     var serviceRunning by remember { mutableStateOf(isHotwordServiceRunning(context)) }
     var modelReadyTick by remember { mutableStateOf(0) }
@@ -129,7 +138,12 @@ private fun HotwordSettingsContent(current: SpeechSettings) {
                             return@EtaSwitchPreference
                         }
                         if (!HotwordModelManager.isModelReady(context)) {
-                            // 模型未下载：保持关闭，提示先下载
+                            // Bug 2 修复：模型未下载时给明确 Toast 提示，而不是静默失败
+                            Toast.makeText(
+                                context,
+                                context.getString(R.string.hotword_need_model_first),
+                                Toast.LENGTH_LONG
+                            ).show()
                             return@EtaSwitchPreference
                         }
                     }
@@ -198,10 +212,11 @@ private fun HotwordSettingsContent(current: SpeechSettings) {
                 },
                 onClick = {
                     if (isDownloading) return@EtaArrowPreference
-                    scope.launch {
-                        if (HotwordModelManager.isModelReady(context)) {
-                            HotwordModelManager.deleteModel(context)
-                        } else {
+                    if (HotwordModelManager.isModelReady(context)) {
+                        // Bug 1 修复：已下载时点击弹确认对话框，不再直接删除
+                        showDeleteConfirmDialog = true
+                    } else {
+                        scope.launch {
                             HotwordModelManager.downloadModel(context)
                         }
                     }
@@ -270,6 +285,39 @@ private fun HotwordSettingsContent(current: SpeechSettings) {
                 }
             },
         )
+    }
+
+    // ── 删除模型确认对话框（Bug 1 修复）──
+    if (showDeleteConfirmDialog) {
+        EtaWindowDialog(
+            show = true,
+            title = stringResource(R.string.hotword_model_delete_title),
+            onDismissRequest = { showDeleteConfirmDialog = false },
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 4.dp),
+            ) {
+                Text(
+                    text = stringResource(R.string.hotword_model_delete_message),
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Spacer(Modifier.height(8.dp))
+                MiuixDialogActions(
+                    confirmText = stringResource(R.string.hotword_model_delete_confirm),
+                    cancelText = stringResource(R.string.hotword_model_delete_cancel),
+                    destructive = true,
+                    onCancel = { showDeleteConfirmDialog = false },
+                    onConfirm = {
+                        scope.launch {
+                            HotwordModelManager.deleteModel(context)
+                            showDeleteConfirmDialog = false
+                        }
+                    },
+                )
+            }
+        }
     }
 }
 

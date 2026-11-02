@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -24,7 +25,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
+import io.github.mangi.eta.R
 import io.github.mangi.eta.agent.voice.VoiceConversationController
 import io.github.mangi.eta.agent.voice.VoiceConversationStarter
 import io.github.mangi.eta.ui.model.AgentChatMessageUi
@@ -93,7 +96,19 @@ internal fun VoiceConversationHost(
     }
 
     CompositionLocalProvider(
-        LocalVoiceConversationOpen provides { if (controller != null) showPanel = true },
+        // Bug 3 修复：controller 为 null（TTS 未配置）时弹 Toast 提示，不再静默无反应
+        LocalVoiceConversationOpen provides {
+            val c = controller
+            if (c != null) {
+                showPanel = true
+            } else {
+                Toast.makeText(
+                    context,
+                    context.getString(R.string.voice_conversation_need_tts),
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        },
         content = content,
     )
 
