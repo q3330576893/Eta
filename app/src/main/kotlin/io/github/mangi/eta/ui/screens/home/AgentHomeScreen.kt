@@ -108,8 +108,6 @@ internal fun AgentHomeScreen(
                     onLoadEarlierMessages = { onAction(AgentHomeAction.LoadEarlierMessages) },
                     onHistoryViewportChanged = { onAction(AgentHomeAction.HistoryViewportChanged(it)) },
                     isDrawerOpen = isDrawerOpen,
-                    searchTargetMessageId = messageSearch?.scrollTargetMessageId,
-                    onSearchTargetConsumed = { messageSearch?.consumeScrollTarget() },
                     modifier = modifier,
                 )
                 // 会话内消息搜索面板：覆盖在聊天界面上层。

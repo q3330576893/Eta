@@ -181,15 +181,9 @@ internal fun AgentChatBody(
     onLoadEarlierMessages: () -> Unit = {},
     onHistoryViewportChanged: (Boolean) -> Unit = {},
     isDrawerOpen: Boolean = false,
-    /** 会话内搜索点选结果后待滚动定位的消息 id；消费后通过回调清空。 */
-    searchTargetMessageId: String? = null,
-    onSearchTargetConsumed: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     val scrollState = rememberLazyListState(initialFirstVisibleItemIndex = messages.size + if (hasEarlierMessages) 1 else 0)
-    // 会话内搜索参数提前解包，避免 trailing lambda 作用域解析问题。
-    val messageSearchTargetId = searchTargetMessageId
-    val onMessageSearchTargetConsumed = onSearchTargetConsumed
     val keyboard = LocalSoftwareKeyboardController.current
     val density = LocalDensity.current
     val imeBottomPx = WindowInsets.ime.getBottom(density)
@@ -459,8 +453,6 @@ private fun AgentChatScaffold(
                 historyLoadState = historyLoadState,
                 onLoadEarlierMessages = onLoadEarlierMessages,
                 onHistoryViewportChanged = onHistoryViewportChanged,
-                searchTargetMessageId = messageSearchTargetId,
-                onSearchTargetConsumed = onMessageSearchTargetConsumed,
                 modifier = Modifier
                     .fillMaxSize()
                     .then(if (frostEnabled) Modifier.layerBackdrop(messageBackdrop) else Modifier),
@@ -494,9 +486,6 @@ internal fun AgentConversationMessages(
     historyLoadState: ConversationHistoryLoadState = ConversationHistoryLoadState.Idle,
     onLoadEarlierMessages: () -> Unit = {},
     onHistoryViewportChanged: (Boolean) -> Unit = {},
-    /** 会话内搜索点选结果后待滚动定位的消息 id；消费后通过回调清空。 */
-    searchTargetMessageId: String? = null,
-    onSearchTargetConsumed: () -> Unit = {},
     modifier: Modifier = Modifier,
 ) {
     // 上一版条目只作复用比对，不参与组合观察。
@@ -505,6 +494,9 @@ internal fun AgentConversationMessages(
         visibleMessages.toTimelineEntries(previous = previousTimelineEntries[0])
     }
     SideEffect { previousTimelineEntries[0] = timelineEntries }
+    // 会话内消息搜索：直接读共享状态，不经参数透传。
+    val messageSearch = LocalChatMessageSearch.current
+    val searchTargetMessageId = messageSearch?.scrollTargetMessageId
     // 会话内消息搜索定位到的消息短暂高亮，2 秒后消失。
     var searchHighlightId by remember { mutableStateOf<String?>(null) }
 
@@ -522,13 +514,13 @@ internal fun AgentConversationMessages(
             val listIndex = index + if (hasEarlierMessages) 1 else 0
             scrollState.animateScrollToItem(listIndex)
             searchHighlightId = targetId
-            onSearchTargetConsumed()
+            messageSearch?.consumeScrollTarget()
         } else if (hasEarlierMessages) {
             onLoadEarlierMessages()
             // 不消费 target，timelineEntries.size 变化后本 effect 重跑继续找。
         } else {
             // 历史已全部加载仍找不到（理论上不会发生），直接消费避免卡死。
-            onSearchTargetConsumed()
+            messageSearch?.consumeScrollTarget()
         }
     }
 
