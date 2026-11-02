@@ -50,8 +50,13 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.rememberUpdatedState
+import io.github.mangi.eta.ui.media.LocalMediaGenUi
+import io.github.mangi.eta.ui.media.MediaGenPromptDialog
+import io.github.mangi.eta.ui.media.MediaGenResultViewer
+import io.github.mangi.eta.ui.media.MediaGenUiState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
@@ -245,6 +250,27 @@ internal fun AgentChatBody(
             onSubmit = onSubmit,
             onStop = onStop,
         ) {
+        // 图片/视频生成：经 CompositionLocal 向输入栏提供入口状态
+        val mediaGenUi = remember { MediaGenUiState() }
+        CompositionLocalProvider(LocalMediaGenUi provides mediaGenUi) {
+        // 生图/生视频弹窗
+        if (mediaGenUi.showImageDialog) {
+            MediaGenPromptDialog(
+                isVideo = false,
+                uiState = mediaGenUi,
+                onDismiss = { mediaGenUi.closeDialogs() },
+            )
+        }
+        if (mediaGenUi.showVideoDialog) {
+            MediaGenPromptDialog(
+                isVideo = true,
+                uiState = mediaGenUi,
+                onDismiss = { mediaGenUi.closeDialogs() },
+            )
+        }
+        if (mediaGenUi.showViewer) {
+            MediaGenResultViewer(uiState = mediaGenUi)
+        }
         AgentChatScaffold(
             visibleMessages = visibleMessages,
             hasMessages = visibleMessages.isNotEmpty() || hasEarlierMessages,
@@ -309,6 +335,7 @@ internal fun AgentChatBody(
             onHistoryViewportChanged = onHistoryViewportChanged,
             modifier = modifier,
         )
+        } // CompositionLocalProvider(LocalMediaGenUi)
         }
     }
 }

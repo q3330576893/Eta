@@ -143,6 +143,7 @@ import io.github.mangi.eta.ui.screens.tools.WebToolsSettingsScreen
 import io.github.mangi.eta.ui.voice.SpeechOssScreen
 import io.github.mangi.eta.ui.voice.SpeechRecognitionScreen
 import io.github.mangi.eta.ui.voice.SpeechSettingsScreen
+import io.github.mangi.eta.ui.MediaGenSettingsScreen
 import io.github.mangi.eta.ui.voice.SpeechSynthesisScreen
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Dispatchers
@@ -758,6 +759,9 @@ fun AgentAppRoot(
                     onBack = ::popRoute,
                     onNavigate = { route -> pushRoute(route) },
                 )
+            }
+            entry<AppRoute.MediaGenSettings>(swipeDismiss = swipeDismiss) {
+                MediaGenSettingsScreen(onBack = ::popRoute)
             }
             entry<AppRoute.SpeechRecognition>(swipeDismiss = swipeDismiss) {
                 SpeechRecognitionScreen(

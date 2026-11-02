@@ -28,6 +28,7 @@ import androidx.compose.material.icons.rounded.Language
 import androidx.compose.material.icons.rounded.Layers
 import androidx.compose.material.icons.rounded.Lock
 import androidx.compose.material.icons.rounded.Mic
+import androidx.compose.material.icons.rounded.Image
 import androidx.compose.material.icons.rounded.Palette
 import androidx.compose.material.icons.rounded.PowerSettingsNew
 import androidx.compose.material.icons.rounded.Psychology
@@ -704,6 +705,13 @@ private fun SettingsPageContent(
                         title = stringResource(R.string.speech_settings_title),
                         startAction = { EtaPreferenceIcon(icon = Icons.Rounded.Mic, tint = EtaPreferenceColors.Blue) },
                         onClick = { onNavigate(AppRoute.SpeechSettings) },
+                    )
+                    EtaPreferenceDivider()
+                    EtaArrowPreference(
+                        title = stringResource(R.string.media_gen_settings_title),
+                        summary = stringResource(R.string.media_gen_settings_summary),
+                        startAction = { EtaPreferenceIcon(icon = Icons.Rounded.Image, tint = EtaPreferenceColors.Orange) },
+                        onClick = { onNavigate(AppRoute.MediaGenSettings) },
                     )
                     EtaPreferenceDivider()
                     LanguagePreference(iconTint = EtaPreferenceColors.Blue)
