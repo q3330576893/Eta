@@ -105,6 +105,9 @@ internal fun AgentModelPickerButton(
     }
     val currentModel = selected?.displayName ?: stringResource(R.string.model_not_selected)
     val switchModelDescription = stringResource(R.string.model_switch_current, currentModel)
+    // 确认作用域挂在按钮层：点选后弹窗/面板先收起，140ms 延迟确认不能随弹窗一起被取消，
+    // 否则切换回调时而发不出去，表现为"切了模型但没生效，重启 App 才好"。
+    val select = rememberConfirmedSelection(onModelSelected)
     Box(modifier = modifier) {
         IconButton(
             onClick = {
@@ -139,10 +142,8 @@ internal fun AgentModelPickerButton(
         ) {
             ModelQuickList(
                 state = state,
-                onModelSelected = { modelId ->
-                    showPopup = false
-                    onModelSelected(modelId)
-                },
+                select = select,
+                onDismiss = { showPopup = false },
             )
         }
 
@@ -155,10 +156,8 @@ internal fun AgentModelPickerButton(
             key(sheetSession) {
                 ModelSheetContent(
                     state = state,
-                    onModelSelected = { modelId ->
-                        showSheet = false
-                        onModelSelected(modelId)
-                    },
+                    select = select,
+                    onDismiss = { showSheet = false },
                 )
             }
         }
@@ -168,9 +167,9 @@ internal fun AgentModelPickerButton(
 @Composable
 private fun ModelQuickList(
     state: AgentModelPickerUiState,
-    onModelSelected: (String) -> Unit,
+    select: ConfirmedSelection,
+    onDismiss: () -> Unit,
 ) {
-    val select = rememberConfirmedSelection(onModelSelected)
     val selectedId = select.pendingId ?: state.selectedModel?.id
     val showLabels = state.providerGroups.size > 1
     Column(
@@ -185,7 +184,10 @@ private fun ModelQuickList(
                 ModelPickerRow(
                     model = model,
                     selected = model.id == selectedId,
-                    onClick = { select(model.id) },
+                    onClick = {
+                        onDismiss()
+                        select(model.id)
+                    },
                 )
             }
         }
@@ -207,7 +209,8 @@ private sealed interface ModelSheetEntry {
 @Composable
 private fun ModelSheetContent(
     state: AgentModelPickerUiState,
-    onModelSelected: (String) -> Unit,
+    select: ConfirmedSelection,
+    onDismiss: () -> Unit,
 ) {
     var query by remember { mutableStateOf("") }
     var providerFilter by remember { mutableStateOf<String?>(null) }
@@ -231,7 +234,6 @@ private fun ModelSheetContent(
     LaunchedEffect(listState) {
         snapshotFlow { query to providerFilter }.drop(1).collect { listState.scrollToItem(0) }
     }
-    val select = rememberConfirmedSelection(onModelSelected)
     val selectedId = select.pendingId ?: state.selectedModel?.id
     val density = LocalDensity.current
     // 面板高度固定，不随搜索结果伸缩；键盘弹出时由面板的约束自然压缩列表区域。
@@ -303,7 +305,10 @@ private fun ModelSheetContent(
                     is ModelSheetEntry.Option -> ModelPickerRow(
                         model = entry.model,
                         selected = entry.model.id == selectedId,
-                        onClick = { select(entry.model.id) },
+                        onClick = {
+                            onDismiss()
+                            select(entry.model.id)
+                        },
                         horizontalPadding = 12.dp,
                     )
                 }
@@ -314,7 +319,9 @@ private fun ModelSheetContent(
 
 /**
  * 点选后先把对勾移到新模型上，停留片刻再收起弹层，让人看清选中了谁。
- * 弹层收起会让作用域随组合一起离开，未完成的确认随之取消，不会回写已关闭的界面。
+ * 注意：确认作用域必须挂在弹窗之外（按钮层），否则弹窗收起时作用域被取消，
+ * 延迟的 onConfirm 发不出去，表现为"切了模型但没生效"。
+ * 确认完成后重置 pendingId，否则下一次点选会被 `pendingId != null` 挡掉。
  */
 private class ConfirmedSelection(
     private val onConfirm: (String) -> Unit,
@@ -328,7 +335,11 @@ private class ConfirmedSelection(
         pendingId = modelId
         launch {
             delay(SelectionConfirmMs)
-            onConfirm(modelId)
+            try {
+                onConfirm(modelId)
+            } finally {
+                pendingId = null
+            }
         }
     }
 }
