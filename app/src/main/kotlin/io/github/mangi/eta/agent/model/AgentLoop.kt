@@ -217,6 +217,17 @@ internal class AgentLoop(
             publishTranscript()
             if (purpose.allowsTools) context.compact(final = true)
             onEvent(AgentEvent.RunFinished(round = round, contentChars = content.length))
+
+            // 最后一次检查：final 处理（含 compact）期间到达的 steering 消息，
+            // 继续一轮而不是丢弃。避免"用户晚 100ms 发的消息被吞"。
+            if (purpose.allowsTools && appendPendingSteeringMessage()) {
+                round += 1
+                continue
+            }
+
+            // 确定退出：封口。此后到达的 steering 会被 controller 拒绝，
+            // 走 Service 层的 fallback（等待 session terminal → continuation），消息不丢失。
+            runController.sealSteering()
             return Result(
                 content = content,
                 reasoningContent = reasoningSnapshot(),

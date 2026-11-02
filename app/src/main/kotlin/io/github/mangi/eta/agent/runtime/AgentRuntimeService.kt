@@ -898,22 +898,35 @@ internal class AgentRuntimeService : Service(), LifecycleOwner, SavedStateRegist
         val run = displayedRun?.takeIf { it.runId == runId } ?: return
         if (guiControl.state.value.userPaused && guiControl.state.value.ownerRunId == null) return
         setCapsuleInputMode(focusable = false)
-        runs.get(run.runId)?.let { active ->
+        val active = runs.get(run.runId)
+        if (active != null) {
             val event = active.supplement(supplementText)
-            if (event == null) {
-                if (!active.session.isTerminal) {
-                    state.value = state.value.copy(
-                        status = AgentOverlayStatus.Finishing,
-                    )
-                    return
-                }
-            } else {
+            if (event != null) {
                 AndroidAgentLogger.info(
                     "Agent runtime supplement received: index=${event.index}, chars=${event.text.length}"
                 )
                 active.overlayState = active.overlayState.applyEvent(event)
                 state.value = active.overlayState
                 return
+            }
+            // Steering 被拒绝：
+            // - session 已 terminal → 走下面的 continuation 标准流程（新起一轮）。
+            // - session 未 terminal → 竞态窗口（loop 已封口但 session.complete() 尚未执行）。
+            //   不能静默丢弃：等待 session 进入 terminal，然后走 continuation，确保用户消息不丢失。
+            if (!active.session.isTerminal) {
+                AndroidAgentLogger.warn(
+                    "Agent steering rejected while session active, waiting for terminal to route via continuation"
+                )
+                if (!waitForSessionTerminal(active, timeoutMs = 3000L)) {
+                    AndroidAgentLogger.error(
+                        "Agent steering failed: session did not terminate in time, message not delivered"
+                    )
+                    state.value = state.value.copy(
+                        status = AgentOverlayStatus.ContinuationUnavailable,
+                    )
+                    return
+                }
+                // 已进入 terminal，落到下面的 continuation 流程。
             }
         }
 
@@ -929,6 +942,29 @@ internal class AgentRuntimeService : Service(), LifecycleOwner, SavedStateRegist
             supplement = supplementText,
         )
         startRun(continuationRequest)
+    }
+
+    /**
+     * 等待指定 run 的 session 进入 TERMINAL，用于 steering 被拒后的 fallback。
+     * loop 自然结束与 session.complete() 之间有短暂窗口（final 处理如 compact），
+     * 在此窗口内被拒的 steering 消息等待窗口结束，然后走 continuation，不丢失。
+     * @return true=在超时前进入 terminal；false=超时
+     */
+    private fun waitForSessionTerminal(
+        active: RuntimeRunRegistry.Run,
+        timeoutMs: Long,
+    ): Boolean {
+        val deadline = System.currentTimeMillis() + timeoutMs
+        while (System.currentTimeMillis() < deadline) {
+            if (active.session.isTerminal) return true
+            try {
+                Thread.sleep(100)
+            } catch (_: InterruptedException) {
+                Thread.currentThread().interrupt()
+                return active.session.isTerminal
+            }
+        }
+        return active.session.isTerminal
     }
 
     private fun ensureOverlayVisible() {

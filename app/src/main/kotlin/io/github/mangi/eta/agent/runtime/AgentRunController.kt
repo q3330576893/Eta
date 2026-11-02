@@ -58,15 +58,22 @@ internal class AgentRunController {
         lock.withLock { steeringMessages.pollFirst() }
 
     /**
-     * 自然结束前原子地消费最后一条 steering；若队列为空则永久关闭本 run 的接收入口。
-     * 这样 Service 不会在 loop 已返回后仍把补充指令误报为已接收。
+     * 自然结束前消费最后一条 steering。注意：不再像以前那样在队列为空时永久封口——
+     * 封口与 session.complete() 之间存在竞态窗口（final 处理如 context.compact 可能耗时 100ms+），
+     * 窗口内到达的用户消息会被 steer() 静默拒绝然后丢弃。
+     * 永久封口改由 [sealSteering] 在 loop 真正确定退出前调用；真正的终止由 [cancel] 负责。
      */
     fun pollSteeringOrSeal(): String? =
-        lock.withLock {
-            steeringMessages.pollFirst()?.let { return it }
-            acceptingSteering = false
-            null
-        }
+        lock.withLock { steeringMessages.pollFirst() }
+
+    /**
+     * 永久关闭本 run 的 steering 接收入口。仅在 loop 确定不再检查队列（即将 return）时调用。
+     * 调用后到 session 进入 TERMINAL 之间仍有微小窗口，Service 层的 fallback 会等待 terminal
+     * 然后走 continuation，确保消息不丢失。
+     */
+    fun sealSteering() {
+        lock.withLock { acceptingSteering = false }
+    }
 
     val hasPendingSteering: Boolean
         get() = lock.withLock { steeringMessages.isNotEmpty() }
